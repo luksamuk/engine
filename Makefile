@@ -6,6 +6,7 @@ OFILES =\
 	obj/glad.o\
 	obj/io.o\
 	obj/render.o\
+	obj/controls.o\
 	obj/main.o
 
 LIBS = -lGL -lglfw

@@ -2,6 +2,94 @@
 #include "render.hpp"
 #include <iostream>
 
+#define UNUSED(x) (void)(x)
+
+static void
+gl_debug_callback(
+    GLenum source,
+    GLenum type,
+    GLuint id,
+    GLenum severity,
+    GLsizei length,
+    const GLchar *message,
+    const void *userParam)
+{
+    UNUSED(source);
+    UNUSED(type);
+    UNUSED(id);
+    UNUSED(severity);
+    UNUSED(length);
+    UNUSED(userParam);
+    
+    std::cerr << "GL: " << message << std::endl;
+}
+
+static void
+error_callback(int error, const char *description)
+{
+    std::cerr << "GLFW Error #" << error << ": "
+              << description
+              << std::endl;
+}
+
+GLFWwindow *
+initWindow(void)
+{
+    GLFWwindow* window = nullptr;
+
+    glfwSetErrorCallback(error_callback);
+
+    if(!glfwInit()) {
+        exit(1);
+    }
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    //glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+    if((window = glfwCreateWindow(640, 480, "Engine", nullptr, nullptr)) == nullptr)
+    {
+        glfwTerminate();
+        exit(1);
+    }
+
+    return window;
+}
+
+void
+disposeWindow(GLFWwindow *&window)
+{
+    glfwDestroyWindow(window);
+    window = nullptr;
+    glfwTerminate();
+}
+
+void
+initRender(GLFWwindow *window)
+{
+    glfwMakeContextCurrent(window);
+    gladLoadGLES2Loader((GLADloadproc) glfwGetProcAddress);
+    
+    glEnable(GL_DEBUG_OUTPUT);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glDebugMessageCallback(gl_debug_callback, nullptr);
+
+    glEnable(GL_DEPTH_TEST);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
+
+    std::cout << "OpenGL version: "
+              << glGetString(GL_VERSION)
+              << std::endl
+              << "Shader Language: "
+              << glGetString(GL_SHADING_LANGUAGE_VERSION)
+              << std::endl;
+}
+
 GLuint
 load_shader(const char *path)
 {

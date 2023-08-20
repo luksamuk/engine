@@ -3,6 +3,11 @@
 
 #include <cstring>
 #include <glad/glad.h>
+#include <GLFW/glfw3.h>
+
+GLFWwindow *initWindow(void);
+void        initRender(GLFWwindow *);
+void        disposeWindow(GLFWwindow *&);
 
 GLuint  load_shader(const char *path);
 GLuint  link_program(GLuint vs, GLuint fs);
