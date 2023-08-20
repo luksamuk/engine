@@ -139,6 +139,19 @@ make_vbo(const void *data, size_t size, GLenum usage)
 }
 
 GLuint
+make_ebo(const void *data, size_t size, GLenum usage)
+{
+    GLuint ebo;
+    GLint old_ebo;
+    glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &old_ebo);
+    glGenBuffers(1, &ebo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, usage);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, old_ebo);
+    return ebo;
+}
+
+GLuint
 make_vao(void)
 {
     GLuint vao;

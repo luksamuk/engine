@@ -12,25 +12,17 @@
 // TODO: This is just placeholder data -- represents a tetrahedron.
 static const float vertices[] = {
     /* position (3f)     color (3f) */
-    // front face
-    0.0f,  0.6f,  0.0f,  1.0f, 0.0f, 0.0f,  // top
-    0.6f,  -0.4f, 0.4f,  0.0f, 1.0f, 0.0f,  // bottom right, close
-    -0.6f, -0.4f, 0.4f,  0.0f, 0.0f, 1.0f, // bottom left, close
-
-    // left face
     0.0f,  0.6f,  0.0f,  1.0f, 0.0f, 0.0f, // top
+    0.6f,  -0.4f, 0.4f,  0.0f, 1.0f, 0.0f, // bottom right, close
     -0.6f, -0.4f, 0.4f,  0.0f, 0.0f, 1.0f, // bottom left, close
     0.0f,  -0.4f, -0.6f, 0.0f, 1.0f, 1.0f, // far, behind
+};
 
-    // right face
-    0.0f,  0.6f,  0.0f,  1.0f, 0.0f, 0.0f,  // top
-    0.6f,  -0.4f, 0.4f,  0.0f, 1.0f, 0.0f,  // bottom right, close
-    0.0f,  -0.4f, -0.6f, 0.0f, 1.0f, 1.0f, // far, behind
-
-    // bottom face
-    0.0f,  -0.4f, -0.6f, 0.0f, 1.0f, 1.0f, // far, behind
-    0.6f,  -0.4f, 0.4f,  0.0f, 1.0f, 0.0f,  // bottom right, close
-    -0.6f, -0.4f, 0.4f,  0.0f, 0.0f, 1.0f, // bottom left, close
+static const unsigned int elements[] = {
+    0, 1, 2, // front face
+    0, 2, 3, // left face
+    0, 1, 3, // right face
+    3, 1, 2, // bottom face
 };
 
 int
@@ -40,11 +32,12 @@ main(void)
     initRender(window);
     initControls(window);
     
-    // Load vertex buffer
+    // Load vertices
     GLuint vbo = make_vbo(vertices, sizeof(vertices), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    GLuint ebo = make_ebo(elements, sizeof(elements), GL_STATIC_DRAW);
 
     // load vertex arrays
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
     GLuint vao = make_vao();
 
     // Load shaders
@@ -56,9 +49,9 @@ main(void)
     glBindVertexArray(vao);
     
     const GLint alphaloc = glGetUniformLocation(program, "alpha");
-    const GLint mvploc  = glGetUniformLocation(program, "mvp");
-    const GLint vposloc = glGetAttribLocation(program, "vpos");
-    const GLint vcolloc = glGetAttribLocation(program, "vcol");
+    const GLint mvploc   = glGetUniformLocation(program, "mvp");
+    const GLint vposloc  = glGetAttribLocation(program, "vpos");
+    const GLint vcolloc  = glGetAttribLocation(program, "vcol");
 
     glEnableVertexAttribArray(vposloc);
     glVertexAttribPointer(
@@ -69,6 +62,7 @@ main(void)
         vcolloc, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*) (3 * sizeof(float)));
 
     glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     // Prepare matrices for model-view-projection matrix calculation
     glm::mat4 model = glm::mat4(1.0f);
@@ -112,28 +106,32 @@ main(void)
             view = glm::mat4(1.0f);
         }
 
-        /* draw */
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // prepare
-
-        glUseProgram(program);
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBindVertexArray(vao);
-
         view = glm::rotate(view, rotationZ, glm::vec3(0.0f, 0.0f, 1.0f));
         view = glm::rotate(view, rotationY, glm::vec3(0.0f, 1.0f, 0.0f));
         view = glm::rotate(view, rotationX, glm::vec3(1.0f, 0.0f, 0.0f));
         
         glm::mat4 mvp = projection * view * model;
 
+        /* draw */
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // prepare
+
+        // NOTE: Apparently, order matters here
+        glUseProgram(program);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBindVertexArray(vao);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+
         glUniformMatrix4fv(mvploc, 1, GL_FALSE, glm::value_ptr(mvp));
         glUniform1f(alphaloc, 0.3f + (0.2f * glm::cos(5.0f * (float)glfwGetTime())));
-        glDrawArrays(GL_TRIANGLES, 0, 12);
+        
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
         // post-drawing
         glUseProgram(0);
         glBindVertexArray(0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        
         /* post-processing */
         glfwSwapBuffers(window);
         processControls();
