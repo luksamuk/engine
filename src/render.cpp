@@ -138,4 +138,10 @@ make_vbo(const void *data, size_t size, GLenum usage)
     return vbo;
 }
 
-
+GLuint
+make_vao(void)
+{
+    GLuint vao;
+    glGenVertexArrays(1, &vao);
+    return vao;
+}
