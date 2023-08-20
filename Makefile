@@ -1,15 +1,18 @@
 CXX = g++ --std=c++20
-CXXFLAGS = -g -Wall -I./include
+INCLUDES = -I./include
+CXXFLAGS = -g -Wall $(INCLUDES)
 
 OFILES =\
 	obj/glad.o\
+	obj/io.o\
+	obj/render.o\
 	obj/main.o
 
 LIBS = -lGL -lglfw
 
 BIN = bin/game
 
-.PHONY: dirs
+.PHONY: dirs clean purge
 
 all: dirs $(OFILES)
 	$(CXX) $(CXXFLAGS) -o $(BIN) $(OFILES) $(LIBS)
@@ -17,9 +20,18 @@ all: dirs $(OFILES)
 obj/glad.o: src/glad.c
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
-obj/%.o: src/%.cpp
+obj/main.o: src/main.cpp
+	$(CXX) $(CXXFLAGS) -c -o $@ $<
+
+obj/%.o: src/%.cpp src/%.hpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
 
 dirs:
 	@mkdir -p bin/ obj/
+
+clean:
+	rm -rf obj/
+
+purge: clean
+	rm -rf bin/
 

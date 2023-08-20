@@ -5,8 +5,8 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 
-#include <fstream>
-#include <string>
+#include "io.hpp"
+#include "render.hpp"
 
 // TODO: This is just placeholder data!
 static const float vertices[] = {
@@ -15,62 +15,6 @@ static const float vertices[] = {
      0.6f, -0.4f,  0.0f, 1.0f, 0.0f,
      0.0f,  0.6f,  0.0f, 0.0f, 1.0f,
 };
-
-std::string
-gulp_file(const char *path)
-{
-    std::ifstream ifs(path);
-    return std::string((std::istreambuf_iterator<char>(ifs)),
-                       (std::istreambuf_iterator<char>()));
-}
-
-GLuint
-load_shader(const char *path)
-{
-    GLuint type;
-    if(strstr(path, ".vs")) {
-        type = GL_VERTEX_SHADER;
-    } else if(strstr(path, ".fs")) {
-        type = GL_FRAGMENT_SHADER;
-    } else if(strstr(path, ".gs")) {
-        type = GL_GEOMETRY_SHADER;
-    } else {
-        std::cerr << "WARNING: Could not deduce shader type for "
-                  << path
-                  << ". Assuming fragment shader.";
-        type = GL_FRAGMENT_SHADER;
-    }
-    
-    std::string src = gulp_file(path);
-    const char *c_src = src.c_str();
-    GLuint shader = glCreateShader(type);
-    glShaderSource(shader, 1, &c_src, nullptr);
-    glCompileShader(shader);
-    return shader;
-}
-
-GLuint
-link_program(GLuint vertex_shader, GLuint fragment_shader)
-{
-    GLuint program = glCreateProgram();
-    glAttachShader(program, vertex_shader);
-    glAttachShader(program, fragment_shader);
-    glLinkProgram(program);
-    return program;
-}
-
-GLuint
-make_vbo(const void *data, size_t size, GLenum usage)
-{
-    GLuint vbo;
-    GLint old_vbo;
-    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_vbo);
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
-    glBindBuffer(GL_ARRAY_BUFFER, old_vbo);
-    return vbo;
-}
 
 static void
 error_callback(int error, const char *description)
