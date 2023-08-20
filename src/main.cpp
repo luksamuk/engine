@@ -25,8 +25,22 @@ gulp_file(const char *path)
 }
 
 GLuint
-load_shader(GLuint type, const char *path) // TODO: infer by filename
+load_shader(const char *path)
 {
+    GLuint type;
+    if(strstr(path, ".vs")) {
+        type = GL_VERTEX_SHADER;
+    } else if(strstr(path, ".fs")) {
+        type = GL_FRAGMENT_SHADER;
+    } else if(strstr(path, ".gs")) {
+        type = GL_GEOMETRY_SHADER;
+    } else {
+        std::cerr << "WARNING: Could not deduce shader type for "
+                  << path
+                  << ". Assuming fragment shader.";
+        type = GL_FRAGMENT_SHADER;
+    }
+    
     std::string src = gulp_file(path);
     const char *c_src = src.c_str();
     GLuint shader = glCreateShader(type);
@@ -45,10 +59,25 @@ link_program(GLuint vertex_shader, GLuint fragment_shader)
     return program;
 }
 
+GLuint
+make_vbo(const void *data, size_t size, GLenum usage)
+{
+    GLuint vbo;
+    GLint old_vbo;
+    glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &old_vbo);
+    glGenBuffers(1, &vbo);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, size, data, usage);
+    glBindBuffer(GL_ARRAY_BUFFER, old_vbo);
+    return vbo;
+}
+
 static void
 error_callback(int error, const char *description)
 {
-    std::cerr << "GLFW Error #" << error << ": " << description << std::endl;
+    std::cerr << "GLFW Error #" << error << ": "
+              << description
+              << std::endl;
 }
 
 static void
@@ -130,18 +159,12 @@ main(void)
               << std::endl;
     
     // Load vertex buffer
-    GLuint vbo;
-    glGenBuffers(1, &vbo);
+    GLuint vbo = make_vbo(vertices, sizeof(vertices), GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
     // Load shaders
-    const GLuint vs = load_shader(
-        GL_VERTEX_SHADER,
-        "resources/shaders/default/default.vs.glsl");
-    const GLuint fs = load_shader(
-        GL_FRAGMENT_SHADER,
-        "resources/shaders/default/default.fs.glsl");
+    const GLuint vs = load_shader("resources/shaders/default/default.vs.glsl");
+    const GLuint fs = load_shader("resources/shaders/default/default.fs.glsl");
     const GLuint program = link_program(vs, fs);
 
     // Get shaders uniforms / attributes
@@ -151,11 +174,12 @@ main(void)
     const GLint vcolloc = glGetAttribLocation(program, "vcol");
 
     glEnableVertexAttribArray(vposloc);
+    glVertexAttribPointer(
+        vposloc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) 0);
+
     glEnableVertexAttribArray(vcolloc);
-    glVertexAttribPointer(vposloc, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          (void*) 0);
-    glVertexAttribPointer(vcolloc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float),
-                          (void*) (2 * sizeof(float)));
+    glVertexAttribPointer(
+        vcolloc, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*) (2 * sizeof(float)));
 
     glm::mat4 model = glm::mat4(1.0f);
     glm::mat4 view = glm::mat4(1.0f);
