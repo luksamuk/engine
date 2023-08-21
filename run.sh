@@ -1,2 +1,2 @@
 #!/bin/bash
-exec ./bin/game
+exec ./bin/linux/game

@@ -41,11 +41,11 @@ void TestScene::load()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
      // Load shaders
-    GLuint vs =
-        load_shader("resources/shaders/default/default.vs.glsl");
-    GLuint fs =
-        load_shader("resources/shaders/default/default.fs.glsl");
+    GLuint vs = load_shader("resources/shaders/default/default.vs.glsl");
+    GLuint fs = load_shader("resources/shaders/default/default.fs.glsl");
     program = link_program(vs, fs);
+    glDeleteShader(vs);
+    glDeleteShader(fs);
 
     // Get shaders uniforms / attributes
     glBindVertexArray(vao);
@@ -70,12 +70,10 @@ void TestScene::load()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    // Prepare matrices for model-view-projection
-    // matrix calculation
-    model = glm::mat4(1.0f);
-    view = glm::mat4(1.0f);
-    projection =
-        glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
+    // Prepare matrices for model-view-projection matrix calculation
+    model      = glm::mat4(1.0f);
+    view       = glm::mat4(1.0f);
+    projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
 }
 
 void TestScene::update()
@@ -142,5 +140,14 @@ void TestScene::draw()
 
 void TestScene::unload()
 {
+    glUseProgram(0);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    glDeleteProgram(program);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
 }
 
