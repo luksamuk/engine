@@ -7,6 +7,7 @@ OFILES =\
 	obj/io.o\
 	obj/render.o\
 	obj/controls.o\
+	obj/scene.o\
 	obj/main.o
 
 LIBS = -lGL -lglfw

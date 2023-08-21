@@ -8,6 +8,7 @@
 #include "io.hpp"
 #include "render.hpp"
 #include "controls.hpp"
+#include "scene.hpp"
 
 // TODO: This is just placeholder data -- represents a tetrahedron.
 static const float vertices[] = {
@@ -75,8 +76,10 @@ main(void)
     static float rotationZ = 0.0f;
 
     // Game loop
-    while(!glfwWindowShouldClose(window)) {
+    while(!glfwWindowShouldClose(window)) {      
         /* update */
+        SceneManager::updateAll();
+        
         if(controlsPressing(BTN_DIGITAL_UP)) {
             rotationX = glm::radians(1.0f);
         }
@@ -115,6 +118,8 @@ main(void)
         /* draw */
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // prepare
 
+        SceneManager::drawAll();
+
         // NOTE: Apparently, order matters here
         glUseProgram(program);
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
@@ -138,6 +143,7 @@ main(void)
         glfwPollEvents();
     }
 
+    SceneManager::dispose();
     disposeWindow(window);
     return 0;
 }
