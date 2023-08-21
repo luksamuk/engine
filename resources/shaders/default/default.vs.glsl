@@ -1,13 +1,16 @@
-#version 100
+#version 300 es
 precision mediump float;
+
 uniform mat4 mvp;
-attribute vec3 vcol;
-attribute vec3 vpos;
-varying vec3 color;
+
+layout(location = 0) in vec3 vcol;
+layout(location = 1) in vec3 vpos;
+
+out vec3 color;
 
 void main()
 {
-	gl_Position = mvp * vec4(vpos, 1.0);
-	color = vcol;
+  gl_Position = mvp * vec4(vpos, 1.0);
+  color = vcol;
 }
 

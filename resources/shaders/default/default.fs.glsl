@@ -1,10 +1,14 @@
-#version 100
+#version 300 es
 precision mediump float;
+
 uniform float alpha;
-varying vec3 color;
+
+in vec3 color;
+
+out vec4 fragColor;
 
 void main()
 {
-     vec3 interm_color = mix(color, vec3(1.0, 1.0, 1.0), alpha);
-     gl_FragColor = vec4(interm_color, 1.0);
+  vec3 interm_color = mix(color, vec3(1.0, 1.0, 1.0), alpha);
+  fragColor = vec4(interm_color, 1.0);
 }
