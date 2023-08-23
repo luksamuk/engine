@@ -22,6 +22,7 @@ OFILES =\
 	obj/$(OS)/scene.o\
 	obj/$(OS)/test_scene.o\
 	obj/$(OS)/sprite_scene.o\
+	obj/$(OS)/core.o\
 	obj/$(OS)/main.o
 
 .PHONY: dirs clean purge
