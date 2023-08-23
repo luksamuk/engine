@@ -42,7 +42,8 @@ void   initControls(GLFWwindow *);
 void   processControls(void);
 
 
-bool   controlsPressing(DigitalButton);
-bool   controlsPressed(DigitalButton);
+bool      controlsPressing(DigitalButton);
+bool      controlsPressed(DigitalButton);
+glm::vec2 controlsMousePos(void);
 
 #endif

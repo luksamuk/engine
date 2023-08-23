@@ -71,7 +71,7 @@ void SpriteScene::unload()
 
 static int currentFrameIter = 0;
 static glm::vec2 currentFrameCoord;
-#include<iostream>
+
 void SpriteScene::update()
 {
     static double oldTime = 0.0;

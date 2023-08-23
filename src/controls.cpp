@@ -101,3 +101,9 @@ controlsPressed(DigitalButton btn)
 {
     return current_state.btn[(int)btn] && !old_state.btn[(int)btn];
 }
+
+glm::vec2
+controlsMousePos(void)
+{
+    return mouse_pos;
+}
