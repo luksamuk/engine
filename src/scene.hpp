@@ -8,7 +8,7 @@ class Scene
 private:
     bool shouldUnload = false;
 public:
-    virtual ~Scene() {}
+    virtual ~Scene() = 0;
     virtual void load() = 0;
     virtual void update() = 0;
     virtual void draw() = 0;
@@ -17,6 +17,8 @@ public:
     void setShouldUnload(bool);
     bool getShouldUnload(void);
 };
+
+inline Scene::~Scene() {}
 
 class SceneManager
 {

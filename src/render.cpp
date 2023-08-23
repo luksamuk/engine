@@ -2,6 +2,14 @@
 #include "render.hpp"
 #include <iostream>
 
+#include <glad/glad.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
+
+#define WINWIDTH  640
+#define WINHEIGHT 360
+
 #define UNUSED(x) (void)(x)
 
 static void
@@ -32,6 +40,13 @@ error_callback(int error, const char *description)
               << std::endl;
 }
 
+static void
+window_size_callback(GLFWwindow *window, int width, int height)
+{
+    UNUSED(window);
+    glViewport(0,0, width, height);
+}
+
 GLFWwindow *
 initWindow(void)
 {
@@ -49,11 +64,13 @@ initWindow(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    if((window = glfwCreateWindow(640, 480, "Engine", nullptr, nullptr)) == nullptr)
+    if((window = glfwCreateWindow(WINWIDTH, WINHEIGHT, "Engine", nullptr, nullptr)) == nullptr)
     {
         glfwTerminate();
         exit(1);
     }
+
+    glfwSetWindowSizeCallback(window, window_size_callback);
 
     return window;
 }
@@ -80,13 +97,45 @@ initRender(GLFWwindow *window)
 
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
-
+    
+    glViewport(0, 0, WINWIDTH, WINHEIGHT);
+    
     std::cout << "OpenGL version: "
               << glGetString(GL_VERSION)
               << std::endl
               << "Shader Language: "
               << glGetString(GL_SHADING_LANGUAGE_VERSION)
               << std::endl;
+};
+
+GLuint
+load_texture(const char *path, glm::vec2& size)
+{
+    GLuint tex;
+    GLint old_tex;
+    glGenTextures(1, &tex);
+    glGetIntegerv(GL_TEXTURE_BINDING_2D, &old_tex);
+    glBindTexture(GL_TEXTURE_2D, tex);
+
+    int width, height, channels;
+    unsigned char *data = stbi_load(path, &width, &height, &channels, STBI_rgb_alpha);
+    GLuint comp = (channels == 3) ? GL_RGB : (channels == 4) ? GL_RGBA : 0;
+    glTexImage2D(GL_TEXTURE_2D, 0, comp, width, height, 0, comp, GL_UNSIGNED_BYTE, data);
+    glFinish();
+    stbi_image_free(data);
+    
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    glBindTexture(GL_TEXTURE_2D, old_tex);
+
+    size = glm::vec2((float)width, (float)height);
+    return tex;
 }
 
 GLuint

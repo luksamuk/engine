@@ -11,6 +11,7 @@
 #include "scene.hpp"
 
 #include "test_scene.hpp"
+#include "sprite_scene.hpp"
 
 int
 main(void)
@@ -20,6 +21,7 @@ main(void)
     initControls(window);
 
     SceneManager::add(new TestScene());
+    SceneManager::add(new SpriteScene());
 
     // Game loop
     while(!glfwWindowShouldClose(window)) {      

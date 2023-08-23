@@ -40,7 +40,7 @@ void TestScene::load()
     vao = make_vao();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
-     // Load shaders
+    // Load shaders
     GLuint vs = load_shader("resources/shaders/default/default.vs.glsl");
     GLuint fs = load_shader("resources/shaders/default/default.fs.glsl");
     program = link_program(vs, fs);
@@ -75,6 +75,21 @@ void TestScene::load()
     view       = glm::mat4(1.0f);
     projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
 }
+
+void TestScene::unload()
+{
+    glUseProgram(0);
+    glBindVertexArray(0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glDeleteProgram(program);
+    glDeleteVertexArrays(1, &vao);
+    glDeleteBuffers(1, &vbo);
+    glDeleteBuffers(1, &ebo);
+}
+
 
 void TestScene::update()
 {
@@ -136,18 +151,5 @@ void TestScene::draw()
     glBindVertexArray(0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-}
-
-void TestScene::unload()
-{
-    glUseProgram(0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    glDeleteProgram(program);
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
 }
 
