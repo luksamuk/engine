@@ -79,7 +79,7 @@ void SpriteScene::update()
 
     double currentTime = glfwGetTime();
 
-    // const int animFrames = 5;
+    // const int animFrames = 6;
     // const int minFrame = 5;
     // const double frameDuration = 0.016 * 8;
 
@@ -98,8 +98,8 @@ void SpriteScene::update()
     currentFrameCoord.y = glm::floor(currentFrameCoord.x / frames_per_line);
     currentFrameCoord.x = glm::mod(currentFrameCoord.x, frames_per_line);
    
-    position.x = 0.5 * glm::cos(2 * (float)glfwGetTime());
-    position.y = 0.5 * glm::sin(2 * (float)glfwGetTime());
+    position.x = 0.9 * glm::cos(1 * (float)glfwGetTime());
+    position.y = 0.9 * glm::sin(2 * (float)glfwGetTime());
 
     // animation: 5-10
     
@@ -107,7 +107,7 @@ void SpriteScene::update()
     // through scaling, and then apply a translation to the center
     model = glm::mat4(1.0f);
     model = glm::translate(model, position);
-    model = glm::scale(model, glm::vec3(glm::sign(position.x) * 0.1f, -0.15f, 1.0f));
+    model = glm::scale(model, glm::vec3(glm::sign(position.x) * 0.15f, -0.225f, 1.0f));
 
     
     view = glm::mat4(1.0f);

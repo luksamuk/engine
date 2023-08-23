@@ -143,7 +143,7 @@ void TestScene::draw()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
     glUniformMatrix4fv(mvp, 1, GL_FALSE, glm::value_ptr(mvpmat));
-    glUniform1f(alpha, 0.3f + (0.2f * glm::cos(5.0f * (float)glfwGetTime())));
+    glUniform1f(alpha, (0.4f * glm::cos(5.0f * (float)glfwGetTime())));
         
     glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 

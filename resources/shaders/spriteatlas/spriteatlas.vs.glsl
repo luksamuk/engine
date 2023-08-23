@@ -1,14 +1,13 @@
 #version 310 es
 precision mediump float;
 
-uniform mat4 mvp;
-uniform vec2 framecoord;
-uniform vec2 framesize;
+layout(location=0) uniform mat4 mvp;
+layout(location=1) uniform vec2 framecoord;
+layout(location=2) uniform vec2 framesize;
 
-in vec3 vpos;
-
-out vec2 texcoord;
-out vec3 color;
+layout(location=0) in vec3 vpos;
+layout(location=1) out vec3 color;
+layout(location=2) out vec2 texcoord;
 
 void main()
 {

@@ -3,9 +3,8 @@ precision mediump float;
 
 uniform sampler2D tex;
 
-in vec2 texcoord;
-
-out vec4 fragColor;
+layout(location=2) in vec2 texcoord;
+layout(location=0) out vec4 fragColor;
 
 void main()
 {
