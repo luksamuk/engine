@@ -71,26 +71,57 @@ void SpriteScene::unload()
 
 static int currentFrameIter = 0;
 static glm::vec2 currentFrameCoord;
+static int animation = 0;
 
 void SpriteScene::update()
 {
     static double oldTime = 0.0;
-    static glm::vec3 position;
+    static glm::vec3 position(15.0f, 15.0f, 0.0f);
 
     double currentTime = glfwGetTime();
 
-    // const int animFrames = 6;
-    // const int minFrame = 5;
-    // const double frameDuration = 0.016 * 8;
+    int animFrames;
+    int minFrame;
+    double frameDuration = 1.0;
 
-    const int animFrames = 4;
-    const int minFrame = 24;
-    const double frameDuration = 0.016 * 4;
+    switch(animation) {
+    default:
+        animFrames = 1;
+        minFrame = 0;
+        break;
+    case 1:
+        animFrames = 6;
+        minFrame = 5;
+        frameDuration = 0.016 * 8;
+        break;
+    case 2:
+        animFrames = 4;
+        minFrame = 11;
+        frameDuration = 0.016 * 4;
+        break;
+    case 3:
+        animFrames = 8;
+        minFrame = 15;
+        frameDuration = 0.016 * 4;
+        break;
+    case 4:
+        animFrames = 4;
+        minFrame = 24;
+        frameDuration = 0.016 * 4;
+        break;
+    }
 
-    if(currentTime - oldTime > frameDuration) {
-        // frame must be in range [5, 10], so variate over 5 frames
-        currentFrameIter = (currentFrameIter + 1) % (animFrames - 1);
-        oldTime = currentTime;
+    if(animFrames > 1) {
+        if(currentTime - oldTime > frameDuration) {
+            // frame must be in range [5, 10], so variate over 5 frames
+            currentFrameIter = (currentFrameIter + 1) % (animFrames - 1);
+            oldTime = currentTime;
+        }
+    }
+
+    if(controlsPressed(BTN_DIGITAL_START)) {
+        animation = (animation + 1) % 5;
+        currentFrameIter = 0;
     }
 
     const float frames_per_line = glm::floor(sheetsize.x / 60.0f);
@@ -101,17 +132,22 @@ void SpriteScene::update()
     position.x = 0.9 * glm::cos(1 * (float)glfwGetTime());
     position.y = 0.9 * glm::sin(2 * (float)glfwGetTime());
 
+    auto mouse = controlsMousePos();
+    position.x = mouse.x;
+    position.y = mouse.y;
+
     // animation: 5-10
     
     // Model matrix should reflect the sprite size
     // through scaling, and then apply a translation to the center
     model = glm::mat4(1.0f);
     model = glm::translate(model, position);
-    model = glm::scale(model, glm::vec3(glm::sign(position.x) * 0.15f, -0.225f, 1.0f));
+    model = glm::scale(model, glm::vec3(glm::sign(position.x) * 30.0f, 30.0f, 1.0f));
 
     
     view = glm::mat4(1.0f);
-    projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
+    //projection = glm::ortho(0.0f, 640.0f, 0.0f, 360.0f, 1.0f, -1.0f);
+    projection = glm::ortho(0.0f, 640.0f, 360.0f, 0.0f, 1.0f, -1.0f);
 }
 
 void SpriteScene::draw()
