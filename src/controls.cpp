@@ -81,6 +81,7 @@ initControls(GLFWwindow *window)
     glfwSetCursorPosCallback(window, process_mouse_pos);
     glfwSetMouseButtonCallback(window, process_mouse_button);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 void
