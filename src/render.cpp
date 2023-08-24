@@ -99,6 +99,8 @@ initRender(GLFWwindow *window)
     glEnable(GL_BLEND);
     
     glViewport(0, 0, WINWIDTH, WINHEIGHT);
+
+    glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
     
     std::cout << "OpenGL version: "
               << glGetString(GL_VERSION)
@@ -205,4 +207,31 @@ make_vao(void)
     GLuint vao;
     glGenVertexArrays(1, &vao);
     return vao;
+}
+
+
+Texture
+Texture::load(const char *path)
+{
+    Texture t;
+    t._texture = load_texture(path, t._size);
+    return t;
+}
+
+void
+Texture::bind(void)
+{
+    glBindTexture(GL_TEXTURE_2D, this->_texture);
+}
+
+glm::vec2
+Texture::getSize(void)
+{
+    return this->_size;
+}
+
+void
+Texture::dispose()
+{
+    glDeleteTextures(1, &this->_texture);
 }

@@ -10,6 +10,18 @@ GLFWwindow *initWindow(void);
 void        initRender(GLFWwindow *);
 void        disposeWindow(GLFWwindow *&);
 
+struct Texture
+{
+private:
+    GLuint    _texture = 0;
+    glm::vec2 _size;
+public:
+    static Texture load(const char *path);
+    void           bind(void);
+    glm::vec2      getSize(void);
+    void           dispose(void);
+};
+
 GLuint  load_texture(const char *path, glm::vec2& size);
 GLuint  load_shader(const char *path);
 GLuint  link_program(GLuint vs, GLuint fs);

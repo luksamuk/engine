@@ -25,10 +25,10 @@ SpriteScene::~SpriteScene() {}
 void SpriteScene::load()
 {
     /* Loading textures */
-    texture = load_texture("resources/sprites/sonic.png", sheetsize);
+    tex = Texture::load("resources/sprites/sonic.png");
 
     // Normalized (texels) framesize = frame / sheetsize
-    framesize_shader = glm::vec2(60.0f, 60.0f) / sheetsize;
+    framesize_shader = glm::vec2(60.0f, 60.0f) / tex.getSize();
     
     // Load vertex data
     vbo = make_vbo(quadvertices, sizeof(quadvertices), GL_STATIC_DRAW);
@@ -62,7 +62,7 @@ void SpriteScene::load()
 
 void SpriteScene::unload()
 {
-    glDeleteTextures(1, &texture);
+    tex.dispose();
     glDeleteProgram(program);
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
@@ -119,12 +119,12 @@ void SpriteScene::update()
         }
     }
 
-    if(controlsPressed(BTN_DIGITAL_START)) {
+    if(controlsPressed(BTN_DIGITAL_OPTION)) {
         animation = (animation + 1) % 5;
         currentFrameIter = 0;
     }
 
-    const float frames_per_line = glm::floor(sheetsize.x / 60.0f);
+    const float frames_per_line = glm::floor(tex.getSize().x / 60.0f);
     currentFrameCoord.x = currentFrameIter + minFrame;
     currentFrameCoord.y = glm::floor(currentFrameCoord.x / frames_per_line);
     currentFrameCoord.x = glm::mod(currentFrameCoord.x, frames_per_line);
@@ -158,7 +158,7 @@ void SpriteScene::draw()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, texture);
+    tex.bind();
     
     // MVP
     glm::mat4 mvp = projection * view * model;

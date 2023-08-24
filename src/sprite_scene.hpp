@@ -1,18 +1,20 @@
 #ifndef SPRITE_SCENE_HPP_INCLUDED
 #define SPRITE_SCENE_HPP_INCLUDED
 
-#include "scene.hpp"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+
+#include "scene.hpp"
+#include "render.hpp"
 
 class SpriteScene : public Scene
 {
 private:
 
     glm::mat4 model, view, projection;
+    Texture tex;
 
     GLuint vbo, ebo, vao, program;
-    GLuint texture;
     GLint  locmvp, locframecoord, locframesize, loctex, locvpos, locvcolor;
     glm::vec2 framesize_shader, sheetsize;
 public:
