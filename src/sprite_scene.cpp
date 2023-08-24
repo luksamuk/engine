@@ -4,19 +4,6 @@
 
 #include <glm/ext.hpp>
 
-/* Sprite atlas geometry */
-static const float quadvertices[] = {
-    /* position (3f)     color (3f) */
-    -1.0f, -1.0f, 0.0f,
-     1.0f, -1.0f, 0.0f,
-     1.0f,  1.0f, 0.0f,
-    -1.0f,  1.0f, 0.0f,
-};
-
-static const unsigned int quadelements[] = {
-    0, 1, 2,
-    0, 2, 3,
-};
 
 SpriteScene::SpriteScene() {}
 
@@ -31,8 +18,8 @@ void SpriteScene::load()
     framesize_shader = glm::vec2(60.0f, 60.0f) / tex.getSize();
     
     // Load vertex data
-    vbo = make_vbo(quadvertices, sizeof(quadvertices), GL_STATIC_DRAW);
-    ebo = make_ebo(quadelements, sizeof(quadelements), GL_STATIC_DRAW);
+    vbo = make_vbo(QuadGeometry::vertices(), QuadGeometry::verticesSize(), GL_STATIC_DRAW);
+    ebo = make_ebo(QuadGeometry::elements(), QuadGeometry::elementsSize(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     vao = make_vao();
@@ -52,14 +39,19 @@ void SpriteScene::load()
     locvpos       = prog.getAttribLocation("vpos");
 
     glEnableVertexAttribArray(locvpos);
-    glVertexAttribPointer(locvpos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+    glVertexAttribPointer(
+        locvpos,
+        QuadGeometry::numVertexComponents(),
+        GL_FLOAT,
+        GL_FALSE,
+        QuadGeometry::singleVertexSize(),
+        0);
 }
 
 void SpriteScene::unload()
 {
     tex.dispose();
     prog.dispose();
-    // glDeleteProgram(program);
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
@@ -172,5 +164,5 @@ void SpriteScene::draw()
     glUniform1i(loctex, 0);
 
     // Draw elements
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, QuadGeometry::numElements(), GL_UNSIGNED_INT, 0);
 }

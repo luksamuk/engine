@@ -277,3 +277,65 @@ ShaderProgram::dispose(void)
 {
     glDeleteProgram(this->_program);
 }
+
+/* ============= */
+
+static const float quadvertices[] = {
+    -1.0f, -1.0f, 0.0f,
+     1.0f, -1.0f, 0.0f,
+     1.0f,  1.0f, 0.0f,
+    -1.0f,  1.0f, 0.0f,
+};
+
+static const unsigned int quadelements[] = {
+    0, 1, 2,
+    0, 2, 3,
+};
+
+const float *
+QuadGeometry::vertices(void)
+{
+    return quadvertices;
+}
+
+const unsigned int *
+QuadGeometry::elements(void)
+{
+    return quadelements;
+}
+
+unsigned int
+QuadGeometry::numVertices(void)
+{
+    return 4;
+}
+
+unsigned int
+QuadGeometry::numElements(void)
+{
+    return 6;
+}
+
+unsigned int
+QuadGeometry::numVertexComponents(void)
+{
+    return 3;
+}
+
+unsigned int
+QuadGeometry::singleVertexSize(void)
+{
+    return QuadGeometry::numVertexComponents() * sizeof(float);
+}
+
+unsigned int
+QuadGeometry::verticesSize(void)
+{
+    return sizeof(quadvertices);
+}
+
+unsigned int
+QuadGeometry::elementsSize(void)
+{
+    return sizeof(quadelements);
+}

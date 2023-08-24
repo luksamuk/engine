@@ -35,11 +35,28 @@ public:
     void                 dispose(void);
 };
 
+struct QuadGeometry
+{
+private:
+    virtual ~QuadGeometry() = 0;
+public:
+    static const float *        vertices(void);
+    static const unsigned int * elements(void);
+    static unsigned int         numVertices(void);
+    static unsigned int         numElements(void);
+    static unsigned int         numVertexComponents(void);
+    static unsigned int         verticesSize(void);
+    static unsigned int         singleVertexSize(void);
+    static unsigned int         elementsSize(void);
+};
+
 GLuint  load_texture(const char *path, glm::vec2& size);
 GLuint  load_shader(const char *path);
 GLuint  link_program(GLuint vs, GLuint fs);
 GLuint  make_vbo(const void *data, size_t size, GLenum usage);
 GLuint  make_vao(void);
 GLuint  make_ebo(const void *data, size_t size, GLenum usage);
+
+
 
 #endif
