@@ -235,3 +235,45 @@ Texture::dispose()
 {
     glDeleteTextures(1, &this->_texture);
 }
+
+ShaderProgram
+ShaderProgram::link(const std::vector<const char*> shaderpaths)
+{
+    ShaderProgram p;
+    std::vector<GLuint> shaders;
+    p._program = glCreateProgram();
+    for(auto path : shaderpaths) {
+        GLuint shader = load_shader(path);
+        glAttachShader(p._program, shader);
+        shaders.push_back(shader);
+    }
+    glLinkProgram(p._program);
+    for(auto shader : shaders) {
+        glDeleteShader(shader);
+    }
+    return p;
+}
+
+void
+ShaderProgram::use(void)
+{
+    glUseProgram(this->_program);
+}
+
+GLuint
+ShaderProgram::getAttribLocation(const char *name)
+{
+    return glGetAttribLocation(this->_program, name);
+}
+
+GLuint
+ShaderProgram::getUniformLocation(const char *name)
+{
+    return glGetUniformLocation(this->_program, name);
+}
+
+void
+ShaderProgram::dispose(void)
+{
+    glDeleteProgram(this->_program);
+}

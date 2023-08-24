@@ -39,31 +39,27 @@ void SpriteScene::load()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
     
     // Load shaders
-    GLuint vs = load_shader("resources/shaders/spriteatlas/spriteatlas.vs.glsl");
-    GLuint fs = load_shader("resources/shaders/spriteatlas/spriteatlas.fs.glsl");
-    program = link_program(vs, fs);
-    glDeleteShader(vs); glDeleteShader(fs);
+    prog = ShaderProgram::link({
+            "resources/shaders/spriteatlas/spriteatlas.vs.glsl",
+            "resources/shaders/spriteatlas/spriteatlas.fs.glsl",
+        });
 
     glBindVertexArray(vao);
-    locmvp        = glGetUniformLocation(program, "mvp");
-    locframecoord = glGetUniformLocation(program, "framecoord");
-    locframesize  = glGetUniformLocation(program, "framesize");
-    loctex        = glGetUniformLocation(program, "tex");
-    locvpos       = glGetAttribLocation(program, "vpos");
+    locmvp        = prog.getUniformLocation("mvp");
+    locframecoord = prog.getUniformLocation("framecoord");
+    locframesize  = prog.getUniformLocation("framesize");
+    loctex        = prog.getUniformLocation("tex");
+    locvpos       = prog.getAttribLocation("vpos");
 
     glEnableVertexAttribArray(locvpos);
     glVertexAttribPointer(locvpos, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-    // Unbind buffers
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void SpriteScene::unload()
 {
     tex.dispose();
-    glDeleteProgram(program);
+    prog.dispose();
+    // glDeleteProgram(program);
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
@@ -152,7 +148,8 @@ void SpriteScene::update()
 
 void SpriteScene::draw()
 {
-    glUseProgram(program);
+    // glUseProgram(program);
+    prog.use();
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindVertexArray(vao);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);

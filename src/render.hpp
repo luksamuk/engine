@@ -5,6 +5,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
+#include <vector>
 
 GLFWwindow *initWindow(void);
 void        initRender(GLFWwindow *);
@@ -13,13 +14,25 @@ void        disposeWindow(GLFWwindow *&);
 struct Texture
 {
 private:
-    GLuint    _texture = 0;
+    GLuint    _texture;
     glm::vec2 _size;
 public:
     static Texture load(const char *path);
     void           bind(void);
     glm::vec2      getSize(void);
     void           dispose(void);
+};
+
+struct ShaderProgram
+{
+private:
+    GLuint _program;
+public:
+    static ShaderProgram link(const std::vector<const char*> shaderpaths);
+    void                 use(void);
+    GLuint               getAttribLocation(const char *name);
+    GLuint               getUniformLocation(const char *name);
+    void                 dispose(void);
 };
 
 GLuint  load_texture(const char *path, glm::vec2& size);
