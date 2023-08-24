@@ -35,7 +35,6 @@ public:
 
     static void          updateAll();
     static void          drawAll();
-    
     static void          unloadAll();
     
     static void          dispose();

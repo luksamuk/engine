@@ -78,11 +78,11 @@ void TestScene::load()
 
 void TestScene::unload()
 {
-    glUseProgram(0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindTexture(GL_TEXTURE_2D, 0);
+    // glUseProgram(0);
+    // glBindVertexArray(0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    // glBindTexture(GL_TEXTURE_2D, 0);
 
     glDeleteProgram(program);
     glDeleteVertexArrays(1, &vao);
@@ -94,9 +94,9 @@ void TestScene::unload()
 void TestScene::update()
 {
     // Rotation parameters
-    static float rotationX = 0.0f;
+    static float rotationX = glm::radians(1.0f);
     static float rotationY = 0.0f;
-    static float rotationZ = 0.0f;
+    static float rotationZ = glm::radians(1.0f);
 
     if(controlsPressing(BTN_DIGITAL_UP)) {
         rotationX = glm::radians(1.0f);
@@ -123,10 +123,6 @@ void TestScene::update()
         rotationX = rotationY = rotationZ = 0.0f;
     }
 
-    if(controlsPressed(BTN_DIGITAL_OPTION)) {
-        view = glm::mat4(1.0f);
-    }
-
     view = glm::rotate(view, rotationZ, glm::vec3(0.0f, 0.0f, 1.0f));
     view = glm::rotate(view, rotationY, glm::vec3(0.0f, 1.0f, 0.0f));
     view = glm::rotate(view, rotationX, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -147,9 +143,9 @@ void TestScene::draw()
         
     glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
-    glUseProgram(0);
-    glBindVertexArray(0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    // glUseProgram(0);
+    // glBindVertexArray(0);
+    // glBindBuffer(GL_ARRAY_BUFFER, 0);
+    // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
