@@ -1,0 +1,5 @@
+#ifndef RESOURCES_HPP_INCLUDED
+#define RESOURCES_HPP_INCLUDED
+
+
+#endif

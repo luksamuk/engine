@@ -11,54 +11,15 @@ SpriteScene::~SpriteScene() {}
 
 void SpriteScene::load()
 {
-    /* Loading textures */
-    tex = Texture::load("resources/sprites/sonic.png");
-
-    // Normalized (texels) framesize = frame / sheetsize
-    framesize_shader = glm::vec2(60.0f, 60.0f) / tex.getSize();
-    
-    // Load vertex data
-    vbo = make_vbo(QuadGeometry::vertices(), QuadGeometry::verticesSize(), GL_STATIC_DRAW);
-    ebo = make_ebo(QuadGeometry::elements(), QuadGeometry::elementsSize(), GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    vao = make_vao();
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    
-    // Load shaders
-    prog = ShaderProgram::link({
-            "resources/shaders/spriteatlas/spriteatlas.vs.glsl",
-            "resources/shaders/spriteatlas/spriteatlas.fs.glsl",
-        });
-
-    glBindVertexArray(vao);
-    locmvp        = prog.getUniformLocation("mvp");
-    locframecoord = prog.getUniformLocation("framecoord");
-    locframesize  = prog.getUniformLocation("framesize");
-    loctex        = prog.getUniformLocation("tex");
-    locvpos       = prog.getAttribLocation("vpos");
-
-    glEnableVertexAttribArray(locvpos);
-    glVertexAttribPointer(
-        locvpos,
-        QuadGeometry::numVertexComponents(),
-        GL_FLOAT,
-        GL_FALSE,
-        QuadGeometry::singleVertexSize(),
-        0);
+    atlas = new SpriteAtlas("resources/sprites/sonic.png", glm::vec2(60.0f, 60.0f));
 }
 
 void SpriteScene::unload()
 {
-    tex.dispose();
-    prog.dispose();
-    glDeleteVertexArrays(1, &vao);
-    glDeleteBuffers(1, &vbo);
-    glDeleteBuffers(1, &ebo);
+    delete atlas;
 }
 
 static int currentFrameIter = 0;
-static glm::vec2 currentFrameCoord;
 static int animation = 0;
 
 void SpriteScene::update()
@@ -107,16 +68,13 @@ void SpriteScene::update()
         }
     }
 
+    atlas->setFrame(minFrame + currentFrameIter);
+
     if(controlsPressed(BTN_DIGITAL_OPTION)) {
         animation = (animation + 1) % 5;
         currentFrameIter = 0;
     }
 
-    const float frames_per_line = glm::floor(tex.getSize().x / 60.0f);
-    currentFrameCoord.x = currentFrameIter + minFrame;
-    currentFrameCoord.y = glm::floor(currentFrameCoord.x / frames_per_line);
-    currentFrameCoord.x = glm::mod(currentFrameCoord.x, frames_per_line);
-   
     position.x = 0.9 * glm::cos(1 * (float)glfwGetTime());
     position.y = 0.9 * glm::sin(2 * (float)glfwGetTime());
 
@@ -140,29 +98,7 @@ void SpriteScene::update()
 
 void SpriteScene::draw()
 {
-    // glUseProgram(program);
-    prog.use();
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBindVertexArray(vao);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-    
-    glActiveTexture(GL_TEXTURE0);
-    tex.bind();
-    
     // MVP
     glm::mat4 mvp = projection * view * model;
-    glUniformMatrix4fv(locmvp, 1, GL_FALSE, glm::value_ptr(mvp));
-    
-    // Frame size
-    glUniform2fv(locframesize, 1, glm::value_ptr(framesize_shader));
-    
-    // Frame coordinates
-    //glUniform2f(locframecoord, 0.0f, 0.0f);
-    glUniform2fv(locframecoord, 1, glm::value_ptr(currentFrameCoord));
-    
-    // Texture
-    glUniform1i(loctex, 0);
-
-    // Draw elements
-    glDrawElements(GL_TRIANGLES, QuadGeometry::numElements(), GL_UNSIGNED_INT, 0);
+    atlas->draw(mvp);
 }

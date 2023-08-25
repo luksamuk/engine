@@ -6,18 +6,14 @@
 
 #include "scene.hpp"
 #include "render.hpp"
+#include "sprite.hpp"
 
 class SpriteScene : public Scene
 {
 private:
 
     glm::mat4 model, view, projection;
-    Texture tex;
-    ShaderProgram prog;
-
-    GLuint vbo, ebo, vao;
-    GLint  locmvp, locframecoord, locframesize, loctex, locvpos, locvcolor;
-    glm::vec2 framesize_shader, sheetsize;
+    SpriteAtlas *atlas;
 public:
     SpriteScene();
     virtual ~SpriteScene();
