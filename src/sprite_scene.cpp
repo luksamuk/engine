@@ -40,9 +40,9 @@ void SpriteScene::update()
     //position.x = 0.9 * glm::cos(1 * (float)glfwGetTime());
     //position.y = 0.9 * glm::sin(2 * (float)glfwGetTime());
 
-    //auto mouse = controlsMousePos();
-    //position.x = mouse.x;
-    //position.y = mouse.y;
+    auto mouse = controlsMousePos();
+    position.x = mouse.x;
+    position.y = mouse.y;
 
     // Model matrix should reflect the sprite size
     // through scaling, and then apply a translation to the center
@@ -63,13 +63,15 @@ void SpriteScene::draw()
 
     glm::mat4 mvp_movie, movie_model;
 
+    //auto mouse = controlsMousePos();
     movie_model = glm::mat4(1.0f);
     movie_model = glm::translate(movie_model, glm::vec3(360.0f, 160.0f, 0.0f));
+    //movie_model = glm::translate(movie_model, glm::vec3(mouse.x, mouse.y, 0.0f));
     //movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
     movie_model = glm::scale(movie_model, glm::vec3(120.0f, 80.0f, 1.0f));
 
     mvp_movie = projection * view * movie_model;
     
-    movie->draw(mvp_movie);
     animator->draw(mvp);
+    movie->draw(mvp_movie);
 }
