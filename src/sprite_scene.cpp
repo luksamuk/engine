@@ -53,7 +53,9 @@ void SpriteScene::update()
     
     view = glm::mat4(1.0f);
     //projection = glm::ortho(0.0f, 640.0f, 0.0f, 360.0f, 1.0f, -1.0f);
-    projection = glm::ortho(0.0f, 640.0f, 360.0f, 0.0f, 1.0f, -1.0f);
+    //projection = glm::ortho(0.0f, 640.0f, 360.0f, 0.0f, 1.0f, -1.0f);
+    //projection = glm::ortho(0.0f, 320.0f, 224.0f, 0.0f, 1.0f, -1.0f);
+    projection = glm::ortho(0.0f, 320.0f, 180.0f, 0.0f, 1.0f, -1.0f);
 }
 
 void SpriteScene::draw()
@@ -65,8 +67,9 @@ void SpriteScene::draw()
 
     //auto mouse = controlsMousePos();
     movie_model = glm::mat4(1.0f);
-    movie_model = glm::translate(movie_model, glm::vec3(360.0f, 160.0f, 0.0f));
+    //movie_model = glm::translate(movie_model, glm::vec3(360.0f, 160.0f, 0.0f));
     //movie_model = glm::translate(movie_model, glm::vec3(mouse.x, mouse.y, 0.0f));
+    movie_model = glm::translate(movie_model, glm::vec3(160.0f, 90.0f, 0.0f));
     //movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
     movie_model = glm::scale(movie_model, glm::vec3(120.0f, 80.0f, 1.0f));
 
