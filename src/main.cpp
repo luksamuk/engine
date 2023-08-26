@@ -9,7 +9,7 @@ main(void)
 {
     initCore();
 
-    SceneManager::add(new TestScene());
+    //SceneManager::add(new TestScene());
     SceneManager::add(new SpriteScene());
 
     coreGameLoop();

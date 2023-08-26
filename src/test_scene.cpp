@@ -72,8 +72,9 @@ void TestScene::load()
 
     // Prepare matrices for model-view-projection matrix calculation
     model      = glm::mat4(1.0f);
+    model      = glm::translate(model, glm::vec3(-0.5f, -0.5f, 0.0f));
     view       = glm::mat4(1.0f);
-    projection = glm::ortho(-1.0f, 1.0f, -1.0f, 1.0f, 1.0f, -1.0f);
+    projection = glm::ortho(-2.0f, 2.0f, -2.0f, 2.0f, 2.0f, -2.0f);
 }
 
 void TestScene::unload()
