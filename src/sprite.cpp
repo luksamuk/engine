@@ -72,3 +72,81 @@ SpriteAtlas::draw(glm::mat4& mvp)
     glUniform1i(tex_loc, 0);
     glDrawElements(GL_TRIANGLES, QuadGeometry::numElements(), GL_UNSIGNED_INT, 0);
 }
+
+
+Animator::Animator(const char *atlaspath, glm::vec2 framesize)
+{
+    atlas = new SpriteAtlas(atlaspath, framesize);
+}
+
+Animator::Animator(const char *atlaspath,
+                   glm::vec2 framesize,
+                   std::vector<AnimationData> data)
+{
+    new (this) Animator(atlaspath, framesize);
+    for(unsigned int i = 0; i < data.size(); i++)
+        _data[i] = data[i];
+}
+
+Animator::~Animator()
+{
+    delete atlas;
+}
+
+void
+Animator::update()
+{
+    if(!_currentData) return;
+    
+    double currentTime = glfwGetTime();
+    if(_currentData->frames.size() > 1) {
+        if(currentTime - _lastCheck > _frameDuration) {
+            _lastCheck = currentTime;
+            _iterFrame++;
+            if(_iterFrame > (_currentData->frames.size() - 1))
+                _iterFrame = std::max(_currentData->minFrameIndex, 0);
+        }
+    }
+    
+    atlas->setFrame(_currentData->frames[_iterFrame]);
+}
+
+void
+Animator::draw(glm::mat4& mvp)
+{
+    if(_currentData)
+        atlas->draw(mvp);
+}
+
+void
+Animator::setAnimation(int index)
+{
+    if(index < 0) {
+        _currentAnimation = -1;
+        _currentData = nullptr;
+        _minFrame = 0;
+        _iterFrame = 0;
+        _frameDuration = _currentData->frameDuration;
+        return;
+    }
+
+    if((index < (int)_data.size()) && (index != _currentAnimation)) {
+        _currentAnimation = index;
+        _currentData = &_data[index];
+        _minFrame = _currentData->minFrameIndex;
+        _frameDuration = _currentData->frameDuration;
+        _iterFrame = 0;
+    }
+}
+
+unsigned int
+Animator::getAnimation(void)
+{
+    return _currentAnimation;
+}
+
+unsigned int
+Animator::numAnimations(void)
+{
+    return _data.size();
+}

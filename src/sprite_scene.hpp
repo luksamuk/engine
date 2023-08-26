@@ -13,7 +13,7 @@ class SpriteScene : public Scene
 private:
 
     glm::mat4 model, view, projection;
-    SpriteAtlas *atlas;
+    Animator *animator;
 public:
     SpriteScene();
     virtual ~SpriteScene();
