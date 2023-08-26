@@ -1,0 +1,56 @@
+atlas      = "resources/sprites/sonic.png"
+frame_size = [ 60.0, 60.0 ]
+
+[[animations]]
+name           = "Idle"
+frames         = [
+    0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0,
+    1, 2, 3, 3, 4, 4
+]
+frame_duration = 0.128
+min_frame      = 26
+
+[[animations]]
+name = "Walking"
+frames         = [ 5, 6, 7, 8, 9, 10 ]
+frame_duration = 0.128   # 8 * 0.016
+
+[[animations]]
+name           = "Running"
+frames         = [ 11, 12, 13, 14 ]
+frame_duration = 0.064   # 4 * 0.016
+
+[[animations]]
+name           = "Peel-out"
+frames         = [ 24, 25, 26, 27 ]
+frame_duration = 0.064
+
+[[animations]]
+name           = "Rolling"
+frames         = [ 15, 16, 17, 18, 19, 20, 21, 22 ]
+frame_duration = 0.064
+
+[[animations]]
+name           = "Skidding"
+frames         = [ 23 ]
+
+[[animations]]
+name           = "Pushing"
+frames         = [ 28, 29, 30, 31 ]
+frame_duration = 0.5
+
+[[animations]]
+name           = "Crouching"
+frames         = [ 32 ]
+
+[[animations]]
+name           = "Looking Up"
+frames         = [ 33 ]
+
+[[animations]]
+name           = "Death"
+frames         = [ 34 ]
+

@@ -4,6 +4,7 @@
 #include "render.hpp"
 #include <map>
 #include <glm/glm.hpp>
+#include <string>
 
 
 class SpriteAtlas
@@ -30,6 +31,7 @@ typedef std::vector<unsigned int> FrameIndexArray;
 
 struct AnimationData
 {
+    std::string     name;
     FrameIndexArray frames;
     float           frameDuration;
     int             minFrameIndex = -1;

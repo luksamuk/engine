@@ -1,6 +1,7 @@
 #include "sprite_scene.hpp"
 #include "render.hpp"
 #include "controls.hpp"
+#include "resources.hpp"
 
 #include <glm/ext.hpp>
 
@@ -11,26 +12,7 @@ SpriteScene::~SpriteScene() {}
 
 void SpriteScene::load()
 {
-    animator = new Animator(
-        "resources/sprites/sonic.png",
-        glm::vec2(60.0f, 60.0f),
-        {
-            { // Stopped
-                { 0 }, 1.0f
-            },
-            { // Walking
-                { 5, 6, 7, 8, 9, 10 }, 0.016 * 8
-            },
-            { // Running
-                { 11, 12, 13, 14 }, 0.016 * 4
-            },
-            { // Peel-out
-                { 15, 16, 17, 18, 19, 20, 21, 22 }, 0.016 * 4
-            },
-            { // Rolling
-                { 24, 25, 26, 27 }, 0.016 * 4
-            },
-        });
+    animator = resourcesLoadAnimator("resources/animation/sonic.toml");
     animator->setAnimation(0);
 }
 

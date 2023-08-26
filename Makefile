@@ -7,7 +7,7 @@ ifeq ($(OS),windows)
 	BIN = bin/$(OS)/game.exe
 else
 	CXX = g++
-	LIBS = -lGL -lglfw
+	LIBS = -lGL -lglfw -ltomlplusplus
 	BIN = bin/$(OS)/game
 endif
 
