@@ -30,6 +30,7 @@ struct TileData
     int tileheight;
     int tilecount;
     int columns;
+    
     std::vector<std::optional<CollisionArray>> collisionarrays;
     
     
@@ -44,6 +45,9 @@ struct LayerData
     std::string name;
     int width;
     int height;
+    // REMEMBER: TILES START COUNTING AT 1. TILE #0, FROM A LEVEL LAYER
+    // PERSPECTIVE, IS ACTUALLY AN EMPTY TILE. SO YOU SHOULD ALWAYS MAP A
+    // LAYER'S TILE X TO (X - 1) ON TILE DATA, AND TREAT LAYER TILE 0 AS EMPTY
     std::vector<int> data;
 };
 

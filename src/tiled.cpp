@@ -4,6 +4,18 @@
 #include <cstring>
 #include <sstream>
 
+auto getattr = [](auto node, const char *name) -> std::string {
+        auto attr = node->first_attribute(name);
+        if(!attr) return "";
+        return attr->value();
+    };
+
+auto getfattr = [](auto node, const char *name) -> float {
+    auto val = getattr(node, name);
+    if(val == "") return 0.0f;
+    return std::stof(val);
+ };
+
 TileData::TileData(const char *path)
 {
     std::string contents = slurp_file(path);
@@ -11,18 +23,6 @@ TileData::TileData(const char *path)
     doc.parse<0>(const_cast<char*>(contents.c_str()));
 
     auto tileset = doc.first_node("tileset");
-
-    auto getattr = [&](auto node, const char *name) -> std::string {
-        auto attr = node->first_attribute(name);
-        if(!attr) return "";
-        return attr->value();
-    };
-
-    auto getfattr = [&](auto node, const char *name) -> float {
-        auto val = getattr(node, name);
-        if(val == "") return 0.0f;
-        return std::stof(val);
-    };
 
     version = getattr(tileset, "version");
     tiledversion = getattr(tileset, "tiledversion");
@@ -103,6 +103,63 @@ TileData::~TileData()
             for(auto shape : *arr) {
                 delete shape;
             }
+        }
+    }
+}
+#include<iostream>
+TileMap::TileMap(const char *path)
+{
+    std::string contents = slurp_file(path);
+    rapidxml::xml_document<> doc;
+    doc.parse<0>(const_cast<char*>(contents.c_str()));
+
+    auto map = doc.first_node("map");
+
+    version = getattr(map, "version");
+    tiledversion = getattr(map, "tiledversion");
+    orientation = getattr(map, "orientation");
+    renderorder = getattr(map, "renderorder");
+    width = std::stoi(getattr(map, "width"));
+    height = std::stoi(getattr(map, "height"));
+    tilewidth = std::stoi(getattr(map, "tilewidth"));
+    infinite = (std::stoi(getattr(map, "infinite")) == 0 ? false : true);
+    nextlayerid = std::stoi(getattr(map, "nextlayerid"));
+    nextobjectid = std::stoi(getattr(map, "nextobjectid"));
+
+    // ignore "tileset" child. We'll always use a .tsx file
+    // programatically associated with this map
+
+    for(auto child = map->first_node();
+        child != nullptr;
+        child = child->next_sibling()) {
+        if(!strcmp(child->name(), "layer")) {
+            LayerData layer;
+            layer.id = std::stoi(getattr(child, "id"));
+            layer.name = getattr(child, "name");
+            layer.width = std::stoi(getattr(child, "width"));
+            layer.height = std::stoi(getattr(child, "height"));
+
+            // Read CSV data sequentially. We can always do the math
+            // and map these tiles according to layer width.
+            layer.data.reserve(layer.width * layer.height);
+            auto csv_child = child->first_node("data");
+            std::istringstream csv(csv_child->value());
+            std::string line;
+            while(std::getline(csv, line)) {
+                std::cout << line << std::endl;
+                char comma;
+                int tile;
+                std::istringstream ss(line);
+                while(!ss.eof()) {
+                    ss >> tile;
+                    if(!ss.eof()) {
+                        // each element must always end with a comma
+                        ss >> comma;
+                        layer.data.push_back(tile);
+                    }
+                }
+            }
+            layers.push_back(layer);
         }
     }
 }

@@ -9,12 +9,14 @@
 
 static Animator *movie;
 static TileData *tiles;
+static TileMap  *map;
 
 SpriteScene::SpriteScene() {}
 
 SpriteScene::~SpriteScene() {}
 #include <iostream>
 #include <typeinfo>
+
 void SpriteScene::load()
 {
     animator = resourcesLoadAnimator("resources/animation/sonic.toml");
@@ -24,6 +26,7 @@ void SpriteScene::load()
     movie->setAnimation(0);
 
     tiles = new TileData("resources/levels/R0/tiles.tsx");
+    map = new TileMap("resources/levels/R0/zone0.tmx");
 
     std::cout << "version: " << tiles->version << std::endl
               << "tiledversion: " << tiles->tiledversion << std::endl
@@ -43,7 +46,39 @@ void SpriteScene::load()
         }
     }
 
+    std::cout << "version: " << map->version << std::endl
+              << "tiledversion: " << map->tiledversion << std::endl
+              << "orientation: " << map->orientation << std::endl
+              << "renderorder: " << map->renderorder << std::endl
+              << "width: " << map->width << std::endl
+              << "height: " << map->height << std::endl
+              << "tilewidth: " << map->tilewidth << std::endl
+              << "infinite: " << map->infinite << std::endl
+              << "nextlayerid: " << map->nextlayerid << std::endl
+              << "nextobjectid: " << map->nextobjectid << std::endl
+              << "# layers: " << map->layers.size() << std::endl;
+    for(auto& layer : map->layers) {
+        std::cout << "  Layer #" << layer.id
+                  << ' ' << '(' << layer.name << ')' << std::endl
+                  << "  Width: " << layer.width << " Height: " << layer.height
+                  << " #tiles: " << layer.data.size()
+                  << std::endl;
+        int x = 0;
+        for(auto tile : layer.data) {
+            if(tile == 0)
+                std::cout << ' ';
+            else std::cout << (tile - 1);
+
+            if(x++ >= layer.width - 1) {
+                std::cout << std::endl;
+                x = 0;
+            }
+        }
+        std::cout << std::endl;
+    }
+
     delete tiles;
+    delete map;
 }
 
 void SpriteScene::unload()
