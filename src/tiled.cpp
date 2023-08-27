@@ -13,7 +13,15 @@ TileData::TileData(const char *path)
     auto tileset = doc.first_node("tileset");
 
     auto getattr = [&](auto node, const char *name) -> std::string {
-        return node->first_attribute(name)->value();
+        auto attr = node->first_attribute(name);
+        if(!attr) return "";
+        return attr->value();
+    };
+
+    auto getfattr = [&](auto node, const char *name) -> float {
+        auto val = getattr(node, name);
+        if(val == "") return 0.0f;
+        return std::stof(val);
     };
 
     version = getattr(tileset, "version");
@@ -47,10 +55,10 @@ TileData::TileData(const char *path)
                 obj = obj->next_sibling()) {
                 glm::vec2 position, size;
 
-                position.x = std::stof(getattr(obj, "x"));
-                position.y = std::stof(getattr(obj, "y"));
-                size.x = std::stof(getattr(obj, "width"));
-                size.y = std::stof(getattr(obj, "height"));
+                position.x = getfattr(obj, "x");
+                position.y = getfattr(obj, "y");
+                size.x = getfattr(obj, "width");
+                size.y = getfattr(obj, "height");
 
                 auto child = obj->first_node();
                 if(child == nullptr) {
@@ -83,6 +91,17 @@ TileData::TileData(const char *path)
                         c->insert(c->end(), triangles.begin(), triangles.end());
                     }
                 }
+            }
+        }
+    }
+}
+
+TileData::~TileData()
+{
+    for(auto arr : collisionarrays) {
+        if(arr != std::nullopt) {
+            for(auto shape : *arr) {
+                delete shape;
             }
         }
     }

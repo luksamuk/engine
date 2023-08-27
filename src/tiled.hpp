@@ -34,6 +34,7 @@ struct TileData
     
     
     TileData(const char *path);
+    ~TileData();
 };
 
 // Relates to a single layer in a .tmx file.
@@ -72,6 +73,8 @@ struct TileMap
     int  nextlayerid;
     int  nextobjectid;
     std::vector<LayerData> layers;
+
+    TileMap(const char *path);
 };
 
 #endif

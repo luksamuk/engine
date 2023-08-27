@@ -5,12 +5,16 @@
 
 #include <glm/ext.hpp>
 
+#include "tiled.hpp"
+
 static Animator *movie;
+static TileData *tiles;
 
 SpriteScene::SpriteScene() {}
 
 SpriteScene::~SpriteScene() {}
-
+#include <iostream>
+#include <typeinfo>
 void SpriteScene::load()
 {
     animator = resourcesLoadAnimator("resources/animation/sonic.toml");
@@ -18,6 +22,28 @@ void SpriteScene::load()
 
     movie = resourcesLoadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
+
+    tiles = new TileData("resources/levels/R0/tiles.tsx");
+
+    std::cout << "version: " << tiles->version << std::endl
+              << "tiledversion: " << tiles->tiledversion << std::endl
+              << "tilewidth: " << tiles->tilewidth << std::endl
+              << "tileheight: " << tiles->tileheight << std::endl
+              << "tilecount: " << tiles->tilecount << std::endl
+              << "columns: " << tiles->columns << std::endl;
+    for(unsigned i = 0; i < tiles->collisionarrays.size(); i++) {
+        std::cout << "Tile #" << i;
+        if(tiles->collisionarrays[i] == std::nullopt) {
+            std::cout << " no collision" << std::endl;
+        } else {
+            std::cout << " collision:" << std::endl;
+            for(auto shapeptr : *tiles->collisionarrays[i]) {
+                std::cout << "  " << typeid(*shapeptr).name() << std::endl;
+            }
+        }
+    }
+
+    delete tiles;
 }
 
 void SpriteScene::unload()
