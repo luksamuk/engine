@@ -25,6 +25,8 @@ OFILES =\
 	obj/$(OS)/core.o\
 	obj/$(OS)/resources.o\
 	obj/$(OS)/sprite.o\
+	obj/$(OS)/tiled.o\
+	obj/$(OS)/collision.o\
 	obj/$(OS)/main.o
 
 .PHONY: dirs clean purge
