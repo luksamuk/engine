@@ -163,3 +163,55 @@ TileMap::TileMap(const char *path)
         }
     }
 }
+
+std::vector<int>
+LayerData::getTileWindow(
+    glm::vec2 cameraCenter,
+    glm::vec2 viewportSize,
+    glm::vec2 tilesize,
+    glm::ivec2& windowSize)
+{
+    std::vector<int> window;
+
+    auto xpostile = [&](float x) -> int {
+        return glm::trunc(x / tilesize.x);
+    };
+
+    auto ypostile = [&](float y) -> int {
+        return glm::trunc(y / tilesize.y);
+    };
+    
+
+    viewportSize /= 2.0;
+    float left   = cameraCenter.x - viewportSize.x;
+    float right  = cameraCenter.x + viewportSize.x;
+    float top    = cameraCenter.y - viewportSize.y;
+    float bottom = cameraCenter.y + viewportSize.y;
+
+    int tileminx = xpostile(left);
+    int tileminy = ypostile(top);
+    int tilemaxx = xpostile(right) + 1;
+    int tilemaxy = ypostile(bottom) + 1;
+
+    windowSize.x = tilemaxx - tileminx + 1;
+    windowSize.y = tilemaxy - tileminy + 1;
+
+    window.reserve(windowSize.x * windowSize.y); 
+
+    auto posToCoord = [&](int x, int y) -> int {
+        return (y * this->width) + x;
+    };
+    
+    for(int j = tileminy; j <= tilemaxy + 1; j++)
+        for(int i = tileminx; i < tilemaxx + 1; i++) {
+            if((i < 0) ||
+               (j < 0) ||
+               (i >= this->width) ||
+               (j >= this->height))
+                window.push_back(0);
+            else
+                window.push_back(this->data[posToCoord(i, j)]);
+        }
+
+    return window;
+}

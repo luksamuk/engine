@@ -7,8 +7,11 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-#define WINWIDTH  640
-#define WINHEIGHT 360
+// #define WINWIDTH  640
+// #define WINHEIGHT 360
+
+#define WINWIDTH  320
+#define WINHEIGHT 224
 
 #define UNUSED(x) (void)(x)
 

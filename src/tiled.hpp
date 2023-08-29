@@ -49,6 +49,12 @@ struct LayerData
     // PERSPECTIVE, IS ACTUALLY AN EMPTY TILE. SO YOU SHOULD ALWAYS MAP A
     // LAYER'S TILE X TO (X - 1) ON TILE DATA, AND TREAT LAYER TILE 0 AS EMPTY
     std::vector<int> data;
+
+    std::vector<int> getTileWindow(
+        glm::vec2 cameraCenter,
+        glm::vec2 viewportWidth,
+        glm::vec2 tilesize,
+        glm::ivec2& windowSize);
 };
 
 // Relates to .tmx files. Possible data:

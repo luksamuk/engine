@@ -8,8 +8,14 @@
 #include "tiled.hpp"
 
 static Animator *movie;
-static TileData *tiles;
-static TileMap  *map;
+
+static SpriteAtlas *chunks;
+static TileData    *tiles;
+static TileMap     *map;
+static glm::vec2 cameraCenter;
+
+const glm::vec2 viewportSize(320.0f, 224.0f);
+//const glm::vec2 viewportSize(640.0f, 360.0f);
 
 SpriteScene::SpriteScene() {}
 
@@ -25,7 +31,12 @@ void SpriteScene::load()
     movie = resourcesLoadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
 
+    //cameraCenter = viewportSize / 2.0f;
+
     tiles = new TileData("resources/levels/R0/tiles.tsx");
+    chunks = new SpriteAtlas(
+        "resources/levels/R0/chunks.png",
+        glm::vec2(tiles->tilewidth, tiles->tileheight));
     map = new TileMap("resources/levels/R0/zone0.tmx");
 
     std::cout << "version: " << tiles->version << std::endl
@@ -69,22 +80,22 @@ void SpriteScene::load()
                 std::cout << ' ';
             else std::cout << (tile - 1);
 
-            if(x++ >= layer.width - 1) {
+            if(x++ >= layer.width) {
                 std::cout << std::endl;
                 x = 0;
             }
         }
         std::cout << std::endl;
     }
-
-    delete tiles;
-    delete map;
 }
 
 void SpriteScene::unload()
 {
     delete animator;
     delete movie;
+    delete chunks;
+    delete tiles;
+    delete map;
 }
 
 void SpriteScene::update()
@@ -111,21 +122,36 @@ void SpriteScene::update()
     model = glm::translate(model, position);
     model = glm::scale(model, glm::vec3(glm::sign(position.x) * 30.0f, 30.0f, 1.0f));
 
+    if(controlsPressing(BTN_DIGITAL_UP)) {
+        cameraCenter.y -= 8.0f;
+    }
+    if(controlsPressing(BTN_DIGITAL_DOWN)) {
+        cameraCenter.y += 8.0f;
+    }
+    if(controlsPressing(BTN_DIGITAL_LEFT)) {
+        cameraCenter.x -= 8.0f;
+    }
+    if(controlsPressing(BTN_DIGITAL_RIGHT)) {
+        cameraCenter.x += 8.0f;
+    }
+
     
     view = glm::mat4(1.0f);
     //projection = glm::ortho(0.0f, 640.0f, 0.0f, 360.0f, 1.0f, -1.0f);
     //projection = glm::ortho(0.0f, 640.0f, 360.0f, 0.0f, 1.0f, -1.0f);
     //projection = glm::ortho(0.0f, 320.0f, 224.0f, 0.0f, 1.0f, -1.0f);
-    projection = glm::ortho(0.0f, 320.0f, 180.0f, 0.0f, 1.0f, -1.0f);
+    //projection = glm::ortho(0.0f, 320.0f, 180.0f, 0.0f, 1.0f, -1.0f);
+    projection = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
 }
-
+#include<iomanip>
 void SpriteScene::draw()
 {
-    // MVP
+    glm::mat4 mvp_movie, movie_model, level_model;
+    
+    // Sprite MVP
     glm::mat4 mvp = projection * view * model;
 
-    glm::mat4 mvp_movie, movie_model;
-
+    // Movie MVP
     //auto mouse = controlsMousePos();
     movie_model = glm::mat4(1.0f);
     //movie_model = glm::translate(movie_model, glm::vec3(360.0f, 160.0f, 0.0f));
@@ -133,9 +159,65 @@ void SpriteScene::draw()
     movie_model = glm::translate(movie_model, glm::vec3(160.0f, 90.0f, 0.0f));
     //movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
     movie_model = glm::scale(movie_model, glm::vec3(120.0f, 80.0f, 1.0f));
-
     mvp_movie = projection * view * movie_model;
     
     animator->draw(mvp);
-    movie->draw(mvp_movie);
+    //movie->draw(mvp_movie);
+
+    // Draw the level
+    glm::ivec2 windowSize;
+    glm::vec2 tileSize(tiles->tilewidth, tiles->tileheight);
+    for(auto& layer : map->layers) {
+        std::vector<int> window = layer.getTileWindow(
+            cameraCenter,
+            viewportSize,
+            tileSize,
+            windowSize);
+
+        std::cout << "Window: " << std::endl;
+        int xx = 0;
+        for(int i = 0; i < window.size(); i++) {
+            if(window[i] == 0)
+                std::cout << "___";
+            else
+                std::cout << std::setw(3) << window[i] - 1;
+            std::cout << ' ';
+            if(xx++ >= windowSize.x - 1) {
+                xx = 0;
+                std::cout << std::endl;
+            }
+        }
+        std::cout << std::endl;
+        
+        int x = 0;
+        int y = 0;
+        for(unsigned i = 0; i < window.size(); i++) {
+            if(window[i] != 0) {
+                glm::vec2 cameraDiff;
+                //cameraDiff = glm::trunc(cameraCenter / tileSize) * tileSize;
+                //cameraDiff = cameraCenter;
+                level_model = glm::translate(
+                    glm::mat4(1.0),
+                    // glm::vec3(
+                    //     (tileSize.x / 2.0f) + (x * tileSize.x),
+                    //     (tileSize.y / 2.0f) + (y * tileSize.y),
+                    //     0.0f)
+                    glm::vec3(
+                        (tileSize.x / 2) + (x * tileSize.x) - (cameraDiff.x),
+                        (tileSize.y / 2) + (y * tileSize.y) - (cameraDiff.y),
+                        0.0f)
+                    );
+                level_model = glm::scale(
+                    level_model,
+                    glm::vec3(tileSize.x / 2.0f, tileSize.y / 2.0f, 1.0f));
+                chunks->setFrame(window[i] - 1);
+                glm::mat4 levelmvp = projection * view * level_model;
+                chunks->draw(levelmvp);
+            }
+            if(x++ >= windowSize.x - 1) {
+                x = 0;
+                y++;
+            }
+        }
+    }
 }
