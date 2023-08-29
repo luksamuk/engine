@@ -31,33 +31,36 @@ void SpriteScene::load()
     movie = resourcesLoadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
 
-    //cameraCenter = viewportSize / 2.0f;
+    cameraCenter = glm::vec2(3 * 128.0f, 9 * 128.0f);
 
-    tiles = new TileData("resources/levels/R0/tiles.tsx");
+    tiles = new TileData("resources/levels/R1/tiles.tsx");
     chunks = new SpriteAtlas(
-        "resources/levels/R0/chunks.png",
+        "resources/levels/R1/chunks.png",
         glm::vec2(tiles->tilewidth, tiles->tileheight));
-    map = new TileMap("resources/levels/R0/zone0.tmx");
+    map = new TileMap("resources/levels/R1/zone0.tmx");
 
-    std::cout << "version: " << tiles->version << std::endl
+    std::cout << "TILE DATA" << std::endl
+              << "version: " << tiles->version << std::endl
               << "tiledversion: " << tiles->tiledversion << std::endl
               << "tilewidth: " << tiles->tilewidth << std::endl
               << "tileheight: " << tiles->tileheight << std::endl
               << "tilecount: " << tiles->tilecount << std::endl
-              << "columns: " << tiles->columns << std::endl;
-    for(unsigned i = 0; i < tiles->collisionarrays.size(); i++) {
-        std::cout << "Tile #" << i;
-        if(tiles->collisionarrays[i] == std::nullopt) {
-            std::cout << " no collision" << std::endl;
-        } else {
-            std::cout << " collision:" << std::endl;
-            for(auto shapeptr : *tiles->collisionarrays[i]) {
-                std::cout << "  " << typeid(*shapeptr).name() << std::endl;
-            }
-        }
-    }
+              << "columns: " << tiles->columns << std::endl
+              << std::endl;
+    // for(unsigned i = 0; i < tiles->collisionarrays.size(); i++) {
+    //     std::cout << "Tile #" << i;
+    //     if(tiles->collisionarrays[i] == std::nullopt) {
+    //         std::cout << " no collision" << std::endl;
+    //     } else {
+    //         std::cout << " collision:" << std::endl;
+    //         for(auto shapeptr : *tiles->collisionarrays[i]) {
+    //             std::cout << "  " << typeid(*shapeptr).name() << std::endl;
+    //         }
+    //     }
+    // }
 
-    std::cout << "version: " << map->version << std::endl
+    std::cout << "MAP DATA" << std::endl
+              << "version: " << map->version << std::endl
               << "tiledversion: " << map->tiledversion << std::endl
               << "orientation: " << map->orientation << std::endl
               << "renderorder: " << map->renderorder << std::endl
@@ -68,25 +71,25 @@ void SpriteScene::load()
               << "nextlayerid: " << map->nextlayerid << std::endl
               << "nextobjectid: " << map->nextobjectid << std::endl
               << "# layers: " << map->layers.size() << std::endl;
-    for(auto& layer : map->layers) {
-        std::cout << "  Layer #" << layer.id
-                  << ' ' << '(' << layer.name << ')' << std::endl
-                  << "  Width: " << layer.width << " Height: " << layer.height
-                  << " #tiles: " << layer.data.size()
-                  << std::endl;
-        int x = 0;
-        for(auto tile : layer.data) {
-            if(tile == 0)
-                std::cout << ' ';
-            else std::cout << (tile - 1);
+    // for(auto& layer : map->layers) {
+    //     std::cout << "  Layer #" << layer.id
+    //               << ' ' << '(' << layer.name << ')' << std::endl
+    //               << "  Width: " << layer.width << " Height: " << layer.height
+    //               << " #tiles: " << layer.data.size()
+    //               << std::endl;
+    //     int x = 0;
+    //     for(auto tile : layer.data) {
+    //         if(tile == 0)
+    //             std::cout << ' ';
+    //         else std::cout << (tile - 1);
 
-            if(x++ >= layer.width) {
-                std::cout << std::endl;
-                x = 0;
-            }
-        }
-        std::cout << std::endl;
-    }
+    //         if(x++ >= layer.width) {
+    //             std::cout << std::endl;
+    //             x = 0;
+    //         }
+    //     }
+    //     std::cout << std::endl;
+    // }
 }
 
 void SpriteScene::unload()
@@ -143,7 +146,7 @@ void SpriteScene::update()
     //projection = glm::ortho(0.0f, 320.0f, 180.0f, 0.0f, 1.0f, -1.0f);
     projection = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
 }
-#include<iomanip>
+//#include<iomanip>
 void SpriteScene::draw()
 {
     glm::mat4 mvp_movie, movie_model, level_model;
@@ -167,27 +170,28 @@ void SpriteScene::draw()
     // Draw the level
     glm::ivec2 windowSize;
     glm::vec2 tileSize(tiles->tilewidth, tiles->tileheight);
-    for(auto& layer : map->layers) {
+    for(auto it = map->layers.rbegin(); it != map->layers.rend(); it++) {
+        auto& layer = *it;
         std::vector<int> window = layer.getTileWindow(
             cameraCenter,
             viewportSize,
             tileSize,
             windowSize);
 
-        std::cout << "Window: " << std::endl;
-        int xx = 0;
-        for(int i = 0; i < window.size(); i++) {
-            if(window[i] == 0)
-                std::cout << "___";
-            else
-                std::cout << std::setw(3) << window[i] - 1;
-            std::cout << ' ';
-            if(xx++ >= windowSize.x - 1) {
-                xx = 0;
-                std::cout << std::endl;
-            }
-        }
-        std::cout << std::endl;
+        // std::cout << "Window: " << std::endl;
+        // int xx = 0;
+        // for(int i = 0; i < window.size(); i++) {
+        //     if(window[i] == 0)
+        //         std::cout << "___";
+        //     else
+        //         std::cout << std::setw(3) << window[i] - 1;
+        //     std::cout << ' ';
+        //     if(xx++ >= windowSize.x - 1) {
+        //         xx = 0;
+        //         std::cout << std::endl;
+        //     }
+        // }
+        // std::cout << std::endl;
         
         int x = 0;
         int y = 0;

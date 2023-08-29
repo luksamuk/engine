@@ -146,7 +146,7 @@ TileMap::TileMap(const char *path)
             std::istringstream csv(csv_child->value());
             std::string line;
             while(std::getline(csv, line)) {
-                std::cout << line << std::endl;
+                //std::cout << line << std::endl;
                 char comma;
                 int tile;
                 std::istringstream ss(line);
