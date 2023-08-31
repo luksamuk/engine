@@ -29,6 +29,7 @@ TileData::TileData(const char *path)
     name = getattr(tileset, "name");
     tilewidth = std::stoi(getattr(tileset, "tilewidth"));
     tileheight = std::stoi(getattr(tileset, "tileheight"));
+    tilesize = glm::vec2(tilewidth, tileheight);
     tilecount = std::stoi(getattr(tileset, "tilecount"));
     columns = std::stoi(getattr(tileset, "columns"));
 
@@ -173,6 +174,9 @@ LayerData::getTileWindow(
 {
     std::vector<int> window;
 
+    // Adjust camera center as if it were at a precise middle tile position
+    cameraCenter -= glm::mod(cameraCenter, tilesize);
+
     auto xpostile = [&](float x) -> int {
         return glm::trunc(x / tilesize.x);
     };
@@ -180,19 +184,25 @@ LayerData::getTileWindow(
     auto ypostile = [&](float y) -> int {
         return glm::trunc(y / tilesize.y);
     };
-    
 
-    viewportSize /= 2.0;
-    float left   = cameraCenter.x - viewportSize.x;
-    float right  = cameraCenter.x + viewportSize.x;
-    float top    = cameraCenter.y - viewportSize.y;
-    float bottom = cameraCenter.y + viewportSize.y;
+    // Determine tile window size
+    windowSize = glm::trunc(viewportSize / tilesize);
+    windowSize += glm::ivec2(2, 1);
 
+    // Determine map coordinates of tiles according to adjusted camera
+    float left = cameraCenter.x - (tilesize.x * (windowSize.x / 2));
+    float right = cameraCenter.x + (tilesize.x * (windowSize.x / 2));
+    float top = cameraCenter.y - (tilesize.y * (windowSize.y / 2));
+    float bottom = cameraCenter.y + (tilesize.y * (windowSize.y / 2));    
+
+    // Determine actual tile indexes on map grid
     int tileminx = xpostile(left);
     int tileminy = ypostile(top);
-    int tilemaxx = xpostile(right) + 1;
-    int tilemaxy = ypostile(bottom) + 1;
+    int tilemaxx = xpostile(right);
+    int tilemaxy = ypostile(bottom);
 
+
+    // Recalculate actual window size
     windowSize.x = tilemaxx - tileminx + 1;
     windowSize.y = tilemaxy - tileminy + 1;
 

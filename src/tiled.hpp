@@ -26,6 +26,7 @@ struct TileData
     std::string version;
     std::string tiledversion;
     std::string name;
+    glm::vec2 tilesize;
     int tilewidth;
     int tileheight;
     int tilecount;

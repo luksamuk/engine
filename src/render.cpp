@@ -1,17 +1,16 @@
 #include "io.hpp"
 #include "render.hpp"
 #include <iostream>
-
 #include <glad/glad.h>
+#include <glm/glm.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
-// #define WINWIDTH  640
-// #define WINHEIGHT 360
 
-#define WINWIDTH  320
-#define WINHEIGHT 224
+//const glm::ivec2 winSize(320, 224);
+const glm::ivec2 winSize = glm::ivec2(320, 224) * 3;
+const float aspectRatio = (float)winSize.x / (float)winSize.y;
 
 #define UNUSED(x) (void)(x)
 
@@ -47,7 +46,10 @@ static void
 window_size_callback(GLFWwindow *window, int width, int height)
 {
     UNUSED(window);
-    glViewport(0,0, width, height);
+    //glViewport(0,0, width, height);
+    int targetWidth = (int)glm::trunc(height * aspectRatio);
+    auto newX = (width - targetWidth) / 2;
+    glViewport(newX, 0, targetWidth, height);
 }
 
 GLFWwindow *
@@ -67,7 +69,7 @@ initWindow(void)
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-    if((window = glfwCreateWindow(WINWIDTH, WINHEIGHT, "Engine", nullptr, nullptr)) == nullptr)
+    if((window = glfwCreateWindow(winSize.x, winSize.y, "Engine", nullptr, nullptr)) == nullptr)
     {
         glfwTerminate();
         exit(1);
@@ -101,7 +103,7 @@ initRender(GLFWwindow *window)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_BLEND);
     
-    glViewport(0, 0, WINWIDTH, WINHEIGHT);
+    glViewport(0, 0, winSize.x, winSize.y);
 
     glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
     

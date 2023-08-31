@@ -31,12 +31,11 @@ void SpriteScene::load()
     movie = resourcesLoadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
 
-    cameraCenter = glm::vec2(3 * 128.0f, 9 * 128.0f);
+    cameraCenter = glm::vec2(2 * 128.0f, 9 * 128.0f);
 
     tiles = new TileData("resources/levels/R1/tiles.tsx");
-    chunks = new SpriteAtlas(
-        "resources/levels/R1/chunks.png",
-        glm::vec2(tiles->tilewidth, tiles->tileheight));
+    chunks = new SpriteAtlas("resources/levels/R1/chunks.png",
+                             tiles->tilesize);
     map = new TileMap("resources/levels/R1/zone0.tmx");
 
     std::cout << "TILE DATA" << std::endl
@@ -101,13 +100,15 @@ void SpriteScene::unload()
     delete map;
 }
 
+static float direction = 1.0f;
+
 void SpriteScene::update()
 {
-    static glm::vec3 position(100.0f, 100.0f, 0.0f);
+    static glm::vec3 position = glm::vec3(viewportSize / 2.0f, 0.0f);
 
-    if(controlsPressed(BTN_DIGITAL_OPTION)) {
-        animator->setAnimation((animator->getAnimation() + 1) % animator->numAnimations());
-    }
+    // if(controlsPressed(BTN_DIGITAL_OPTION)) {
+    //     animator->setAnimation((animator->getAnimation() + 1) % animator->numAnimations());
+    // }
 
     animator->update();
     movie->update();
@@ -115,28 +116,40 @@ void SpriteScene::update()
     //position.x = 0.9 * glm::cos(1 * (float)glfwGetTime());
     //position.y = 0.9 * glm::sin(2 * (float)glfwGetTime());
 
-    auto mouse = controlsMousePos();
-    position.x = mouse.x;
-    position.y = mouse.y;
+    // auto mouse = controlsMousePos();
+    // position.x = mouse.x;
+    // position.y = mouse.y;
 
     // Model matrix should reflect the sprite size
     // through scaling, and then apply a translation to the center
     model = glm::mat4(1.0f);
     model = glm::translate(model, position);
-    model = glm::scale(model, glm::vec3(glm::sign(position.x) * 30.0f, 30.0f, 1.0f));
+    model = glm::scale(model, glm::vec3(direction * 30.0f, 30.0f, 1.0f));
 
     if(controlsPressing(BTN_DIGITAL_UP)) {
         cameraCenter.y -= 8.0f;
+        animator->setAnimation(8);
     }
     if(controlsPressing(BTN_DIGITAL_DOWN)) {
         cameraCenter.y += 8.0f;
+        animator->setAnimation(7);
     }
     if(controlsPressing(BTN_DIGITAL_LEFT)) {
         cameraCenter.x -= 8.0f;
+        animator->setAnimation(2);
+        direction = -1.0f;
     }
     if(controlsPressing(BTN_DIGITAL_RIGHT)) {
         cameraCenter.x += 8.0f;
+        animator->setAnimation(2);
+        direction = 1.0f;
     }
+
+    if(!controlsPressing(BTN_DIGITAL_UP) &&
+       !controlsPressing(BTN_DIGITAL_DOWN) &&
+       !controlsPressing(BTN_DIGITAL_LEFT) &&
+       !controlsPressing(BTN_DIGITAL_RIGHT))
+        animator->setAnimation(0);
 
     
     view = glm::mat4(1.0f);
@@ -160,12 +173,11 @@ void SpriteScene::draw()
     //movie_model = glm::translate(movie_model, glm::vec3(360.0f, 160.0f, 0.0f));
     //movie_model = glm::translate(movie_model, glm::vec3(mouse.x, mouse.y, 0.0f));
     movie_model = glm::translate(movie_model, glm::vec3(160.0f, 90.0f, 0.0f));
-    //movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
-    movie_model = glm::scale(movie_model, glm::vec3(120.0f, 80.0f, 1.0f));
+    movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
+    //movie_model = glm::scale(movie_model, glm::vec3(120.0f, 80.0f, 1.0f));
     mvp_movie = projection * view * movie_model;
     
     animator->draw(mvp);
-    //movie->draw(mvp_movie);
 
     // Draw the level
     glm::ivec2 windowSize;
@@ -197,9 +209,15 @@ void SpriteScene::draw()
         int y = 0;
         for(unsigned i = 0; i < window.size(); i++) {
             if(window[i] != 0) {
+                glm::vec2 realWindowSize = tileSize * glm::vec2(windowSize.x, windowSize.y);
                 glm::vec2 cameraDiff;
-                //cameraDiff = glm::trunc(cameraCenter / tileSize) * tileSize;
+                glm::vec2 hotSpot;
+                hotSpot = glm::vec2((-tileSize.x / 2.0f),
+                                    (-tileSize.y / 2.0f));
+                hotSpot -= realWindowSize / 2.0f;
+                cameraDiff = glm::trunc(cameraCenter / tileSize) * tileSize;
                 //cameraDiff = cameraCenter;
+                cameraDiff = glm::mod(cameraCenter, tileSize);
                 level_model = glm::translate(
                     glm::mat4(1.0),
                     // glm::vec3(
@@ -210,6 +228,7 @@ void SpriteScene::draw()
                         (tileSize.x / 2) + (x * tileSize.x) - (cameraDiff.x),
                         (tileSize.y / 2) + (y * tileSize.y) - (cameraDiff.y),
                         0.0f)
+                    //glm::vec3(hotSpot.x, hotSpot.y, 0.0f)
                     );
                 level_model = glm::scale(
                     level_model,
@@ -224,4 +243,6 @@ void SpriteScene::draw()
             }
         }
     }
+
+    movie->draw(mvp_movie);
 }
