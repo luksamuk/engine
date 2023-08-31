@@ -161,6 +161,19 @@ TileMap::TileMap(const char *path)
                 }
             }
             layers.push_back(layer);
+        } else if(!strcmp(child->name(), "objectgroup")) {
+            // Any object groups are treated equally.
+            for(auto object = child->first_node();
+                object != nullptr;
+                object = object->next_sibling()) {
+                MapObject o;
+                std::string name = getattr(object, "name");
+                o.type = getattr(object, "type");
+                o.position = glm::vec2(
+                    getfattr(object, "x"),
+                    getfattr(object, "y"));
+                objects[name] = o;
+            }
         }
     }
 }
@@ -224,4 +237,13 @@ LayerData::getTileWindow(
         }
 
     return window;
+}
+
+std::optional<MapObject>
+TileMap::getObject(std::string name)
+{
+    auto it = this->objects.find(name);
+    if(it == this->objects.end())
+        return std::nullopt;
+    return it->second;
 }

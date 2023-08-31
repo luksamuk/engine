@@ -4,6 +4,7 @@
 #include <string>
 #include "collision.hpp"
 #include <optional>
+#include <map>
 
 // Tools and structure to load Tiled file data
 
@@ -58,6 +59,12 @@ struct LayerData
         glm::ivec2& windowSize);
 };
 
+struct MapObject
+{
+    std::string type;
+    glm::vec2 position;
+};
+
 // Relates to .tmx files. Possible data:
 // .TMX file:
 // => tag: map
@@ -84,8 +91,11 @@ struct TileMap
     int  nextlayerid;
     int  nextobjectid;
     std::vector<LayerData> layers;
+    std::map<std::string, MapObject> objects;
 
     TileMap(const char *path);
+
+    std::optional<MapObject> getObject(std::string name);
 };
 
 #endif

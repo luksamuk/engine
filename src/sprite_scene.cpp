@@ -31,12 +31,17 @@ void SpriteScene::load()
     movie = resourcesLoadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
 
-    cameraCenter = glm::vec2(2 * 128.0f, 9 * 128.0f);
+    //cameraCenter = glm::vec2(2 * 128.0f, 9 * 128.0f);
 
     tiles = new TileData("resources/levels/R1/tiles.tsx");
     chunks = new SpriteAtlas("resources/levels/R1/chunks.png",
                              tiles->tilesize);
     map = new TileMap("resources/levels/R1/zone0.tmx");
+
+    auto spawnpoint = map->getObject("spawn_sonic");
+    if(spawnpoint) {
+        cameraCenter = spawnpoint->position;
+    }
 
     std::cout << "TILE DATA" << std::endl
               << "version: " << tiles->version << std::endl
@@ -172,7 +177,7 @@ void SpriteScene::draw()
     movie_model = glm::mat4(1.0f);
     //movie_model = glm::translate(movie_model, glm::vec3(360.0f, 160.0f, 0.0f));
     //movie_model = glm::translate(movie_model, glm::vec3(mouse.x, mouse.y, 0.0f));
-    movie_model = glm::translate(movie_model, glm::vec3(160.0f, 90.0f, 0.0f));
+    movie_model = glm::translate(movie_model, glm::vec3(160.0f, 100.0f, 0.0f));
     movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
     //movie_model = glm::scale(movie_model, glm::vec3(120.0f, 80.0f, 1.0f));
     mvp_movie = projection * view * movie_model;
@@ -209,14 +214,8 @@ void SpriteScene::draw()
         int y = 0;
         for(unsigned i = 0; i < window.size(); i++) {
             if(window[i] != 0) {
-                glm::vec2 realWindowSize = tileSize * glm::vec2(windowSize.x, windowSize.y);
                 glm::vec2 cameraDiff;
-                glm::vec2 hotSpot;
-                hotSpot = glm::vec2((-tileSize.x / 2.0f),
-                                    (-tileSize.y / 2.0f));
-                hotSpot -= realWindowSize / 2.0f;
                 cameraDiff = glm::trunc(cameraCenter / tileSize) * tileSize;
-                //cameraDiff = cameraCenter;
                 cameraDiff = glm::mod(cameraCenter, tileSize);
                 level_model = glm::translate(
                     glm::mat4(1.0),
@@ -225,10 +224,9 @@ void SpriteScene::draw()
                     //     (tileSize.y / 2.0f) + (y * tileSize.y),
                     //     0.0f)
                     glm::vec3(
-                        (tileSize.x / 2) + (x * tileSize.x) - (cameraDiff.x),
+                        (tileSize.x / 2) + ((x - 1) * tileSize.x) - (cameraDiff.x),
                         (tileSize.y / 2) + (y * tileSize.y) - (cameraDiff.y),
                         0.0f)
-                    //glm::vec3(hotSpot.x, hotSpot.y, 0.0f)
                     );
                 level_model = glm::scale(
                     level_model,
