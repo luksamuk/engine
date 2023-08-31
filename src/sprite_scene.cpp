@@ -31,12 +31,12 @@ void SpriteScene::load()
     movie = resourcesLoadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
 
-    //cameraCenter = glm::vec2(2 * 128.0f, 9 * 128.0f);
+    cameraCenter = viewportSize / 2.0f;
 
     tiles = new TileData("resources/levels/R1/tiles.tsx");
     chunks = new SpriteAtlas("resources/levels/R1/chunks.png",
                              tiles->tilesize);
-    map = new TileMap("resources/levels/R1/zone0.tmx");
+    map = new TileMap("resources/levels/R1/zone1.tmx");
 
     auto spawnpoint = map->getObject("spawn_sonic");
     if(spawnpoint) {
@@ -219,10 +219,6 @@ void SpriteScene::draw()
                 cameraDiff = glm::mod(cameraCenter, tileSize);
                 level_model = glm::translate(
                     glm::mat4(1.0),
-                    // glm::vec3(
-                    //     (tileSize.x / 2.0f) + (x * tileSize.x),
-                    //     (tileSize.y / 2.0f) + (y * tileSize.y),
-                    //     0.0f)
                     glm::vec3(
                         (tileSize.x / 2) + ((x - 1) * tileSize.x) - (cameraDiff.x),
                         (tileSize.y / 2) + (y * tileSize.y) - (cameraDiff.y),
