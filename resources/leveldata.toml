@@ -14,3 +14,12 @@ maps = [
       "resources/levels/R1/zone0.tmx",
       "resources/levels/R1/zone1.tmx"
 ]
+
+[[levels]]
+name = "Attraction"
+atlas = "resources/levels/R2/chunks.png"
+tiles = "resources/levels/R2/tiles.tsx"
+maps = [
+     "resources/levels/R2/zone0.tmx"
+]
+
