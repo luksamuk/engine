@@ -6,6 +6,7 @@
 #include <glm/ext.hpp>
 
 #include "tiled.hpp"
+#include "level_select.hpp"
 
 static Animator *movie;
 
@@ -17,7 +18,11 @@ static glm::vec2 cameraCenter;
 const glm::vec2 viewportSize(320.0f, 224.0f);
 //const glm::vec2 viewportSize(640.0f, 360.0f);
 
-SpriteScene::SpriteScene() {}
+SpriteScene::SpriteScene(LevelData l, unsigned act)
+{
+    lvl = l;
+    this->act = act;
+}
 
 SpriteScene::~SpriteScene() {}
 #include <iostream>
@@ -36,10 +41,10 @@ void SpriteScene::load()
 
     cameraCenter = viewportSize / 2.0f;
 
-    tiles = new TileData("resources/levels/R1/tiles.tsx");
-    chunks = new SpriteAtlas("resources/levels/R1/chunks.png",
+    tiles = new TileData(lvl.tiles_path.c_str());
+    chunks = new SpriteAtlas(lvl.atlas_path.c_str(),
                              tiles->tilesize);
-    map = new TileMap("resources/levels/R1/zone1.tmx");
+    map = new TileMap(lvl.maps_path[act].c_str());
 
     auto spawnpoint = map->getObject("spawn_sonic");
     if(spawnpoint) {
@@ -115,9 +120,10 @@ void SpriteScene::update()
 {
     static glm::vec3 position = glm::vec3(viewportSize / 2.0f, 0.0f);
 
-    // if(controlsPressed(BTN_DIGITAL_OPTION)) {
-    //     animator->setAnimation((animator->getAnimation() + 1) % animator->numAnimations());
-    // }
+    if(controlsPressed(BTN_DIGITAL_OPTION)) {
+        SceneManager::add(new LevelSelect());
+        setShouldUnload(true);
+    }
 
     animator->update();
     movie->update();
@@ -171,7 +177,7 @@ void SpriteScene::update()
 //#include<iomanip>
 void SpriteScene::draw()
 {
-    glm::mat4 mvp_movie, movie_model, level_model, font_model, font_mvp;
+    glm::mat4 mvp_movie, movie_model, level_model, font_mvp;
     
     // Sprite MVP
     glm::mat4 mvp = projection * view * model;

@@ -1,0 +1,16 @@
+[[levels]]
+name = "Test Level"
+atlas = "resources/levels/R0/chunks.png"
+tiles = "resources/levels/R0/tiles.tsx"
+maps = [
+      "resources/levels/R0/zone0.tmx"
+]
+
+[[levels]]
+name = "Isolated Island"
+atlas = "resources/levels/R1/chunks.png"
+tiles = "resources/levels/R1/tiles.tsx"
+maps = [
+      "resources/levels/R1/zone0.tmx",
+      "resources/levels/R1/zone1.tmx"
+]

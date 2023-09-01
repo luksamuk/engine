@@ -45,3 +45,46 @@ resourcesLoadAnimator(const char *path)
         return nullptr;
     }
 }
+
+LevelDataManager
+resourcesLoadLevelDataManager(const char *path)
+{
+    LevelDataManager mng;
+    toml::table tbl;
+    try {
+        tbl = toml::parse_file(path);
+        auto levels_tbl = tbl["levels"].as_array();
+        levels_tbl->for_each([&](auto&& el) {
+            toml::table tb = *el.as_table();
+            LevelData datum;
+            datum.name = tb["name"].value_or("");
+            datum.atlas_path = tb["atlas"].value_or("");
+            datum.tiles_path = tb["tiles"].value_or("");
+            auto maps_arr = tb["maps"].as_array();
+            maps_arr->for_each([&](auto&& e) {
+                auto val = e.value_or("");
+                datum.maps_path.push_back(val);
+            });
+            mng.data.push_back(datum);
+        });
+    } catch(const toml::parse_error& err) {
+        std::cerr << "Error loading level data manager \""
+                  << path
+                  << "\": "
+                  << err
+                  << std::endl;
+    }
+    return mng;
+}
+
+const LevelData *
+LevelDataManager::getLevel(std::string name) const
+{
+    for(unsigned i = 0; i < data.size(); i++)
+    {
+        if(data[i].name == name) {
+            return &data[i];
+        }
+    }
+    return nullptr;
+}
