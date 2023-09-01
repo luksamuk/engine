@@ -31,6 +31,9 @@ void SpriteScene::load()
     movie = resourcesLoadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
 
+    font = new SpriteFont("resources/sprites/fonts/levelselect.png",
+                          glm::vec2(10.0f, 10.0f));
+
     cameraCenter = viewportSize / 2.0f;
 
     tiles = new TileData("resources/levels/R1/tiles.tsx");
@@ -98,6 +101,7 @@ void SpriteScene::load()
 
 void SpriteScene::unload()
 {
+    delete font;
     delete animator;
     delete movie;
     delete chunks;
@@ -167,7 +171,7 @@ void SpriteScene::update()
 //#include<iomanip>
 void SpriteScene::draw()
 {
-    glm::mat4 mvp_movie, movie_model, level_model;
+    glm::mat4 mvp_movie, movie_model, level_model, font_model, font_mvp;
     
     // Sprite MVP
     glm::mat4 mvp = projection * view * model;
@@ -181,6 +185,12 @@ void SpriteScene::draw()
     movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
     //movie_model = glm::scale(movie_model, glm::vec3(120.0f, 80.0f, 1.0f));
     mvp_movie = projection * view * movie_model;
+
+    font_mvp =
+        projection *
+        view *
+        glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 0.0f));
+    font->draw(font_mvp, "Hello world!\n\rThis is a test.");
     
     animator->draw(mvp);
 

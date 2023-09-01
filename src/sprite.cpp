@@ -46,6 +46,12 @@ SpriteAtlas::~SpriteAtlas()
     glDeleteBuffers(1, &ebo);
 }
 
+glm::vec2
+SpriteAtlas::getFramesize() const
+{
+    return this->framesize;
+}
+
 void
 SpriteAtlas::setFrame(unsigned int frame)
 {
@@ -149,4 +155,46 @@ unsigned int
 Animator::numAnimations(void)
 {
     return _data.size();
+}
+
+
+SpriteFont::SpriteFont(const char *atlaspath, glm::vec2 glyphsize)
+{
+    atlas = new SpriteAtlas(atlaspath, glyphsize);
+}
+
+SpriteFont::~SpriteFont()
+{
+    delete atlas;
+}
+
+void
+SpriteFont::draw(glm::mat4& mvp, const char *text)
+{
+    const char *ptr = text;
+    int atlascoord;
+    glm::vec2 pos(0.0f, 0.0f);
+    glm::mat4 charmodel;
+    glm::vec2 glyphsize = atlas->getFramesize();
+
+    
+    while(*ptr != '\0') {
+        switch(*ptr) {
+        case '\n':
+            pos.x = 0.0f;
+            pos.y += glyphsize.y;
+            break;
+        case '\r': break;
+        default:
+            atlascoord = (int)(*ptr) - 31;
+            charmodel =  glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
+            charmodel = glm::scale(charmodel, glm::vec3(glyphsize / 2.0f, 1.0f));
+            charmodel = mvp * charmodel;
+            atlas->setFrame(atlascoord);
+            atlas->draw(charmodel);
+            pos.x += glyphsize.x;
+            break;
+        }
+        ptr++;
+    }
 }

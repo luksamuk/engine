@@ -23,8 +23,10 @@ private:
 public:
     SpriteAtlas(const char *texturePath, glm::vec2 framesize);
     ~SpriteAtlas();
-    void  setFrame(unsigned int);
-    void  draw(glm::mat4& mvp);
+    
+    glm::vec2  getFramesize() const;
+    void       setFrame(unsigned int);
+    void       draw(glm::mat4& mvp);
 };
 
 typedef std::vector<unsigned int> FrameIndexArray;
@@ -60,6 +62,16 @@ public:
     unsigned int  numAnimations(void);
     void          update();
     void          draw(glm::mat4& mvp);
+};
+
+class SpriteFont
+{
+private:
+    SpriteAtlas *atlas;
+public:
+    SpriteFont(const char *atlaspath, glm::vec2 glyphsize);
+    ~SpriteFont();
+    void draw(glm::mat4& mvp, const char *text);
 };
 
 #endif

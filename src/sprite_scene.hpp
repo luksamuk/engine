@@ -14,6 +14,7 @@ private:
 
     glm::mat4 model, view, projection;
     Animator *animator;
+    SpriteFont *font;
 public:
     SpriteScene();
     virtual ~SpriteScene();
