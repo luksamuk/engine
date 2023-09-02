@@ -6,6 +6,9 @@
 #include <optional>
 #include <map>
 
+namespace Tiled
+{
+
 // Tools and structure to load Tiled file data
 
 // Relates to .tsx files. Possible data:
@@ -22,48 +25,48 @@
 //    - trans (transparent color)
 //    - width (image width)
 //    - height (image height)
-struct TileData
-{
-    std::string version;
-    std::string tiledversion;
-    std::string name;
-    glm::vec2 tilesize;
-    int tilewidth;
-    int tileheight;
-    int tilecount;
-    int columns;
+    struct TileData
+    {
+        std::string version;
+        std::string tiledversion;
+        std::string name;
+        glm::vec2 tilesize;
+        int tilewidth;
+        int tileheight;
+        int tilecount;
+        int columns;
     
-    std::vector<std::optional<CollisionArray>> collisionarrays;
+        std::vector<std::optional<Collision::Array>> collisionarrays;
     
     
-    TileData(const char *path);
-    ~TileData();
-};
+        TileData(const char *path);
+        ~TileData();
+    };
 
 // Relates to a single layer in a .tmx file.
-struct LayerData
-{
-    int id;
-    std::string name;
-    int width;
-    int height;
-    // REMEMBER: TILES START COUNTING AT 1. TILE #0, FROM A LEVEL LAYER
-    // PERSPECTIVE, IS ACTUALLY AN EMPTY TILE. SO YOU SHOULD ALWAYS MAP A
-    // LAYER'S TILE X TO (X - 1) ON TILE DATA, AND TREAT LAYER TILE 0 AS EMPTY
-    std::vector<int> data;
+    struct LayerData
+    {
+        int id;
+        std::string name;
+        int width;
+        int height;
+        // REMEMBER: TILES START COUNTING AT 1. TILE #0, FROM A LEVEL LAYER
+        // PERSPECTIVE, IS ACTUALLY AN EMPTY TILE. SO YOU SHOULD ALWAYS MAP A
+        // LAYER'S TILE X TO (X - 1) ON TILE DATA, AND TREAT LAYER TILE 0 AS EMPTY
+        std::vector<int> data;
 
-    std::vector<int> getTileWindow(
-        glm::vec2 cameraCenter,
-        glm::vec2 viewportWidth,
-        glm::vec2 tilesize,
-        glm::ivec2& windowSize);
-};
+        std::vector<int> getTileWindow(
+            glm::vec2 cameraCenter,
+            glm::vec2 viewportWidth,
+            glm::vec2 tilesize,
+            glm::ivec2& windowSize);
+    };
 
-struct MapObject
-{
-    std::string type;
-    glm::vec2 position;
-};
+    struct MapObject
+    {
+        std::string type;
+        glm::vec2 position;
+    };
 
 // Relates to .tmx files. Possible data:
 // .TMX file:
@@ -78,24 +81,26 @@ struct MapObject
 //    - infinite (int)
 //    - nextlayerid (?)
 //    - nextobjectid (?)
-struct TileMap
-{
-    std::string version;
-    std::string tiledversion;
-    std::string orientation;
-    std::string renderorder;
-    int  width;
-    int  height;
-    int  tilewidth;
-    bool infinite;
-    int  nextlayerid;
-    int  nextobjectid;
-    std::vector<LayerData> layers;
-    std::map<std::string, MapObject> objects;
+    struct TileMap
+    {
+        std::string version;
+        std::string tiledversion;
+        std::string orientation;
+        std::string renderorder;
+        int  width;
+        int  height;
+        int  tilewidth;
+        bool infinite;
+        int  nextlayerid;
+        int  nextobjectid;
+        std::vector<LayerData> layers;
+        std::map<std::string, MapObject> objects;
 
-    TileMap(const char *path);
+        TileMap(const char *path);
 
-    std::optional<MapObject> getObject(std::string name);
-};
+        std::optional<MapObject> getObject(std::string name);
+    };
+
+}
 
 #endif

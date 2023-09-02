@@ -6,17 +6,17 @@
 #include "sprite.hpp"
 #include <glm/glm.hpp>
 
-class LevelSelect : public Scene
+class LevelSelect : public Scenes::Scene
 {
 private:
-    std::shared_ptr<LevelDataManager>  manager;
-    SpriteFont       *font;
-    SpriteAtlas      *bg;
+    std::shared_ptr<Resources::LevelDataManager>  manager;
+    Sprite::Font       *font;
+    Sprite::Atlas      *bg;
     glm::mat4         vp, text_mvp, title_mvp;
     std::string       txt;
     int selection = 0;
 
-    std::pair<LevelData, unsigned> fromSelection();
+    std::pair<Resources::LevelData, unsigned> fromSelection();
 public:
     LevelSelect();
     virtual ~LevelSelect();

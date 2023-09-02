@@ -21,11 +21,11 @@ LevelSelect::~LevelSelect()
 
 void LevelSelect::load()
 {
-    manager = resourcesLoadLevelDataManager("resources/leveldata.toml");
-    font = new SpriteFont("resources/sprites/fonts/levelselect.png",
-                          glm::vec2(10.0f, 10.0f));
-    bg = new SpriteAtlas("resources/background/levelselect.png",
-                         glm::vec2(96.0f, 64.0f));
+    manager = Resources::loadLevelDataManager("resources/leveldata.toml");
+    font = new Sprite::Font("resources/sprites/fonts/levelselect.png",
+                            glm::vec2(10.0f, 10.0f));
+    bg = new Sprite::Atlas("resources/background/levelselect.png",
+                           glm::vec2(96.0f, 64.0f));
     bg->setFrame(0);
 
     vp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
@@ -37,7 +37,7 @@ void LevelSelect::load()
         glm::translate(glm::mat4(1.0f), glm::vec3(140.0f, 20.0f, 0.0f));
 }
 
-std::pair<LevelData, unsigned>
+std::pair<Resources::LevelData, unsigned>
 LevelSelect::fromSelection()
 {
     int currlvl = 0;
@@ -46,14 +46,14 @@ LevelSelect::fromSelection()
         maxlvl = maxlvl == 0 ? 1 : maxlvl;
         for(unsigned i = 0; i < maxlvl; i++) {
             if(currlvl == selection) {
-                return std::pair<LevelData, unsigned>(level, i);
+                return std::pair<Resources::LevelData, unsigned>(level, i);
             }
             currlvl++;
         }
     }
 
-    LevelData l;
-    return std::pair<LevelData, unsigned>(l, 0);
+    Resources::LevelData l;
+    return std::pair<Resources::LevelData, unsigned>(l, 0);
 }
 
 void LevelSelect::update()
@@ -86,18 +86,18 @@ void LevelSelect::update()
     }
     txt = oss.str();
 
-    if(controlsPressed(BTN_DIGITAL_UP))
+    if(Controls::pressed(BTN_DIGITAL_UP))
         selection--;
-    if(controlsPressed(BTN_DIGITAL_DOWN))
+    if(Controls::pressed(BTN_DIGITAL_DOWN))
         selection++;
 
     if(selection >= currlvl) selection = 0;
     if(selection < 0) selection = currlvl - 1;
 
-    if(controlsPressed(BTN_DIGITAL_START)) {
+    if(Controls::pressed(BTN_DIGITAL_START)) {
         auto lvldata = fromSelection();
         if(lvldata.first.maps_path.size() > 0) {
-            SceneManager::add(new SpriteScene(lvldata.first, lvldata.second));
+            Scenes::Manager::add(new SpriteScene(lvldata.first, lvldata.second));
             setShouldUnload(true);
         }
     }

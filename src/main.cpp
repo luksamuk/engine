@@ -8,12 +8,13 @@
 int
 main(void)
 {
-    initCore();
+    Core::init();
 
-    SceneManager::add(new LevelSelect());
-    //SceneManager::add(new TestScene());
+    Scenes::Manager::add(new LevelSelect());
+    //Scenes::Manager::add(new TestScene());
 
-    coreGameLoop();
-    disposeCore();
+    Core::gameLoop();
+    Core::dispose();
+    
     return 0;
 }

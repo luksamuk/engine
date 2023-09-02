@@ -1,8 +1,11 @@
 #ifndef CORE_HPP_INCLUDED
 #define CORE_HPP_INCLUDED
 
-void    initCore(void);
-void    coreGameLoop(void);
-void    disposeCore(void);
+namespace Core
+{
+    void    init(void);
+    void    gameLoop(void);
+    void    dispose(void);
+}
 
 #endif

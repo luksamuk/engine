@@ -8,52 +8,55 @@
 #include "controls.hpp"
 #include "scene.hpp"
 
-static GLFWwindow *window = nullptr;
-
-void
-initCore(void)
+namespace Core
 {
-    if(!window) {
-        window = initWindow();
-        initRender(window);
-        initControls(window);
-    }
-}
+    static GLFWwindow *window = nullptr;
 
-void
-coreGameLoop(void)
-{
-    if(!window) {
-        std::cerr << "Core was not initialized" << std::endl;
-        return;
+    void
+    init(void)
+    {
+        if(!window) {
+            window = Render::initWindow();
+            Render::init(window);
+            Controls::init(window);
+        }
     }
+
+    void
+    gameLoop(void)
+    {
+        if(!window) {
+            std::cerr << "Core was not initialized" << std::endl;
+            return;
+        }
     
-    while(!glfwWindowShouldClose(window)) {
-        SceneManager::updateAll();
+        while(!glfwWindowShouldClose(window)) {
+            Scenes::Manager::updateAll();
 
-        /* draw */
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            /* draw */
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        SceneManager::drawAll();
+            Scenes::Manager::drawAll();
 
-        // post-drawing
-        // glUseProgram(0);
-        // glBindVertexArray(0);
-        // glBindBuffer(GL_ARRAY_BUFFER, 0);
-        // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            // post-drawing
+            // glUseProgram(0);
+            // glBindVertexArray(0);
+            // glBindBuffer(GL_ARRAY_BUFFER, 0);
+            // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-        /* post-processing */
-        glfwSwapBuffers(window);
-        processControls();
-        glfwPollEvents();
+            /* post-processing */
+            glfwSwapBuffers(window);
+            Controls::process();
+            glfwPollEvents();
+        }
     }
-}
 
-void
-disposeCore(void)
-{
-    if(window) {
-        SceneManager::dispose();
-        disposeWindow(window);
+    void
+    dispose(void)
+    {
+        if(window) {
+            Scenes::Manager::dispose();
+            Render::disposeWindow(window);
+        }
     }
 }

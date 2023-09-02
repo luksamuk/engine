@@ -32,18 +32,18 @@ TestScene::~TestScene() {}
 void TestScene::load()
 {   
     // Load vertex data
-    vbo = make_vbo(vertices, sizeof(vertices), GL_STATIC_DRAW);
-    ebo = make_ebo(elements, sizeof(elements), GL_STATIC_DRAW);
+    vbo = Render::make_vbo(vertices, sizeof(vertices), GL_STATIC_DRAW);
+    ebo = Render::make_ebo(elements, sizeof(elements), GL_STATIC_DRAW);
 
     // bind vertex data and create vertex arrays
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    vao = make_vao();
+    vao = Render::make_vao();
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
     // Load shaders
-    GLuint vs = load_shader("resources/shaders/default/default.vs.glsl");
-    GLuint fs = load_shader("resources/shaders/default/default.fs.glsl");
-    program = link_program(vs, fs);
+    GLuint vs = Render::load_shader("resources/shaders/default/default.vs.glsl");
+    GLuint fs = Render::load_shader("resources/shaders/default/default.fs.glsl");
+    program = Render::link_program(vs, fs);
     glDeleteShader(vs);
     glDeleteShader(fs);
 
@@ -99,28 +99,28 @@ void TestScene::update()
     static float rotationY = 0.0f;
     static float rotationZ = glm::radians(1.0f);
 
-    if(controlsPressing(BTN_DIGITAL_UP)) {
+    if(Controls::pressing(BTN_DIGITAL_UP)) {
         rotationX = glm::radians(1.0f);
     }
-    if(controlsPressing(BTN_DIGITAL_DOWN)) {
+    if(Controls::pressing(BTN_DIGITAL_DOWN)) {
         rotationX = glm::radians(-1.0f);
     }
 
-    if(controlsPressing(BTN_DIGITAL_RIGHT)) {
+    if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
         rotationY = glm::radians(1.0f);
     }
-    if(controlsPressing(BTN_DIGITAL_LEFT)) {
+    if(Controls::pressing(BTN_DIGITAL_LEFT)) {
         rotationY = glm::radians(-1.0f);
     }
 
-    if(controlsPressing(BTN_DIGITAL_ACTIONUP)) {
+    if(Controls::pressing(BTN_DIGITAL_ACTIONUP)) {
         rotationZ = glm::radians(1.0f);
     }
-    if(controlsPressing(BTN_DIGITAL_ACTIONDOWN)) {
+    if(Controls::pressing(BTN_DIGITAL_ACTIONDOWN)) {
         rotationZ = glm::radians(-1.0f);
     }
 
-    if(controlsPressed(BTN_DIGITAL_START)) {
+    if(Controls::pressed(BTN_DIGITAL_START)) {
         rotationX = rotationY = rotationZ = 0.0f;
     }
 

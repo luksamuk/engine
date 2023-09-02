@@ -3,6 +3,9 @@
 
 #include <string>
 
-std::string slurp_file(const char *path);
+namespace IO
+{
+    std::string slurp_file(const char *path);
+}
 
 #endif

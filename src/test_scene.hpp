@@ -5,7 +5,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-class TestScene : public Scene
+class TestScene : public Scenes::Scene
 {
 private:
     GLuint vbo, ebo, vao, program;

@@ -18,32 +18,36 @@ enum DigitalButton: int {
     BTN_DIGITAL_ACTIONRIGHT = 9,
 };
 
-struct ButtonState {
-    union {
-        struct {
-            bool dpadup;
-            bool dpaddown;
-            bool dpadleft;
-            bool dpadright;
-            bool start;
-            bool option;
-            bool actionup;
-            bool actiondown;
-            bool actionleft;
-            bool actionright;
+namespace Controls
+{
+    struct ButtonState {
+        union {
+            struct {
+                bool dpadup;
+                bool dpaddown;
+                bool dpadleft;
+                bool dpadright;
+                bool start;
+                bool option;
+                bool actionup;
+                bool actiondown;
+                bool actionleft;
+                bool actionright;
+            };
+
+            bool btn[10];
         };
-
-        bool btn[10];
     };
-};
 
 
-void   initControls(GLFWwindow *);
-void   processControls(void);
+    void   init(GLFWwindow *);
+    void   process(void);
 
 
-bool      controlsPressing(DigitalButton);
-bool      controlsPressed(DigitalButton);
-glm::vec2 controlsMousePos(void);
+    bool      pressing(DigitalButton);
+    bool      pressed(DigitalButton);
+    glm::vec2 mousePos(void);
 
+}
+    
 #endif

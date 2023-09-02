@@ -8,11 +8,11 @@
 #include "tiled.hpp"
 #include "level_select.hpp"
 
-static std::shared_ptr<Animator> movie;
+static std::shared_ptr<Sprite::Animator> movie;
 
-static SpriteAtlas *chunks;
-static TileData    *tiles;
-static TileMap     *map;
+static Sprite::Atlas *chunks;
+static Tiled::TileData    *tiles;
+static Tiled::TileMap     *map;
 static glm::vec2 cameraCenter;
 
 const glm::vec2 viewportSize(320.0f, 224.0f);
@@ -25,7 +25,7 @@ static unsigned ANIM_LOOKUP,
     ANIM_ROLLING;
     
 
-SpriteScene::SpriteScene(LevelData l, unsigned act)
+SpriteScene::SpriteScene(Resources::LevelData l, unsigned act)
 {
     lvl = l;
     this->act = act;
@@ -46,13 +46,13 @@ SpriteScene::changeCharacter(unsigned chara)
     
     switch(chara) {
     default:
-        animator = resourcesLoadAnimator("resources/animation/sonic.toml");
+        animator = Resources::loadAnimator("resources/animation/sonic.toml");
         break;
     case 1:
-        animator = resourcesLoadAnimator("resources/animation/knuckles.toml");
+        animator = Resources::loadAnimator("resources/animation/knuckles.toml");
         break;
     case 2:
-        animator = resourcesLoadAnimator("resources/animation/sonic1mania.toml");
+        animator = Resources::loadAnimator("resources/animation/sonic1mania.toml");
         break;
     }
     animator->setAnimation(0);
@@ -69,18 +69,18 @@ SpriteScene::load()
 {
     changeCharacter(0);
 
-    movie = resourcesLoadAnimator("resources/animation/movie.toml");
+    movie = Resources::loadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
 
-    font = new SpriteFont("resources/sprites/fonts/levelselect.png",
-                          glm::vec2(10.0f, 10.0f));
+    font = new Sprite::Font("resources/sprites/fonts/levelselect.png",
+                            glm::vec2(10.0f, 10.0f));
 
     cameraCenter = viewportSize / 2.0f;
 
-    tiles = new TileData(lvl.tiles_path.c_str());
-    chunks = new SpriteAtlas(lvl.atlas_path.c_str(),
-                             tiles->tilesize);
-    map = new TileMap(lvl.maps_path[act].c_str());
+    tiles = new Tiled::TileData(lvl.tiles_path.c_str());
+    chunks = new Sprite::Atlas(lvl.atlas_path.c_str(),
+                               tiles->tilesize);
+    map = new Tiled::TileMap(lvl.maps_path[act].c_str());
 
     auto spawnpoint = map->getObject("spawn_sonic");
     if(spawnpoint) {
@@ -156,8 +156,8 @@ void SpriteScene::update()
 {
     static glm::vec3 position = glm::vec3(viewportSize / 2.0f, 0.0f);
 
-    if(controlsPressed(BTN_DIGITAL_OPTION)) {
-        SceneManager::add(new LevelSelect());
+    if(Controls::pressed(BTN_DIGITAL_OPTION)) {
+        Scenes::Manager::add(new LevelSelect());
         setShouldUnload(true);
     }
 
@@ -178,41 +178,41 @@ void SpriteScene::update()
     model = glm::translate(model, position);
     model = glm::scale(model, glm::vec3(direction * 30.0f, 30.0f, 1.0f));
 
-     if(controlsPressing(BTN_DIGITAL_ACTIONDOWN)) {
+     if(Controls::pressing(BTN_DIGITAL_ACTIONDOWN)) {
         animator->setAnimation(ANIM_ROLLING);
     } else {
-         if(controlsPressing(BTN_DIGITAL_UP)) {
+         if(Controls::pressing(BTN_DIGITAL_UP)) {
              cameraCenter.y -= 8.0f;
              animator->setAnimation(ANIM_LOOKUP);
          }
-         if(controlsPressing(BTN_DIGITAL_DOWN)) {
+         if(Controls::pressing(BTN_DIGITAL_DOWN)) {
              cameraCenter.y += 8.0f;
              animator->setAnimation(ANIM_CROUCHDOWN);
          }
-         if(controlsPressing(BTN_DIGITAL_LEFT)) {
+         if(Controls::pressing(BTN_DIGITAL_LEFT)) {
              cameraCenter.x -= 8.0f;
              animator->setAnimation(ANIM_RUNNING);
              direction = -1.0f;
          }
-         if(controlsPressing(BTN_DIGITAL_RIGHT)) {
+         if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
              cameraCenter.x += 8.0f;
              animator->setAnimation(ANIM_RUNNING);
              direction = 1.0f;
          }
 
-         if(!controlsPressing(BTN_DIGITAL_UP) &&
-            !controlsPressing(BTN_DIGITAL_DOWN) &&
-            !controlsPressing(BTN_DIGITAL_LEFT) &&
-            !controlsPressing(BTN_DIGITAL_RIGHT))
+         if(!Controls::pressing(BTN_DIGITAL_UP) &&
+            !Controls::pressing(BTN_DIGITAL_DOWN) &&
+            !Controls::pressing(BTN_DIGITAL_LEFT) &&
+            !Controls::pressing(BTN_DIGITAL_RIGHT))
              animator->setAnimation(ANIM_IDLE);
      }
 
     
-    if(controlsPressed(BTN_DIGITAL_ACTIONUP)) {
+    if(Controls::pressed(BTN_DIGITAL_ACTIONUP)) {
         changeCharacter(1);
-    } else if(controlsPressed(BTN_DIGITAL_ACTIONLEFT)) {
+    } else if(Controls::pressed(BTN_DIGITAL_ACTIONLEFT)) {
         changeCharacter(0);
-    } else if(controlsPressed(BTN_DIGITAL_ACTIONRIGHT)) {
+    } else if(Controls::pressed(BTN_DIGITAL_ACTIONRIGHT)) {
         changeCharacter(2);
     }
 

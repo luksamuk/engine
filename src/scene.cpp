@@ -3,105 +3,108 @@
 #include <stack>
 #include <algorithm>
 
-static SceneManager *_manager = nullptr;
-
-void
-Scene::setShouldUnload(bool state)
+namespace Scenes
 {
-    this->shouldUnload = state;
-}
+    static Manager *_manager = nullptr;
 
-bool
-Scene::getShouldUnload(void)
-{
-    return this->shouldUnload;
-}
-
-void
-SceneManager::init(void)
-{
-    // TODO
-}
-
-SceneManager&
-SceneManager::get()
-{
-    if(!_manager) {
-        _manager = new SceneManager();
-        _manager->init();
-    }
-    return *_manager;
-}
-
-void
-SceneManager::add(Scene* s)
-{
-    if(s) {
-        s->load();
-        // TODO: is this safe? Should we queue for addition?
-        SceneManager::get()._scenes.push_back(s);
-    }
-}
-
-void
-SceneManager::pop()
-{
-    SceneManager::get()._scenes.pop_front();
-}
-
-void
-SceneManager::updateAll()
-{
-    std::stack<Scene*> shouldRemove;
-    for(auto scene : SceneManager::get()._scenes) {
-        if(scene->getShouldUnload())
-            shouldRemove.push(scene);
-        else scene->update();
+    void
+    Scene::setShouldUnload(bool state)
+    {
+        this->shouldUnload = state;
     }
 
-    while(!shouldRemove.empty()) {
-        Scene *s = shouldRemove.top();
-        shouldRemove.pop();
-        s->unload();
+    bool
+    Scene::getShouldUnload(void)
+    {
+        return this->shouldUnload;
+    }
+
+    void
+    Manager::init(void)
+    {
+        // TODO
+    }
+
+    Manager&
+    Manager::get()
+    {
+        if(!_manager) {
+            _manager = new Manager();
+            _manager->init();
+        }
+        return *_manager;
+    }
+
+    void
+    Manager::add(Scene* s)
+    {
+        if(s) {
+            s->load();
+            // TODO: is this safe? Should we queue for addition?
+            Manager::get()._scenes.push_back(s);
+        }
+    }
+
+    void
+    Manager::pop()
+    {
+        Manager::get()._scenes.pop_front();
+    }
+
+    void
+    Manager::updateAll()
+    {
+        std::stack<Scene*> shouldRemove;
+        for(auto scene : Manager::get()._scenes) {
+            if(scene->getShouldUnload())
+                shouldRemove.push(scene);
+            else scene->update();
+        }
+
+        while(!shouldRemove.empty()) {
+            Scene *s = shouldRemove.top();
+            shouldRemove.pop();
+            s->unload();
         
-        SceneManager::get()
-            ._scenes
-            .erase(
-                std::remove(
-                    SceneManager::get()._scenes.begin(),
-                    SceneManager::get()._scenes.end(),
-                    s),
-                SceneManager::get()._scenes.end());
+            Manager::get()
+                ._scenes
+                .erase(
+                    std::remove(
+                        Manager::get()._scenes.begin(),
+                        Manager::get()._scenes.end(),
+                        s),
+                    Manager::get()._scenes.end());
 
-        delete s;
-    }
-}
-
-void
-SceneManager::drawAll()
-{
-    for(auto scene : SceneManager::get()._scenes) {
-        scene->draw();
-    }
-}
-
-void
-SceneManager::unloadAll()
-{
-    for(auto scene : SceneManager::get()._scenes) {
-        scene->unload();
-        delete scene;
+            delete s;
+        }
     }
 
-    SceneManager::get()._scenes.clear();
-}
+    void
+    Manager::drawAll()
+    {
+        for(auto scene : Manager::get()._scenes) {
+            scene->draw();
+        }
+    }
 
-void
-SceneManager::dispose()
-{
-    if(_manager) {
-        SceneManager::unloadAll();
-        delete _manager;
-        _manager = nullptr;
+    void
+    Manager::unloadAll()
+    {
+        for(auto scene : Manager::get()._scenes) {
+            scene->unload();
+            delete scene;
+        }
+
+        Manager::get()._scenes.clear();
+    }
+
+    void
+    Manager::dispose()
+    {
+        if(_manager) {
+            Manager::unloadAll();
+            delete _manager;
+            _manager = nullptr;
+        }
     }
 }

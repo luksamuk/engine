@@ -3,42 +3,44 @@
 
 #include <queue>
 
-class Scene
+namespace Scenes
 {
-private:
-    bool shouldUnload = false;
-public:
-    virtual ~Scene() = 0;
-    virtual void load() = 0;
-    virtual void update() = 0;
-    virtual void draw() = 0;
-    virtual void unload() = 0;
+    class Scene
+    {
+    private:
+        bool shouldUnload = false;
+    public:
+        virtual ~Scene() = 0;
+        virtual void load() = 0;
+        virtual void update() = 0;
+        virtual void draw() = 0;
+        virtual void unload() = 0;
 
-    void setShouldUnload(bool);
-    bool getShouldUnload(void);
-};
+        void setShouldUnload(bool);
+        bool getShouldUnload(void);
+    };
 
-inline Scene::~Scene() {}
+    inline Scene::~Scene() {}
 
-class SceneManager
-{
-private:
-    std::deque<Scene*> _scenes;
+    class Manager
+    {
+    private:
+        std::deque<Scene*> _scenes;
     
-    SceneManager() {}
-    void init();
-public:
-    static SceneManager& get();
+        Manager() {}
+        void init();
+    public:
+        static Manager&      get();
 
-    static void          add(Scene*);
-    static void          pop();
+        static void          add(Scene*);
+        static void          pop();
 
-    static void          updateAll();
-    static void          drawAll();
-    static void          unloadAll();
+        static void          updateAll();
+        static void          drawAll();
+        static void          unloadAll();
     
-    static void          dispose();
-};
-
+        static void          dispose();
+    };
+}
 
 #endif
