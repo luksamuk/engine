@@ -11,7 +11,8 @@ class LevelSelect : public Scene
 private:
     LevelDataManager  manager;
     SpriteFont       *font;
-    glm::mat4         mvp;
+    SpriteAtlas      *bg;
+    glm::mat4         vp, text_mvp, title_mvp;
     std::string       txt;
     int selection = 0;
 

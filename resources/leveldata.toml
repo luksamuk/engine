@@ -8,7 +8,13 @@ maps = [
 ]
 
 [[levels]]
-name = "Attraction"
+name  = "Amazing Aquarium"
+atlas = ""
+tiles = ""
+maps  = []
+
+[[levels]]
+name = "Festival Freeway"
 atlas = "resources/levels/R2/chunks.png"
 tiles = "resources/levels/R2/tiles.tsx"
 maps = [
@@ -16,7 +22,37 @@ maps = [
 ]
 
 [[levels]]
-name = "Test Level"
+name  = "R3"
+atlas = ""
+tiles = ""
+maps  = []
+
+[[levels]]
+name  = "R4"
+atlas = ""
+tiles = ""
+maps  = []
+
+[[levels]]
+name  = "Chaotic Corniche"
+atlas = ""
+tiles = ""
+maps  = []
+
+[[levels]]
+name  = "R5"
+atlas = ""
+tiles = ""
+maps  = []
+
+[[levels]]
+name  = "Cosmic Colony"
+atlas = ""
+tiles = ""
+maps  = []
+
+[[levels]]
+name = "Playground"
 atlas = "resources/levels/R0/chunks.png"
 tiles = "resources/levels/R0/tiles.tsx"
 maps = [
