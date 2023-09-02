@@ -21,7 +21,8 @@ const glm::vec2 viewportSize(320.0f, 224.0f);
 static unsigned ANIM_LOOKUP,
     ANIM_CROUCHDOWN,
     ANIM_RUNNING,
-    ANIM_IDLE;
+    ANIM_IDLE,
+    ANIM_ROLLING;
     
 
 SpriteScene::SpriteScene(LevelData l, unsigned act)
@@ -60,13 +61,13 @@ SpriteScene::changeCharacter(unsigned chara)
     ANIM_CROUCHDOWN = animator->getAnimationByName("Crouching Down");
     ANIM_RUNNING    = animator->getAnimationByName("Running");
     ANIM_IDLE       = animator->getAnimationByName("Idle");
+    ANIM_ROLLING    = animator->getAnimationByName("Rolling");
 }
 
 void
 SpriteScene::load()
 {
-    animator = resourcesLoadAnimator("resources/animation/sonic.toml");
-    animator->setAnimation(0);
+    changeCharacter(0);
 
     movie = resourcesLoadAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
@@ -177,34 +178,39 @@ void SpriteScene::update()
     model = glm::translate(model, position);
     model = glm::scale(model, glm::vec3(direction * 30.0f, 30.0f, 1.0f));
 
-    if(controlsPressing(BTN_DIGITAL_UP)) {
-        cameraCenter.y -= 8.0f;
-        animator->setAnimation(ANIM_LOOKUP);
-    }
-    if(controlsPressing(BTN_DIGITAL_DOWN)) {
-        cameraCenter.y += 8.0f;
-        animator->setAnimation(ANIM_CROUCHDOWN);
-    }
-    if(controlsPressing(BTN_DIGITAL_LEFT)) {
-        cameraCenter.x -= 8.0f;
-        animator->setAnimation(ANIM_RUNNING);
-        direction = -1.0f;
-    }
-    if(controlsPressing(BTN_DIGITAL_RIGHT)) {
-        cameraCenter.x += 8.0f;
-        animator->setAnimation(ANIM_RUNNING);
-        direction = 1.0f;
-    }
+     if(controlsPressing(BTN_DIGITAL_ACTIONDOWN)) {
+        animator->setAnimation(ANIM_ROLLING);
+    } else {
+         if(controlsPressing(BTN_DIGITAL_UP)) {
+             cameraCenter.y -= 8.0f;
+             animator->setAnimation(ANIM_LOOKUP);
+         }
+         if(controlsPressing(BTN_DIGITAL_DOWN)) {
+             cameraCenter.y += 8.0f;
+             animator->setAnimation(ANIM_CROUCHDOWN);
+         }
+         if(controlsPressing(BTN_DIGITAL_LEFT)) {
+             cameraCenter.x -= 8.0f;
+             animator->setAnimation(ANIM_RUNNING);
+             direction = -1.0f;
+         }
+         if(controlsPressing(BTN_DIGITAL_RIGHT)) {
+             cameraCenter.x += 8.0f;
+             animator->setAnimation(ANIM_RUNNING);
+             direction = 1.0f;
+         }
 
-    if(!controlsPressing(BTN_DIGITAL_UP) &&
-       !controlsPressing(BTN_DIGITAL_DOWN) &&
-       !controlsPressing(BTN_DIGITAL_LEFT) &&
-       !controlsPressing(BTN_DIGITAL_RIGHT))
-        animator->setAnimation(ANIM_IDLE);
+         if(!controlsPressing(BTN_DIGITAL_UP) &&
+            !controlsPressing(BTN_DIGITAL_DOWN) &&
+            !controlsPressing(BTN_DIGITAL_LEFT) &&
+            !controlsPressing(BTN_DIGITAL_RIGHT))
+             animator->setAnimation(ANIM_IDLE);
+     }
 
+    
     if(controlsPressed(BTN_DIGITAL_ACTIONUP)) {
         changeCharacter(1);
-    } else if(controlsPressed(BTN_DIGITAL_ACTIONDOWN)) {
+    } else if(controlsPressed(BTN_DIGITAL_ACTIONLEFT)) {
         changeCharacter(0);
     } else if(controlsPressed(BTN_DIGITAL_ACTIONRIGHT)) {
         changeCharacter(2);
