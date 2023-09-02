@@ -1,3 +1,5 @@
+# Sprites by SEGA, ripped by Paraemon and Triangly
+
 atlas      = "resources/sprites/knuckles.png"
 frame_size = [ 60.0, 60.0 ]
 

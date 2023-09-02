@@ -18,6 +18,12 @@ static glm::vec2 cameraCenter;
 const glm::vec2 viewportSize(320.0f, 224.0f);
 //const glm::vec2 viewportSize(640.0f, 360.0f);
 
+static unsigned ANIM_LOOKUP,
+    ANIM_CROUCHDOWN,
+    ANIM_RUNNING,
+    ANIM_IDLE;
+    
+
 SpriteScene::SpriteScene(LevelData l, unsigned act)
 {
     lvl = l;
@@ -44,8 +50,16 @@ SpriteScene::changeCharacter(unsigned chara)
     case 1:
         animator = resourcesLoadAnimator("resources/animation/knuckles.toml");
         break;
+    case 2:
+        animator = resourcesLoadAnimator("resources/animation/sonic1mania.toml");
+        break;
     }
     animator->setAnimation(0);
+
+    ANIM_LOOKUP     = animator->getAnimationByName("Looking Up");
+    ANIM_CROUCHDOWN = animator->getAnimationByName("Crouching Down");
+    ANIM_RUNNING    = animator->getAnimationByName("Running");
+    ANIM_IDLE       = animator->getAnimationByName("Idle");
 }
 
 void
@@ -147,7 +161,8 @@ void SpriteScene::update()
     }
 
     animator->update();
-    movie->update();
+    
+    //movie->update();
     
     //position.x = 0.9 * glm::cos(1 * (float)glfwGetTime());
     //position.y = 0.9 * glm::sin(2 * (float)glfwGetTime());
@@ -164,20 +179,20 @@ void SpriteScene::update()
 
     if(controlsPressing(BTN_DIGITAL_UP)) {
         cameraCenter.y -= 8.0f;
-        animator->setAnimationByName("Looking Up");
+        animator->setAnimation(ANIM_LOOKUP);
     }
     if(controlsPressing(BTN_DIGITAL_DOWN)) {
         cameraCenter.y += 8.0f;
-        animator->setAnimationByName("Crouching Down");
+        animator->setAnimation(ANIM_CROUCHDOWN);
     }
     if(controlsPressing(BTN_DIGITAL_LEFT)) {
         cameraCenter.x -= 8.0f;
-        animator->setAnimationByName("Running");
+        animator->setAnimation(ANIM_RUNNING);
         direction = -1.0f;
     }
     if(controlsPressing(BTN_DIGITAL_RIGHT)) {
         cameraCenter.x += 8.0f;
-        animator->setAnimationByName("Running");
+        animator->setAnimation(ANIM_RUNNING);
         direction = 1.0f;
     }
 
@@ -185,12 +200,14 @@ void SpriteScene::update()
        !controlsPressing(BTN_DIGITAL_DOWN) &&
        !controlsPressing(BTN_DIGITAL_LEFT) &&
        !controlsPressing(BTN_DIGITAL_RIGHT))
-        animator->setAnimationByName("Idle");
+        animator->setAnimation(ANIM_IDLE);
 
     if(controlsPressed(BTN_DIGITAL_ACTIONUP)) {
         changeCharacter(1);
     } else if(controlsPressed(BTN_DIGITAL_ACTIONDOWN)) {
         changeCharacter(0);
+    } else if(controlsPressed(BTN_DIGITAL_ACTIONRIGHT)) {
+        changeCharacter(2);
     }
 
     
@@ -210,13 +227,12 @@ void SpriteScene::draw()
     glm::mat4 mvp = projection * view * model;
 
     // Movie MVP
-    //auto mouse = controlsMousePos();
+    /*
     movie_model = glm::mat4(1.0f);
-    //movie_model = glm::translate(movie_model, glm::vec3(360.0f, 160.0f, 0.0f));
-    //movie_model = glm::translate(movie_model, glm::vec3(mouse.x, mouse.y, 0.0f));
     movie_model = glm::translate(movie_model, glm::vec3(160.0f, 100.0f, 0.0f));
     movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
-    //movie_model = glm::scale(movie_model, glm::vec3(120.0f, 80.0f, 1.0f));
+    */
+    
     mvp_movie = projection * view * movie_model;
 
     font_mvp =
@@ -281,5 +297,5 @@ void SpriteScene::draw()
         }
     }
 
-    movie->draw(mvp_movie);
+    //movie->draw(mvp_movie);
 }

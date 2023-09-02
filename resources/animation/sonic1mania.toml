@@ -1,0 +1,64 @@
+# Sonic 1 (Mania Style) by NotSoDevy and Jenny Hound
+atlas      = "resources/sprites/sonic1mania.png"
+frame_size = [ 60.0, 60.0 ]
+
+[[animations]]
+name           = "Idle"
+frames         = [
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10
+]
+frame_duration = 0.064
+min_frame      = 53
+
+[[animations]]
+name           = "Walking"
+frames         = [ 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32 ]
+frame_duration = 0.064
+
+[[animations]]
+name           = "Running"
+frames         = [ 45, 46, 47, 48, 49, 50, 51, 52 ]
+frame_duration = 0.032
+
+[[animations]]
+name           = "Rolling"
+frames         = [
+    53, 54, 55, 56, 53, 54, 57, 58,
+    53, 54, 59, 60, 53, 54, 61, 62
+]
+frame_duration = 0.032
+
+[[animations]]
+name           = "Skidding"
+frames         = [
+    63, 64, 65, 66,
+    67, 68, 69, 70,
+    71, 72, 73
+]
+frame_duration = 0.032
+min_frame      = 10
+
+[[animations]]
+name           = "Pushing"
+frames         = [ 84, 85, 86, 87, 88, 89, 90, 91, 92, 93 ]
+frame_duration = 0.125
+
+[[animations]]
+name           = "Crouching Down"
+frames         = [ 79, 80, 81, 82, 83 ]
+frame_duration = 0.032
+min_frame      = 4
+
+[[animations]]
+name           = "Looking Up"
+frames         = [ 74, 75, 76, 77, 78 ]
+frame_duration = 0.032
+min_frame      = 4
+
+[[animations]]
+name           = "Death"
+frames         = [ 94 ]
