@@ -58,7 +58,9 @@ public:
     ~Animator();
     
     void          setAnimation(int);
+    void          setAnimationByName(std::string name);
     unsigned int  getAnimation(void);
+    unsigned int  getAnimationByName(std::string name);
     unsigned int  numAnimations(void);
     void          update();
     void          draw(glm::mat4& mvp);

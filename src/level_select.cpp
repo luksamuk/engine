@@ -65,7 +65,8 @@ void LevelSelect::update()
             oss << std::setw(linesize)
                 << level.name
                 << ' '
-                << "zone ";
+                //<< "zone "
+                ;
             if(maxlvl > 1)
                 oss << (i + 1);
             oss << std::endl;

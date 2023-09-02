@@ -22,13 +22,34 @@ SpriteScene::SpriteScene(LevelData l, unsigned act)
 {
     lvl = l;
     this->act = act;
+    animator = nullptr;
 }
 
 SpriteScene::~SpriteScene() {}
 #include <iostream>
 #include <typeinfo>
 
-void SpriteScene::load()
+void
+SpriteScene::changeCharacter(unsigned chara)
+{
+    if(animator) {
+        delete animator;
+        animator = nullptr;
+    }
+    
+    switch(chara) {
+    default:
+        animator = resourcesLoadAnimator("resources/animation/sonic.toml");
+        break;
+    case 1:
+        animator = resourcesLoadAnimator("resources/animation/knuckles.toml");
+        break;
+    }
+    animator->setAnimation(0);
+}
+
+void
+SpriteScene::load()
 {
     animator = resourcesLoadAnimator("resources/animation/sonic.toml");
     animator->setAnimation(0);
@@ -143,20 +164,20 @@ void SpriteScene::update()
 
     if(controlsPressing(BTN_DIGITAL_UP)) {
         cameraCenter.y -= 8.0f;
-        animator->setAnimation(8);
+        animator->setAnimationByName("Looking Up");
     }
     if(controlsPressing(BTN_DIGITAL_DOWN)) {
         cameraCenter.y += 8.0f;
-        animator->setAnimation(7);
+        animator->setAnimationByName("Crouching Down");
     }
     if(controlsPressing(BTN_DIGITAL_LEFT)) {
         cameraCenter.x -= 8.0f;
-        animator->setAnimation(2);
+        animator->setAnimationByName("Running");
         direction = -1.0f;
     }
     if(controlsPressing(BTN_DIGITAL_RIGHT)) {
         cameraCenter.x += 8.0f;
-        animator->setAnimation(2);
+        animator->setAnimationByName("Running");
         direction = 1.0f;
     }
 
@@ -164,7 +185,13 @@ void SpriteScene::update()
        !controlsPressing(BTN_DIGITAL_DOWN) &&
        !controlsPressing(BTN_DIGITAL_LEFT) &&
        !controlsPressing(BTN_DIGITAL_RIGHT))
-        animator->setAnimation(0);
+        animator->setAnimationByName("Idle");
+
+    if(controlsPressed(BTN_DIGITAL_ACTIONUP)) {
+        changeCharacter(1);
+    } else if(controlsPressed(BTN_DIGITAL_ACTIONDOWN)) {
+        changeCharacter(0);
+    }
 
     
     view = glm::mat4(1.0f);

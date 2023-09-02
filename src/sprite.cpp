@@ -198,3 +198,20 @@ SpriteFont::draw(glm::mat4& mvp, const char *text)
         ptr++;
     }
 }
+
+void
+Animator::setAnimationByName(std::string name)
+{
+    setAnimation(getAnimationByName(name));
+}
+
+unsigned int
+Animator::getAnimationByName(std::string name)
+{
+    for(unsigned i = 0; i < _data.size(); i++) {
+        if(_data[i].name == name) {
+            return i;
+        }
+    }
+    return 0;
+}

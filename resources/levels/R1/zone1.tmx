@@ -210,7 +210,7 @@
 </data>
  </layer>
  <objectgroup id="3" name="objects">
-  <object id="1" name="spawn_sonic" type="spawner" x="1.23696" y="256.257">
+  <object id="1" name="spawn_sonic" type="spawner" x="384" y="351">
    <point/>
   </object>
  </objectgroup>

@@ -18,6 +18,8 @@ private:
     SpriteFont *font;
     LevelData lvl;
     unsigned  act;
+
+    void changeCharacter(unsigned);
 public:
     SpriteScene(LevelData l, unsigned act);
     virtual ~SpriteScene();
