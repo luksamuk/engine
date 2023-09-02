@@ -3,7 +3,13 @@
 #include <iostream>
 #include <vector>
 
-Animator *
+#include <map>
+
+static std::map<std::string, Texture>             _textures;
+static std::map<std::string, AnimatorPtr>         _animators;
+static std::map<std::string, LevelDataManagerPtr> _levelmanagers;
+
+AnimatorPtr
 resourcesLoadAnimator(const char *path)
 {
     toml::table tbl;
@@ -34,7 +40,7 @@ resourcesLoadAnimator(const char *path)
             data.push_back(datum);
         });
 
-        return new Animator(atlas_path.c_str(), frame_size, data);
+        return std::make_shared<Animator>(atlas_path.c_str(), frame_size, data);
         
     } catch(const toml::parse_error& err) {
         std::cerr << "Error loading animator config \""
@@ -46,10 +52,10 @@ resourcesLoadAnimator(const char *path)
     }
 }
 
-LevelDataManager
+LevelDataManagerPtr
 resourcesLoadLevelDataManager(const char *path)
 {
-    LevelDataManager mng;
+    LevelDataManagerPtr mng = std::make_shared<LevelDataManager>();
     toml::table tbl;
     try {
         tbl = toml::parse_file(path);
@@ -65,7 +71,7 @@ resourcesLoadLevelDataManager(const char *path)
                 auto val = e.value_or("");
                 datum.maps_path.push_back(val);
             });
-            mng.data.push_back(datum);
+            mng->data.push_back(datum);
         });
     } catch(const toml::parse_error& err) {
         std::cerr << "Error loading level data manager \""
@@ -73,6 +79,7 @@ resourcesLoadLevelDataManager(const char *path)
                   << "\": "
                   << err
                   << std::endl;
+        return nullptr;
     }
     return mng;
 }

@@ -2,6 +2,7 @@
 #define RESOURCES_HPP_INCLUDED
 
 #include "sprite.hpp"
+#include <memory>
 
 struct LevelData
 {
@@ -19,7 +20,12 @@ struct LevelDataManager
     // TODO: loadLevel
 };
 
-Animator         *resourcesLoadAnimator(const char *path);
-LevelDataManager  resourcesLoadLevelDataManager(const char *path);
+typedef std::shared_ptr<Animator> AnimatorPtr;
+typedef std::shared_ptr<LevelDataManager> LevelDataManagerPtr;
+
+AnimatorPtr         resourcesLoadAnimator(const char *path);
+LevelDataManagerPtr resourcesLoadLevelDataManager(const char *path);
+
+
 
 #endif

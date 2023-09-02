@@ -41,7 +41,7 @@ std::pair<LevelData, unsigned>
 LevelSelect::fromSelection()
 {
     int currlvl = 0;
-    for(auto& level : manager.data) {
+    for(auto& level : manager->data) {
         unsigned maxlvl = level.maps_path.size();
         maxlvl = maxlvl == 0 ? 1 : maxlvl;
         for(unsigned i = 0; i < maxlvl; i++) {
@@ -64,7 +64,7 @@ void LevelSelect::update()
     oss.clear();
 
     int currlvl = 0;
-    for(auto& level : manager.data) {
+    for(auto& level : manager->data) {
         unsigned maxlvl = level.maps_path.size();
         maxlvl = maxlvl == 0 ? 1 : maxlvl;
         for(unsigned i = 0; i < maxlvl; i++) {

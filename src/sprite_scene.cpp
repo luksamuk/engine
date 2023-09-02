@@ -8,7 +8,7 @@
 #include "tiled.hpp"
 #include "level_select.hpp"
 
-static Animator *movie;
+static std::shared_ptr<Animator> movie;
 
 static SpriteAtlas *chunks;
 static TileData    *tiles;
@@ -39,10 +39,10 @@ SpriteScene::~SpriteScene() {}
 void
 SpriteScene::changeCharacter(unsigned chara)
 {
-    if(animator) {
-        delete animator;
-        animator = nullptr;
-    }
+    // if(animator) {
+    //     delete animator;
+    //     animator = nullptr;
+    // }
     
     switch(chara) {
     default:
@@ -143,8 +143,8 @@ SpriteScene::load()
 void SpriteScene::unload()
 {
     delete font;
-    delete animator;
-    delete movie;
+    //delete animator;
+    //delete movie;
     delete chunks;
     delete tiles;
     delete map;

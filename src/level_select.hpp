@@ -9,7 +9,7 @@
 class LevelSelect : public Scene
 {
 private:
-    LevelDataManager  manager;
+    std::shared_ptr<LevelDataManager>  manager;
     SpriteFont       *font;
     SpriteAtlas      *bg;
     glm::mat4         vp, text_mvp, title_mvp;
