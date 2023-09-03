@@ -7,11 +7,11 @@ maps = [
       "resources/levels/R1/zone1.tmx"
 ]
 
-[[levels]]
-name  = "Amazing Aquarium"
-atlas = ""
-tiles = ""
-maps  = []
+# [[levels]]
+# name  = "Amazing Aquarium"
+# atlas = ""
+# tiles = ""
+# maps  = []
 
 [[levels]]
 name = "Festival Freeway"
@@ -21,35 +21,35 @@ maps = [
      "resources/levels/R2/zone0.tmx"
 ]
 
-[[levels]]
-name  = "R3"
-atlas = ""
-tiles = ""
-maps  = []
+# [[levels]]
+# name  = "R3"
+# atlas = ""
+# tiles = ""
+# maps  = []
 
-[[levels]]
-name  = "R4"
-atlas = ""
-tiles = ""
-maps  = []
+# [[levels]]
+# name  = "R4"
+# atlas = ""
+# tiles = ""
+# maps  = []
 
-[[levels]]
-name  = "Chaotic Corniche"
-atlas = ""
-tiles = ""
-maps  = []
+# [[levels]]
+# name  = "Chaotic Corniche"
+# atlas = ""
+# tiles = ""
+# maps  = []
 
-[[levels]]
-name  = "R5"
-atlas = ""
-tiles = ""
-maps  = []
+# [[levels]]
+# name  = "R5"
+# atlas = ""
+# tiles = ""
+# maps  = []
 
-[[levels]]
-name  = "Cosmic Colony"
-atlas = ""
-tiles = ""
-maps  = []
+# [[levels]]
+# name  = "Cosmic Colony"
+# atlas = ""
+# tiles = ""
+# maps  = []
 
 [[levels]]
 name = "Playground"
