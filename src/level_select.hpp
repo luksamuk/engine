@@ -9,9 +9,10 @@
 class LevelSelect : public Scenes::Scene
 {
 private:
-    std::shared_ptr<Resources::LevelDataManager>  manager;
-    Sprite::Font       *font;
-    Sprite::Atlas      *bg;
+    Resources::LevelDataManagerPtr manager;
+    Resources::FontPtr             font;
+    Resources::AtlasPtr            bg;
+    
     glm::mat4         vp, text_mvp, title_mvp;
     std::string       txt;
     int selection = 0;

@@ -1,19 +1,24 @@
 #include "sprite.hpp"
 
 #include <glm/ext.hpp>
+#include <iostream>
 
 namespace Sprite
 {
     Atlas::Atlas(const char *texturePath, glm::vec2 framesize)
     {
-        texture = Render::Texture::load(texturePath);
-        program = Render::ShaderProgram::link({
+        Resources::Manager::loadTexture(texturePath);
+        Resources::Manager::loadShaderProgram(
+            "spriteatlas", {
                 "resources/shaders/spriteatlas/spriteatlas.vs.glsl",
                 "resources/shaders/spriteatlas/spriteatlas.fs.glsl",
             });
+        
+        texture = Resources::Manager::getTexture(texturePath);
+        program = Resources::Manager::getShaderProgram("spriteatlas");
         this->framesize = framesize;
-        framesize_shader = framesize / this->texture.getSize();
-        framesperline = glm::floor(texture.getSize().x / framesize.x);
+        framesize_shader = framesize / this->texture->getSize();
+        framesperline = glm::floor(texture->getSize().x / framesize.x);
 
         vbo = Render::make_vbo(Render::QuadGeometry::vertices(), Render::QuadGeometry::verticesSize(), GL_STATIC_DRAW);
         ebo = Render::make_ebo(Render::QuadGeometry::elements(), Render::QuadGeometry::elementsSize(), GL_STATIC_DRAW);
@@ -23,11 +28,11 @@ namespace Sprite
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
         glBindVertexArray(vao);
-        mvp_loc        = program.getUniformLocation("mvp");
-        framecoord_loc = program.getUniformLocation("framecoord");
-        framesize_loc  = program.getUniformLocation("framesize");
-        tex_loc        = program.getUniformLocation("tex");
-        vpos_loc       = program.getAttribLocation("vpos");
+        mvp_loc        = program->getUniformLocation("mvp");
+        framecoord_loc = program->getUniformLocation("framecoord");
+        framesize_loc  = program->getUniformLocation("framesize");
+        tex_loc        = program->getUniformLocation("tex");
+        vpos_loc       = program->getAttribLocation("vpos");
 
         glEnableVertexAttribArray(vpos_loc);
         glVertexAttribPointer(
@@ -41,8 +46,8 @@ namespace Sprite
 
     Atlas::~Atlas()
     {
-        texture.dispose();
-        program.dispose();
+        //texture.dispose();
+        //program.dispose();
         glDeleteVertexArrays(1, &vao);
         glDeleteBuffers(1, &vbo);
         glDeleteBuffers(1, &ebo);
@@ -68,12 +73,12 @@ namespace Sprite
         framecoord.y = glm::floor(framecoord.x / framesperline);
         framecoord.x = glm::mod(framecoord.x, framesperline);
     
-        program.use();
+        program->use();
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBindVertexArray(vao);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
         glActiveTexture(GL_TEXTURE0);
-        texture.bind();
+        texture->bind();
         glUniformMatrix4fv(mvp_loc, 1, GL_FALSE, glm::value_ptr(mvp));
         glUniform2fv(framecoord_loc, 1, glm::value_ptr(framecoord));
         glUniform2fv(framesize_loc, 1, glm::value_ptr(framesize_shader));
@@ -84,7 +89,8 @@ namespace Sprite
 
     Animator::Animator(const char *atlaspath, glm::vec2 framesize)
     {
-        atlas = new Atlas(atlaspath, framesize);
+        Resources::Manager::loadAtlas(atlaspath, framesize);
+        atlas = Resources::Manager::getAtlas(atlaspath);
     }
 
     Animator::Animator(const char *atlaspath,
@@ -98,7 +104,7 @@ namespace Sprite
 
     Animator::~Animator()
     {
-        delete atlas;
+        //delete atlas;
     }
 
     void
@@ -162,12 +168,13 @@ namespace Sprite
 
     Font::Font(const char *atlaspath, glm::vec2 glyphsize)
     {
-        atlas = new Atlas(atlaspath, glyphsize);
+        Resources::Manager::loadAtlas(atlaspath, glyphsize);
+        atlas = Resources::Manager::getAtlas(atlaspath);
     }
 
     Font::~Font()
     {
-        delete atlas;
+        //delete atlas;
     }
 
     void

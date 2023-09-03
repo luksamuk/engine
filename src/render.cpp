@@ -117,7 +117,7 @@ namespace Render
     };
 
     GLuint
-    load_texture(const char *path, glm::vec2& size)
+    raw_load_texture(const char *path, glm::vec2& size)
     {
         GLuint tex;
         GLint old_tex;
@@ -147,7 +147,7 @@ namespace Render
     }
 
     GLuint
-    load_shader(const char *path)
+    raw_load_shader(const char *path)
     {
         GLuint type;
         if(strstr(path, ".vs")) {
@@ -172,7 +172,7 @@ namespace Render
     }
 
     GLuint
-    link_program(GLuint vertex_shader, GLuint fragment_shader)
+    raw_link_program(GLuint vertex_shader, GLuint fragment_shader)
     {
         GLuint program = glCreateProgram();
         glAttachShader(program, vertex_shader);
@@ -215,12 +215,17 @@ namespace Render
         return vao;
     }
 
+    Texture::~Texture()
+    {
+        std::cout << "Delete texture" << std::endl;
+        this->dispose();
+    }
 
-    Texture
+    Texture *
     Texture::load(const char *path)
     {
-        Texture t;
-        t._texture = load_texture(path, t._size);
+        Texture *t = new Texture();
+        t->_texture = raw_load_texture(path, t->_size);
         return t;
     }
 
@@ -242,18 +247,24 @@ namespace Render
         glDeleteTextures(1, &this->_texture);
     }
 
-    ShaderProgram
+    ShaderProgram::~ShaderProgram()
+    {
+        std::cout << "Delete shader program" << std::endl;
+        this->dispose();
+    }
+
+    ShaderProgram *
     ShaderProgram::link(const std::vector<const char*> shaderpaths)
     {
-        ShaderProgram p;
+        ShaderProgram *p = new ShaderProgram();
         std::vector<GLuint> shaders;
-        p._program = glCreateProgram();
+        p->_program = glCreateProgram();
         for(auto path : shaderpaths) {
-            GLuint shader = load_shader(path);
-            glAttachShader(p._program, shader);
+            GLuint shader = raw_load_shader(path);
+            glAttachShader(p->_program, shader);
             shaders.push_back(shader);
         }
-        glLinkProgram(p._program);
+        glLinkProgram(p->_program);
         for(auto shader : shaders) {
             glDeleteShader(shader);
         }

@@ -14,9 +14,9 @@ class SpriteScene : public Scenes::Scene
 private:
 
     glm::mat4 model, view, projection;
-    std::shared_ptr<Sprite::Animator> animator;
-    Sprite::Font *font;
-    Resources::LevelData lvl;
+    Resources::AnimatorPtr animator;
+    Resources::FontPtr     font;
+    Resources::LevelData   lvl;
     unsigned  act;
 
     void changeCharacter(unsigned);

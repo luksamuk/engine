@@ -5,13 +5,14 @@
 #include <map>
 #include <glm/glm.hpp>
 #include <string>
+#include "resources.hpp"
 
 namespace Sprite
 {
     class Atlas
     {
     private:
-        Render::Texture texture;
+        Resources::TexturePtr texture;
         unsigned int frame = 0;
         glm::vec2 framesize, framesize_shader, framecoord;
         float framesperline;
@@ -19,7 +20,7 @@ namespace Sprite
         GLuint vao;
     
         // TODO: The following should be shared resources
-        Render::ShaderProgram program;
+        Resources::ShaderProgramPtr program;
         GLuint vbo, ebo;
     public:
         Atlas(const char *texturePath, glm::vec2 framesize);
@@ -48,7 +49,7 @@ namespace Sprite
         double       _lastCheck        = 0.0f;
         unsigned int _minFrame         = 0,
             _iterFrame        = 0;
-        Atlas                                  *atlas;
+        Resources::AtlasPtr                     atlas;
         std::map<unsigned int, AnimationData>   _data;
         AnimationData                          *_currentData;
     
@@ -70,7 +71,7 @@ namespace Sprite
     class Font
     {
     private:
-        Atlas *atlas;
+        Resources::AtlasPtr atlas;
     public:
         Font(const char *atlaspath, glm::vec2 glyphsize);
         ~Font();

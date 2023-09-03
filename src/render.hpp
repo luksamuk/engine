@@ -19,10 +19,11 @@ namespace Render
         GLuint    _texture;
         glm::vec2 _size;
     public:
-        static Texture load(const char *path);
-        void           bind(void);
-        glm::vec2      getSize(void);
-        void           dispose(void);
+        ~Texture();
+        static Texture *load(const char *path);
+        void            bind(void);
+        glm::vec2       getSize(void);
+        void            dispose(void);
     };
 
     struct ShaderProgram
@@ -30,11 +31,12 @@ namespace Render
     private:
         GLuint _program;
     public:
-        static ShaderProgram link(const std::vector<const char*> shaderpaths);
-        void                 use(void);
-        GLuint               getAttribLocation(const char *name);
-        GLuint               getUniformLocation(const char *name);
-        void                 dispose(void);
+        ~ShaderProgram();
+        static ShaderProgram *link(const std::vector<const char*> shaderpaths);
+        void                  use(void);
+        GLuint                getAttribLocation(const char *name);
+        GLuint                getUniformLocation(const char *name);
+        void                  dispose(void);
     };
 
     struct QuadGeometry
@@ -52,9 +54,9 @@ namespace Render
         static unsigned int         elementsSize(void);
     };
 
-    GLuint  load_texture(const char *path, glm::vec2& size);
-    GLuint  load_shader(const char *path);
-    GLuint  link_program(GLuint vs, GLuint fs);
+    GLuint  raw_load_texture(const char *path, glm::vec2& size);
+    GLuint  raw_load_shader(const char *path);
+    GLuint  raw_link_program(GLuint vs, GLuint fs);
     GLuint  make_vbo(const void *data, size_t size, GLenum usage);
     GLuint  make_vao(void);
     GLuint  make_ebo(const void *data, size_t size, GLenum usage);

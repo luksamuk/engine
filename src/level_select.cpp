@@ -21,11 +21,16 @@ LevelSelect::~LevelSelect()
 
 void LevelSelect::load()
 {
-    manager = Resources::loadLevelDataManager("resources/leveldata.toml");
-    font = new Sprite::Font("resources/sprites/fonts/levelselect.png",
-                            glm::vec2(10.0f, 10.0f));
-    bg = new Sprite::Atlas("resources/background/levelselect.png",
-                           glm::vec2(96.0f, 64.0f));
+    Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
+                                 glm::vec2(10.0f, 10.0f));
+    Resources::Manager::loadLevelDataManager("resources/leveldata.toml");
+    Resources::Manager::loadAtlas("resources/background/levelselect.png",
+                                  glm::vec2(96.0f, 64.0f));
+    
+
+    manager = Resources::Manager::getLevelDataManager("resources/leveldata.toml");
+    font = Resources::Manager::getFont("resources/sprites/fonts/levelselect.png");
+    bg = Resources::Manager::getAtlas("resources/background/levelselect.png");
     bg->setFrame(0);
 
     vp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
@@ -130,6 +135,6 @@ void LevelSelect::draw()
 
 void LevelSelect::unload()
 {
-    delete font;
-    delete bg;
+    //delete font;
+    //delete bg;
 }

@@ -41,9 +41,9 @@ void TestScene::load()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
 
     // Load shaders
-    GLuint vs = Render::load_shader("resources/shaders/default/default.vs.glsl");
-    GLuint fs = Render::load_shader("resources/shaders/default/default.fs.glsl");
-    program = Render::link_program(vs, fs);
+    GLuint vs = Render::raw_load_shader("resources/shaders/default/default.vs.glsl");
+    GLuint fs = Render::raw_load_shader("resources/shaders/default/default.fs.glsl");
+    program = Render::raw_link_program(vs, fs);
     glDeleteShader(vs);
     glDeleteShader(fs);
 

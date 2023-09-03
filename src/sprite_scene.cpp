@@ -39,20 +39,15 @@ SpriteScene::~SpriteScene() {}
 void
 SpriteScene::changeCharacter(unsigned chara)
 {
-    // if(animator) {
-    //     delete animator;
-    //     animator = nullptr;
-    // }
-    
     switch(chara) {
     default:
-        animator = Resources::loadAnimator("resources/animation/sonic.toml");
+        animator = Resources::Manager::getAnimator("resources/animation/sonic.toml");
         break;
     case 1:
-        animator = Resources::loadAnimator("resources/animation/knuckles.toml");
+        animator = Resources::Manager::getAnimator("resources/animation/knuckles.toml");
         break;
     case 2:
-        animator = Resources::loadAnimator("resources/animation/sonic1mania.toml");
+        animator = Resources::Manager::getAnimator("resources/animation/sonic1mania.toml");
         break;
     }
     animator->setAnimation(0);
@@ -67,13 +62,19 @@ SpriteScene::changeCharacter(unsigned chara)
 void
 SpriteScene::load()
 {
+    Resources::Manager::loadAnimator("resources/animation/movie.toml");
+    Resources::Manager::loadAnimator("resources/animation/sonic.toml");
+    Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
+    Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
+    Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
+                                 glm::vec2(10.0f, 10.0f));
+    
     changeCharacter(0);
 
-    movie = Resources::loadAnimator("resources/animation/movie.toml");
+    movie = Resources::Manager::getAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
 
-    font = new Sprite::Font("resources/sprites/fonts/levelselect.png",
-                            glm::vec2(10.0f, 10.0f));
+    font = Resources::Manager::getFont("resources/sprites/fonts/levelselect.png");
 
     cameraCenter = viewportSize / 2.0f;
 
@@ -142,7 +143,7 @@ SpriteScene::load()
 
 void SpriteScene::unload()
 {
-    delete font;
+    //delete font;
     //delete animator;
     //delete movie;
     delete chunks;

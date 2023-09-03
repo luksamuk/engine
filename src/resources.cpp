@@ -1,4 +1,6 @@
 #include "resources.hpp"
+#include "sprite.hpp"
+#include "render.hpp"
 #include <toml++/toml.h>
 #include <iostream>
 #include <vector>
@@ -7,13 +9,8 @@
 
 namespace Resources
 {
-    static std::map<std::string, Render::Texture>     _textures;
-    static std::map<std::string, AnimatorPtr>         _animators;
-    static std::map<std::string, LevelDataManagerPtr> _levelmanagers;
-
-
     AnimatorPtr
-    loadAnimator(const char *path)
+    rawLoadAnimator(const char *path)
     {
         toml::table tbl;
 
@@ -56,7 +53,7 @@ namespace Resources
     }
 
     LevelDataManagerPtr
-    loadLevelDataManager(const char *path)
+    rawLoadLevelDataManager(const char *path)
     {
         LevelDataManagerPtr mng = std::make_shared<LevelDataManager>();
         toml::table tbl;
@@ -97,5 +94,119 @@ namespace Resources
             }
         }
         return nullptr;
+    }
+
+    static std::map<std::string, TexturePtr>          _textures;
+    static std::map<std::string, AtlasPtr>            _atlases;
+    static std::map<std::string, AnimatorPtr>         _animators;
+    static std::map<std::string, LevelDataManagerPtr> _levelmanagers;
+    static std::map<std::string, ShaderProgramPtr>    _shaderprograms;
+    static std::map<std::string, FontPtr>             _fonts;
+    
+    void
+    Manager::dispose()
+    {
+        _textures.clear();
+        _atlases.clear();
+        _animators.clear();
+        _levelmanagers.clear();
+        _shaderprograms.clear();
+        _fonts.clear();
+    }
+    
+    void
+    Manager::loadTexture(std::string path)
+    {
+        if(_textures.find(path) == _textures.end()) {
+            std::cout << "Loading texture \"" << path << "\"" << std::endl;
+            _textures[path] = TexturePtr(Render::Texture::load(path.c_str()));
+        }
+    }
+
+    void
+    Manager::loadAtlas(std::string path, glm::vec2 framesize)
+    {
+        if(_atlases.find(path) == _atlases.end()) {
+            std::cout << "Loading atlas \"" << path << "\"" << std::endl;
+            _atlases[path] = std::make_shared<Sprite::Atlas>(path.c_str(), framesize);
+        }
+    }
+    
+    void
+    Manager::loadAnimator(std::string path)
+    {
+        if(_animators.find(path) == _animators.end()) {
+            std::cout << "Loading animator \"" << path << "\"" << std::endl;
+            _animators[path] = rawLoadAnimator(path.c_str());
+        }
+    }
+    
+    void
+    Manager::loadLevelDataManager(std::string path)
+    {
+        if(_levelmanagers.find(path) == _levelmanagers.end()) {
+            std::cout << "Loading level data manager \"" << path << "\"" << std::endl;
+            _levelmanagers[path] = rawLoadLevelDataManager(path.c_str());
+        }
+    }
+
+    void
+    Manager::loadShaderProgram(std::string name, std::vector<const char *> shaders)
+    {
+        if(_shaderprograms.find(name) == _shaderprograms.end()) {
+            std::cout << "Loading shader program \"" << name << "\"" << std::endl;
+            _shaderprograms[name] = ShaderProgramPtr(Render::ShaderProgram::link(shaders));
+        }
+    }
+
+    void
+    Manager::loadFont(std::string path, glm::vec2 glyphsize)
+    {
+        if(_fonts.find(path) == _fonts.end()) {
+            std::cout << "Loading font \"" << path << "\"" << std::endl;
+            _fonts[path] = std::make_shared<Sprite::Font>(path.c_str(), glyphsize);
+        }
+    }
+
+    TexturePtr
+    Manager::getTexture(std::string path)
+    {
+        auto itr = _textures.find(path);
+        return itr == _textures.end() ? nullptr : itr->second;
+    }
+
+    AtlasPtr
+    Manager::getAtlas(std::string path)
+    {
+        auto itr = _atlases.find(path);
+        return itr == _atlases.end() ? nullptr : itr->second;
+    }
+    
+    AnimatorPtr
+    Manager::getAnimator(std::string path)
+    {
+        auto itr = _animators.find(path);
+        return itr == _animators.end() ? nullptr : itr->second;
+    }
+    
+    LevelDataManagerPtr
+    Manager::getLevelDataManager(std::string path)
+    {
+        auto itr = _levelmanagers.find(path);
+        return itr == _levelmanagers.end() ? nullptr : itr->second;
+    }
+
+    ShaderProgramPtr
+    Manager::getShaderProgram(std::string path)
+    {
+        auto itr = _shaderprograms.find(path);
+        return itr == _shaderprograms.end() ? nullptr : itr->second;
+    }
+
+    FontPtr
+    Manager::getFont(std::string path)
+    {
+        auto itr = _fonts.find(path);
+        return itr == _fonts.end() ? nullptr : itr->second;
     }
 }
