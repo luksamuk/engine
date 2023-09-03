@@ -12,6 +12,7 @@ namespace Controls
     static ButtonState old_state;
 
     static int kbdmap[GLFW_KEY_LAST + 1];
+    static bool using_gamepad = false;
 
     static void
     process_keys(
@@ -24,6 +25,8 @@ namespace Controls
         UNUSED(window);
         UNUSED(scancode);
         UNUSED(mods);
+
+        if(using_gamepad) return;
     
         DigitalButton btn = (DigitalButton)kbdmap[key];
         bool pressed = (action == GLFW_PRESS) || (action == GLFW_REPEAT);
@@ -90,6 +93,26 @@ namespace Controls
     process(void)
     {
         memcpy(&old_state, &current_state, sizeof(ButtonState));
+        
+        // Gamepad controls
+        if(glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
+            using_gamepad = true;
+            GLFWgamepadstate state;
+            if(glfwGetGamepadState(GLFW_JOYSTICK_1, &state)) {
+                current_state.dpadup = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_UP];
+                current_state.dpaddown = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_DOWN];
+                current_state.dpadleft = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_LEFT];
+                current_state.dpadright = state.buttons[GLFW_GAMEPAD_BUTTON_DPAD_RIGHT];
+                current_state.start = state.buttons[GLFW_GAMEPAD_BUTTON_START];
+                current_state.option = state.buttons[GLFW_GAMEPAD_BUTTON_BACK];
+                current_state.actionup = state.buttons[GLFW_GAMEPAD_BUTTON_TRIANGLE];
+                current_state.actiondown = state.buttons[GLFW_GAMEPAD_BUTTON_CROSS];
+                current_state.actionleft = state.buttons[GLFW_GAMEPAD_BUTTON_SQUARE];
+                current_state.actionright = state.buttons[GLFW_GAMEPAD_BUTTON_CIRCLE];
+            }
+        } else {
+            using_gamepad = false;
+        }
     }
 
 
@@ -109,5 +132,11 @@ namespace Controls
     mousePos(void)
     {
         return mouse_pos;
+    }
+
+    bool
+    isGamepad(void)
+    {
+        return using_gamepad;
     }
 }

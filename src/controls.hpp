@@ -47,6 +47,7 @@ namespace Controls
     bool      pressing(DigitalButton);
     bool      pressed(DigitalButton);
     glm::vec2 mousePos(void);
+    bool      isGamepad(void);
 
 }
     
