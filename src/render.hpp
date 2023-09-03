@@ -60,6 +60,8 @@ namespace Render
     GLuint  make_vbo(const void *data, size_t size, GLenum usage);
     GLuint  make_vao(void);
     GLuint  make_ebo(const void *data, size_t size, GLenum usage);
+
+    void    setClearColor(glm::vec4 color);
 }
 
 #endif

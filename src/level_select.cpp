@@ -40,6 +40,8 @@ void LevelSelect::load()
 
     title_mvp = vp *
         glm::translate(glm::mat4(1.0f), glm::vec3(140.0f, 20.0f, 0.0f));
+
+    Render::setClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
 std::pair<Resources::LevelData, unsigned>

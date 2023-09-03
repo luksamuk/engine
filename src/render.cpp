@@ -106,7 +106,7 @@ namespace Render
     
         glViewport(0, 0, winSize.x, winSize.y);
 
-        glClearColor(0.392f, 0.584f, 0.929f, 1.0f);
+        setClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
     
         std::cout << "OpenGL version: "
                   << glGetString(GL_VERSION)
@@ -115,6 +115,12 @@ namespace Render
                   << glGetString(GL_SHADING_LANGUAGE_VERSION)
                   << std::endl;
     };
+
+    void
+    setClearColor(glm::vec4 color)
+    {
+        glClearColor(color.r, color.g, color.b, color.a);
+    }
 
     GLuint
     raw_load_texture(const char *path, glm::vec2& size)

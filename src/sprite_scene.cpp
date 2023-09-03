@@ -149,6 +149,8 @@ SpriteScene::load()
     //     }
     //     std::cout << std::endl;
     // }
+
+    Render::setClearColor(glm::vec4(0.392f, 0.584f, 0.929f, 1.0f));
 }
 
 void SpriteScene::unload()
@@ -194,11 +196,15 @@ void SpriteScene::update()
     } else {
          if(Controls::pressing(BTN_DIGITAL_UP)) {
              cameraCenter.y -= 8.0f;
-             animator->setAnimation(ANIM_LOOKUP);
+             if(!Controls::pressing(BTN_DIGITAL_LEFT)
+                && !Controls::pressing(BTN_DIGITAL_RIGHT))
+                 animator->setAnimation(ANIM_LOOKUP);
          }
          if(Controls::pressing(BTN_DIGITAL_DOWN)) {
              cameraCenter.y += 8.0f;
-             animator->setAnimation(ANIM_CROUCHDOWN);
+             if(!Controls::pressing(BTN_DIGITAL_LEFT)
+                && !Controls::pressing(BTN_DIGITAL_RIGHT))
+                 animator->setAnimation(ANIM_CROUCHDOWN);
          }
          if(Controls::pressing(BTN_DIGITAL_LEFT)) {
              cameraCenter.x -= 8.0f;
@@ -261,9 +267,11 @@ void SpriteScene::draw()
     {
         std::ostringstream oss;
         oss.clear();
-        oss << "X:    " << cameraCenter.x << std::endl
-            << "Y:    " << cameraCenter.y << std::endl
-            << "Anim: " << animator->getAnimation();
+        oss << "X:         " << cameraCenter.x << std::endl
+            << "Y:         " << cameraCenter.y << std::endl
+            << "Direction: " << (direction < 0.0f ? "Left" : "Right") << std::endl
+            << "Animation: " << animator->getAnimation() << std::endl
+            << "Gamepad:   " << (Controls::isGamepad() ? "Yes" : "No");
         font->draw(font_mvp, oss.str().c_str());
     }
     
