@@ -47,6 +47,8 @@ namespace Resources
     {
     public:
         static void dispose();
+        static void garbageCollect();
+        
         static void loadTexture(std::string path);
         static void loadAtlas(std::string path, glm::vec2 framesize);
         static void loadAnimator(std::string path);

@@ -4,8 +4,8 @@
 #include <toml++/toml.h>
 #include <iostream>
 #include <vector>
-
 #include <map>
+#include <stack>
 
 namespace Resources
 {
@@ -112,6 +112,38 @@ namespace Resources
         _levelmanagers.clear();
         _shaderprograms.clear();
         _fonts.clear();
+    }
+
+    template<typename P>
+    void
+    _rawGC(std::map<std::string, std::shared_ptr<P>>& collection)
+    {
+        std::stack<std::string> garbage;
+        for(auto& pair : collection) {
+            if(pair.second.use_count() == 1)
+                garbage.push(pair.first);
+        }
+
+        if(!garbage.empty()) {
+            std::cout << "Removing " << garbage.size() << " garbage assets" << std::endl;
+        }
+        
+        while(!garbage.empty()) {
+            auto name = garbage.top(); garbage.pop();
+            collection.erase(name);
+        }
+    }
+
+    void
+    Manager::garbageCollect()
+    {
+        std::cout << "Running resources garbage collector" << std::endl;
+        _rawGC(_textures);
+        _rawGC(_atlases);
+        _rawGC(_animators);
+        _rawGC(_levelmanagers);
+        _rawGC(_shaderprograms);
+        _rawGC(_fonts);
     }
     
     void

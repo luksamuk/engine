@@ -2,10 +2,13 @@
 
 #include <stack>
 #include <algorithm>
+#include <queue>
+#include "resources.hpp"
 
 namespace Scenes
 {
     static Manager *_manager = nullptr;
+    static std::queue<Scene*> newScenes;
 
     void
     Scene::setShouldUnload(bool state)
@@ -39,9 +42,10 @@ namespace Scenes
     Manager::add(Scene* s)
     {
         if(s) {
-            s->load();
-            // TODO: is this safe? Should we queue for addition?
-            Manager::get()._scenes.push_back(s);
+            // TODO: Queue for addition on updateAll
+            //s->load();
+            //Manager::get()._scenes.push_back(s);
+            newScenes.push(s);
         }
     }
 
@@ -55,9 +59,12 @@ namespace Scenes
     Manager::updateAll()
     {
         std::stack<Scene*> shouldRemove;
+        bool shouldRunGC = false;
         for(auto scene : Manager::get()._scenes) {
-            if(scene->getShouldUnload())
+            if(scene->getShouldUnload()) {
                 shouldRemove.push(scene);
+                shouldRunGC = true;
+            }
             else scene->update();
         }
 
@@ -77,6 +84,17 @@ namespace Scenes
 
             delete s;
         }
+
+        // load and add enqueued scenes
+        while(!newScenes.empty()) {
+            shouldRunGC = true;
+            auto s = newScenes.front(); newScenes.pop();
+            s->load();
+            Manager::get()._scenes.push_back(s);
+        }
+
+        // At this point, if we added/removed a scene, run resource GC
+        if(shouldRunGC) Resources::Manager::garbageCollect();
     }
 
     void

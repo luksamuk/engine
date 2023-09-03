@@ -14,10 +14,10 @@
 
 static Resources::AnimatorPtr movie;
 
-static Sprite::Atlas     *chunks;
-static Tiled::TileData    *tiles;
-static Tiled::TileMap     *map;
-static glm::vec2         cameraCenter;
+static Resources::AtlasPtr  chunks;
+static Tiled::TileData     *tiles;
+static Tiled::TileMap      *map;
+static glm::vec2           cameraCenter;
 
 const glm::vec2 viewportSize(320.0f, 224.0f);
 //const glm::vec2 viewportSize(640.0f, 360.0f);
@@ -43,13 +43,13 @@ SpriteScene::changeCharacter(unsigned chara)
 {
     switch(chara) {
     default:
-        animator = Resources::Manager::getAnimator("resources/animation/sonic.toml");
+        animator = sonicAnim;
         break;
     case 1:
-        animator = Resources::Manager::getAnimator("resources/animation/knuckles.toml");
+        animator = knucklesAnim;
         break;
     case 2:
-        animator = Resources::Manager::getAnimator("resources/animation/sonic1mania.toml");
+        animator = sonicManiaAnim;
         break;
     }
     animator->setAnimation(0);
@@ -70,8 +70,12 @@ SpriteScene::load()
     Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
     Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
                                  glm::vec2(10.0f, 10.0f));
+
+    sonicAnim    = Resources::Manager::getAnimator("resources/animation/sonic.toml");
+    knucklesAnim = Resources::Manager::getAnimator("resources/animation/knuckles.toml");
+    sonicManiaAnim = Resources::Manager::getAnimator("resources/animation/sonic1mania.toml");
     
-    changeCharacter(0);
+    changeCharacter(2);
 
     movie = Resources::Manager::getAnimator("resources/animation/movie.toml");
     movie->setAnimation(0);
@@ -80,9 +84,11 @@ SpriteScene::load()
 
     cameraCenter = viewportSize / 2.0f;
 
+    // Loading level data
     tiles = new Tiled::TileData(lvl.tiles_path.c_str());
-    chunks = new Sprite::Atlas(lvl.atlas_path.c_str(),
-                               tiles->tilesize);
+    Resources::Manager::loadAtlas(lvl.atlas_path.c_str(),
+                                  tiles->tilesize);
+    chunks = Resources::Manager::getAtlas(lvl.atlas_path.c_str());
     map = new Tiled::TileMap(lvl.maps_path[act].c_str());
 
     auto spawnpoint = map->getObject("spawn_sonic");
@@ -90,14 +96,15 @@ SpriteScene::load()
         cameraCenter = spawnpoint->position;
     }
 
-    std::cout << "TILE DATA" << std::endl
-              << "version: " << tiles->version << std::endl
-              << "tiledversion: " << tiles->tiledversion << std::endl
-              << "tilewidth: " << tiles->tilewidth << std::endl
-              << "tileheight: " << tiles->tileheight << std::endl
-              << "tilecount: " << tiles->tilecount << std::endl
-              << "columns: " << tiles->columns << std::endl
-              << std::endl;
+    // std::cout << "TILE DATA" << std::endl
+    //           << "version: " << tiles->version << std::endl
+    //           << "tiledversion: " << tiles->tiledversion << std::endl
+    //           << "tilewidth: " << tiles->tilewidth << std::endl
+    //           << "tileheight: " << tiles->tileheight << std::endl
+    //           << "tilecount: " << tiles->tilecount << std::endl
+    //           << "columns: " << tiles->columns << std::endl
+    //           << std::endl;
+    
     // for(unsigned i = 0; i < tiles->collisionarrays.size(); i++) {
     //     std::cout << "Tile #" << i;
     //     if(tiles->collisionarrays[i] == std::nullopt) {
@@ -110,18 +117,19 @@ SpriteScene::load()
     //     }
     // }
 
-    std::cout << "MAP DATA" << std::endl
-              << "version: " << map->version << std::endl
-              << "tiledversion: " << map->tiledversion << std::endl
-              << "orientation: " << map->orientation << std::endl
-              << "renderorder: " << map->renderorder << std::endl
-              << "width: " << map->width << std::endl
-              << "height: " << map->height << std::endl
-              << "tilewidth: " << map->tilewidth << std::endl
-              << "infinite: " << map->infinite << std::endl
-              << "nextlayerid: " << map->nextlayerid << std::endl
-              << "nextobjectid: " << map->nextobjectid << std::endl
-              << "# layers: " << map->layers.size() << std::endl;
+    // std::cout << "MAP DATA" << std::endl
+    //           << "version: " << map->version << std::endl
+    //           << "tiledversion: " << map->tiledversion << std::endl
+    //           << "orientation: " << map->orientation << std::endl
+    //           << "renderorder: " << map->renderorder << std::endl
+    //           << "width: " << map->width << std::endl
+    //           << "height: " << map->height << std::endl
+    //           << "tilewidth: " << map->tilewidth << std::endl
+    //           << "infinite: " << map->infinite << std::endl
+    //           << "nextlayerid: " << map->nextlayerid << std::endl
+    //           << "nextobjectid: " << map->nextobjectid << std::endl
+    //           << "# layers: " << map->layers.size() << std::endl;
+    
     // for(auto& layer : map->layers) {
     //     std::cout << "  Layer #" << layer.id
     //               << ' ' << '(' << layer.name << ')' << std::endl
@@ -148,7 +156,7 @@ void SpriteScene::unload()
     //delete font;
     //delete animator;
     //delete movie;
-    delete chunks;
+    //delete chunks;
     delete tiles;
     delete map;
 }

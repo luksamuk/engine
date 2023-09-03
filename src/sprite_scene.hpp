@@ -19,6 +19,10 @@ private:
     Resources::LevelData   lvl;
     unsigned  act;
 
+    Resources::AnimatorPtr sonicAnim;
+    Resources::AnimatorPtr knucklesAnim;
+    Resources::AnimatorPtr sonicManiaAnim;
+
     void changeCharacter(unsigned);
 public:
     SpriteScene(Resources::LevelData l, unsigned act);
