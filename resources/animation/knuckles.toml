@@ -18,7 +18,7 @@ min_frame      = 47
 [[animations]]
 name           = "Walking"
 frames         = [ 16, 17, 18, 19, 20, 21, 22, 23 ]
-frame_duration = 0.128
+frame_duration = 0.096
 
 [[animations]]
 name           = "Running"

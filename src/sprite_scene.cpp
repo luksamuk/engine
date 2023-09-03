@@ -8,12 +8,16 @@
 #include "tiled.hpp"
 #include "level_select.hpp"
 
-static std::shared_ptr<Sprite::Animator> movie;
+#include <iostream>
+#include <typeinfo>
+#include <sstream>
 
-static Sprite::Atlas *chunks;
+static Resources::AnimatorPtr movie;
+
+static Sprite::Atlas     *chunks;
 static Tiled::TileData    *tiles;
 static Tiled::TileMap     *map;
-static glm::vec2 cameraCenter;
+static glm::vec2         cameraCenter;
 
 const glm::vec2 viewportSize(320.0f, 224.0f);
 //const glm::vec2 viewportSize(640.0f, 360.0f);
@@ -33,8 +37,6 @@ SpriteScene::SpriteScene(Resources::LevelData l, unsigned act)
 }
 
 SpriteScene::~SpriteScene() {}
-#include <iostream>
-#include <typeinfo>
 
 void
 SpriteScene::changeCharacter(unsigned chara)
@@ -54,7 +56,7 @@ SpriteScene::changeCharacter(unsigned chara)
 
     ANIM_LOOKUP     = animator->getAnimationByName("Looking Up");
     ANIM_CROUCHDOWN = animator->getAnimationByName("Crouching Down");
-    ANIM_RUNNING    = animator->getAnimationByName("Running");
+    ANIM_RUNNING    = animator->getAnimationByName("Walking");
     ANIM_IDLE       = animator->getAnimationByName("Idle");
     ANIM_ROLLING    = animator->getAnimationByName("Rolling");
 }
@@ -246,7 +248,16 @@ void SpriteScene::draw()
         projection *
         view *
         glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 0.0f));
-    font->draw(font_mvp, "Hello world!\n\rThis is a test.");
+
+    // Text
+    {
+        std::ostringstream oss;
+        oss.clear();
+        oss << "X:    " << cameraCenter.x << std::endl
+            << "Y:    " << cameraCenter.y << std::endl
+            << "Anim: " << animator->getAnimation();
+        font->draw(font_mvp, oss.str().c_str());
+    }
     
     animator->draw(mvp);
 
