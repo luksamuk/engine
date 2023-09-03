@@ -2,6 +2,7 @@
 
 #include "render.hpp"
 #include "controls.hpp"
+#include "level_select.hpp"
 
 #include <glm/ext.hpp>
 
@@ -94,6 +95,11 @@ void TestScene::unload()
 
 void TestScene::update()
 {
+    if(Controls::pressed(BTN_DIGITAL_OPTION)) {
+        Scenes::Manager::add(new LevelSelect());
+        setShouldUnload(true);
+    }
+    
     // Rotation parameters
     static float rotationX = glm::radians(1.0f);
     static float rotationY = 0.0f;

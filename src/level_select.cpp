@@ -1,15 +1,28 @@
 #include "level_select.hpp"
 #include <sstream>
 #include <iomanip>
+#include <functional>
 
 #include "controls.hpp"
 
 #include <glm/ext.hpp>
 
 #include "sprite_scene.hpp"
+#include "test_scene.hpp"
 
 //const glm::vec2 viewportSize(320.0f, 224.0f);
 const glm::vec2 viewportSize(480.0f, 336.0f);
+
+typedef std::function<Scenes::Scene*()> SceneCreatorFn;
+
+struct SceneEntry {
+    std::string name;
+    SceneCreatorFn spawner;
+};
+
+const std::vector<SceneEntry> extra_scenes = {
+    {"Render Test", []() { return new TestScene(); } },
+};
 
 LevelSelect::LevelSelect()
 {
@@ -91,6 +104,19 @@ void LevelSelect::update()
         }
         oss << std::endl;
     }
+    for(auto& entry : extra_scenes) {
+        if(selection == currlvl) {
+            oss << "* ";
+        } else {
+            oss << "  ";
+        }
+        oss << std::left
+            << std::setw(linesize)
+            << entry.name
+            << std::endl;
+        currlvl++;
+    }
+    
     txt = oss.str();
 
     if(Controls::pressed(BTN_DIGITAL_UP))
@@ -102,9 +128,15 @@ void LevelSelect::update()
     if(selection < 0) selection = currlvl - 1;
 
     if(Controls::pressed(BTN_DIGITAL_START)) {
-        auto lvldata = fromSelection();
-        if(lvldata.first.maps_path.size() > 0) {
-            Scenes::Manager::add(new SpriteScene(lvldata.first, lvldata.second));
+        if(selection <= (int)manager->data.size()) {
+            auto lvldata = fromSelection();
+            if(lvldata.first.maps_path.size() > 0) {
+                Scenes::Manager::add(new SpriteScene(lvldata.first, lvldata.second));
+                setShouldUnload(true);
+            }
+        } else {
+            int sel = selection - (int)manager->data.size() - 1;
+            Scenes::Manager::add(extra_scenes[sel].spawner());
             setShouldUnload(true);
         }
     }

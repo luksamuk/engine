@@ -11,7 +11,6 @@ main(void)
     Core::init();
 
     Scenes::Manager::add(new LevelSelect());
-    //Scenes::Manager::add(new TestScene());
 
     Core::gameLoop();
     Core::dispose();
