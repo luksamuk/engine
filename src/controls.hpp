@@ -16,6 +16,8 @@ enum DigitalButton: int {
     BTN_DIGITAL_ACTIONDOWN = 7,
     BTN_DIGITAL_ACTIONLEFT = 8,
     BTN_DIGITAL_ACTIONRIGHT = 9,
+    BTN_DIGITAL_SHOULDERL   = 10,
+    BTN_DIGITAL_SHOULDERR   = 11,
 };
 
 namespace Controls
@@ -33,9 +35,11 @@ namespace Controls
                 bool actiondown;
                 bool actionleft;
                 bool actionright;
+                bool shoulderl;
+                bool shoulderr;
             };
 
-            bool btn[10];
+            bool btn[12];
         };
     };
 

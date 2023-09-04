@@ -70,6 +70,8 @@ namespace Controls
         kbdmap[GLFW_KEY_S] = BTN_DIGITAL_ACTIONDOWN;
         kbdmap[GLFW_KEY_A] = BTN_DIGITAL_ACTIONLEFT;
         kbdmap[GLFW_KEY_D] = BTN_DIGITAL_ACTIONRIGHT;
+        kbdmap[GLFW_KEY_Q] = BTN_DIGITAL_SHOULDERL;
+        kbdmap[GLFW_KEY_E] = BTN_DIGITAL_SHOULDERR;
     }
 
     void
@@ -109,6 +111,8 @@ namespace Controls
                 current_state.actiondown = state.buttons[GLFW_GAMEPAD_BUTTON_CROSS];
                 current_state.actionleft = state.buttons[GLFW_GAMEPAD_BUTTON_SQUARE];
                 current_state.actionright = state.buttons[GLFW_GAMEPAD_BUTTON_CIRCLE];
+                current_state.shoulderl = state.buttons[GLFW_GAMEPAD_BUTTON_LEFT_BUMPER];
+                current_state.shoulderr = state.buttons[GLFW_GAMEPAD_BUTTON_RIGHT_BUMPER];
             }
         } else {
             using_gamepad = false;

@@ -4,13 +4,17 @@
 #include "scene.hpp"
 #include <glad/glad.h>
 #include <glm/glm.hpp>
+#include "resources.hpp"
 
 class TestScene : public Scenes::Scene
 {
 private:
     GLuint vbo, ebo, vao, program;
     GLint alpha, mvp, vpos, vcol;
-    glm::mat4 model, view, projection;
+    glm::mat4 model, view, projection, text_mvp;
+    Resources::FontPtr font;
+    float fov_angle;
+    bool using_ortho;
 public:
     TestScene();
     virtual ~TestScene();
