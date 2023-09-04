@@ -74,7 +74,7 @@
 </data>
  </layer>
  <objectgroup id="5" name="objects">
-  <object id="1" name="spawn_sonic" type="spawner" x="191" y="2433">
+  <object id="1" name="spawn_sonic" type="spawner" x="191" y="2427">
    <point/>
   </object>
  </objectgroup>

@@ -80,7 +80,7 @@ LevelSelect::fromSelection()
 
 void LevelSelect::update()
 {
-    const int linesize = 18;
+    const int linesize = 23;
     
     std::ostringstream oss;
     oss.clear();
@@ -99,6 +99,7 @@ void LevelSelect::update()
             oss << std::left
                 << std::setw(linesize)
                 << level.name
+                << " Zone"
                 << ' ';
             if(maxlvl > 1)
                 oss << (i + 1);

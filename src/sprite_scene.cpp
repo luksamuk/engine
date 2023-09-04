@@ -17,7 +17,8 @@ static Resources::AnimatorPtr movie;
 static Resources::AtlasPtr  chunks;
 static Tiled::TileData     *tiles;
 static Tiled::TileMap      *map;
-static glm::vec2           cameraCenter;
+static glm::vec2            cameraCenter;
+static float                direction = 1.0f;
 
 const glm::vec2 viewportSize(320.0f, 224.0f);
 //const glm::vec2 viewportSize(640.0f, 360.0f);
@@ -34,6 +35,7 @@ SpriteScene::SpriteScene(Resources::LevelData l, unsigned act)
     lvl = l;
     this->act = act;
     animator = nullptr;
+    direction = 1.0f;
 }
 
 SpriteScene::~SpriteScene() {}
@@ -162,8 +164,6 @@ void SpriteScene::unload()
     delete tiles;
     delete map;
 }
-
-static float direction = 1.0f;
 
 void SpriteScene::update()
 {

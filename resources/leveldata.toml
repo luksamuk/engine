@@ -30,11 +30,13 @@ maps = [
      "resources/levels/R2/zone1.tmx"
 ]
 
-# [[levels]]
-# name  = "R3"
-# atlas = ""
-# tiles = ""
-# maps  = []
+[[levels]]
+name  = "Wood"
+atlas = "resources/levels/R3/chunks.png"
+tiles = "resources/levels/R3/tiles.tsx"
+maps  = [
+      "resources/levels/R3/zone0.tmx"
+]
 
 # [[levels]]
 # name  = "R4"

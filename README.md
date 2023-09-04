@@ -14,3 +14,4 @@ Tools:
 - GCC (G++) with C++20 support
 - GNU Make
 - Tiled 1.10.2
+- [SpriteSheetPacker](http://amakaseev.github.io/sprite-sheet-packer/)
