@@ -3,6 +3,7 @@
 
 #include <glm/glm.hpp>
 #include <vector>
+#include <memory>
 
 // Collision shapes
 
@@ -61,10 +62,11 @@ namespace Collision
         virtual ~Triangle() {}
     };
 
+    typedef std::unique_ptr<Shape> ShapeUPtr;
+    typedef std::vector<ShapeUPtr> Array;
+    
 
-    std::vector<Triangle*> TrianglesFromPolygon(std::vector<glm::vec2>& points);
-
-    typedef std::vector<Shape*> Array;
+    Array TrianglesFromPolygon(std::vector<glm::vec2>& points);
 
 }
     

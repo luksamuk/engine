@@ -98,69 +98,11 @@ SpriteScene::load()
         cameraCenter = spawnpoint->position;
     }
 
-    // std::cout << "TILE DATA" << std::endl
-    //           << "version: " << tiles->version << std::endl
-    //           << "tiledversion: " << tiles->tiledversion << std::endl
-    //           << "tilewidth: " << tiles->tilewidth << std::endl
-    //           << "tileheight: " << tiles->tileheight << std::endl
-    //           << "tilecount: " << tiles->tilecount << std::endl
-    //           << "columns: " << tiles->columns << std::endl
-    //           << std::endl;
-    
-    // for(unsigned i = 0; i < tiles->collisionarrays.size(); i++) {
-    //     std::cout << "Tile #" << i;
-    //     if(tiles->collisionarrays[i] == std::nullopt) {
-    //         std::cout << " no collision" << std::endl;
-    //     } else {
-    //         std::cout << " collision:" << std::endl;
-    //         for(auto shapeptr : *tiles->collisionarrays[i]) {
-    //             std::cout << "  " << typeid(*shapeptr).name() << std::endl;
-    //         }
-    //     }
-    // }
-
-    // std::cout << "MAP DATA" << std::endl
-    //           << "version: " << map->version << std::endl
-    //           << "tiledversion: " << map->tiledversion << std::endl
-    //           << "orientation: " << map->orientation << std::endl
-    //           << "renderorder: " << map->renderorder << std::endl
-    //           << "width: " << map->width << std::endl
-    //           << "height: " << map->height << std::endl
-    //           << "tilewidth: " << map->tilewidth << std::endl
-    //           << "infinite: " << map->infinite << std::endl
-    //           << "nextlayerid: " << map->nextlayerid << std::endl
-    //           << "nextobjectid: " << map->nextobjectid << std::endl
-    //           << "# layers: " << map->layers.size() << std::endl;
-    
-    // for(auto& layer : map->layers) {
-    //     std::cout << "  Layer #" << layer.id
-    //               << ' ' << '(' << layer.name << ')' << std::endl
-    //               << "  Width: " << layer.width << " Height: " << layer.height
-    //               << " #tiles: " << layer.data.size()
-    //               << std::endl;
-    //     int x = 0;
-    //     for(auto tile : layer.data) {
-    //         if(tile == 0)
-    //             std::cout << ' ';
-    //         else std::cout << (tile - 1);
-
-    //         if(x++ >= layer.width) {
-    //             std::cout << std::endl;
-    //             x = 0;
-    //         }
-    //     }
-    //     std::cout << std::endl;
-    // }
-
     Render::setClearColor(glm::vec4(0.392f, 0.584f, 0.929f, 1.0f));
 }
 
 void SpriteScene::unload()
 {
-    //delete font;
-    //delete animator;
-    //delete movie;
-    //delete chunks;
     delete tiles;
     delete map;
 }

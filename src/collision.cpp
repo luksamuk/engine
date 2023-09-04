@@ -3,10 +3,10 @@
 
 namespace Collision
 {
-    std::vector<Collision::Triangle*>
+    Array
     TrianglesFromPolygon(std::vector<glm::vec2>& points)
     {
-        std::vector<Triangle*> triangles;
+        Array triangles;
         if(points.size() < 3) return triangles;
 
         std::sort(points.begin(), points.end(),
@@ -38,7 +38,7 @@ namespace Collision
 
         for(unsigned i = 0; i < ordered.size() - 2; i += 2) {
             triangles.push_back(
-                new Triangle(
+                std::make_unique<Triangle>(
                     ordered[i],
                     ordered[i + 1],
                     ordered[i + 2]));

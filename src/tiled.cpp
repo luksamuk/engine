@@ -65,13 +65,13 @@ namespace Tiled
 
                     auto child = obj->first_node();
                     if(child == nullptr) {
-                        c->push_back(new Collision::AABB(position, size));
+                        c->push_back(std::make_unique<Collision::AABB>(position, size));
                     } else {
                         std::string name = child->name();
                         if(name == "ellipse") {
-                            c->push_back(new Collision::Ellipse(position, size));
+                            c->push_back(std::make_unique<Collision::Ellipse>(position, size));
                         } else if(name == "point") {
-                            c->push_back(new Collision::Point(position));
+                            c->push_back(std::make_unique<Collision::Point>(position));
                         } else if(name == "polygon") {
                             std::vector<glm::vec2> acc;
                             std::istringstream pairs(getattr(child, "points"));
@@ -91,7 +91,11 @@ namespace Tiled
                                 acc.push_back(p);
                             }
                             auto triangles = Collision::TrianglesFromPolygon(acc);
-                            c->insert(c->end(), triangles.begin(), triangles.end());
+                            while(triangles.size() > 0) {
+                                const auto it = triangles.begin();
+                                c->push_back(std::move(*it));
+                                triangles.erase(it);
+                            }
                         }
                     }
                 }
@@ -101,13 +105,7 @@ namespace Tiled
 
     TileData::~TileData()
     {
-        for(auto arr : collisionarrays) {
-            if(arr != std::nullopt) {
-                for(auto shape : *arr) {
-                    delete shape;
-                }
-            }
-        }
+        collisionarrays.clear();
     }
 
     TileMap::TileMap(const char *path)
