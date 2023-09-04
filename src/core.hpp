@@ -6,6 +6,7 @@ namespace Core
     void    init(void);
     void    gameLoop(void);
     void    dispose(void);
+    void    queryClose(void);
 }
 
 #endif

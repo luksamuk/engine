@@ -23,6 +23,14 @@ namespace Core
     }
 
     void
+    queryClose(void)
+    {
+        if(window) {
+            glfwSetWindowShouldClose(window, true);
+        }
+    }
+
+    void
     gameLoop(void)
     {
         if(!window) {

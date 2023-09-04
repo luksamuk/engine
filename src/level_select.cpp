@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "controls.hpp"
+#include "core.hpp"
 
 #include <glm/ext.hpp>
 
@@ -21,7 +22,8 @@ struct SceneEntry {
 };
 
 const std::vector<SceneEntry> extra_scenes = {
-    {"Render Test", []() { return new TestScene(); } },
+    {"Render Test", []() { return new TestScene(); }},
+    {"Exit", [](){ Core::queryClose(); return nullptr; }},
 };
 
 LevelSelect::LevelSelect()
@@ -84,6 +86,7 @@ void LevelSelect::update()
     oss.clear();
 
     int currlvl = 0;
+    int numlvls = 0;
     for(auto& level : manager->data) {
         unsigned maxlvl = level.maps_path.size();
         maxlvl = maxlvl == 0 ? 1 : maxlvl;
@@ -101,6 +104,7 @@ void LevelSelect::update()
                 oss << (i + 1);
             oss << std::endl;
             currlvl++;
+            numlvls++;
         }
         oss << std::endl;
     }
@@ -128,16 +132,19 @@ void LevelSelect::update()
     if(selection < 0) selection = currlvl - 1;
 
     if(Controls::pressed(BTN_DIGITAL_START)) {
-        if(selection <= (int)manager->data.size()) {
+        if(selection < numlvls) {
             auto lvldata = fromSelection();
             if(lvldata.first.maps_path.size() > 0) {
                 Scenes::Manager::add(new SpriteScene(lvldata.first, lvldata.second));
                 setShouldUnload(true);
             }
         } else {
-            int sel = selection - (int)manager->data.size() - 1;
-            Scenes::Manager::add(extra_scenes[sel].spawner());
-            setShouldUnload(true);
+            int sel = selection - numlvls;
+            auto scene = extra_scenes[sel].spawner();
+            if(scene) {
+                Scenes::Manager::add(scene);
+                setShouldUnload(true);
+            }
         }
     }
 }
