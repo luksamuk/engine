@@ -35,7 +35,8 @@ name  = "Wood"
 atlas = "resources/levels/R3/chunks.png"
 tiles = "resources/levels/R3/tiles.tsx"
 maps  = [
-      "resources/levels/R3/zone0.tmx"
+      "resources/levels/R3/zone0.tmx",
+      "resources/levels/R3/zone0.tmx"  # Replicated, for now
 ]
 
 # [[levels]]

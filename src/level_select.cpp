@@ -97,9 +97,9 @@ void LevelSelect::update()
                 oss << "  ";
             }
             oss << std::left
-                << std::setw(linesize)
-                << level.name
-                << " Zone"
+                << std::setw(linesize);
+            oss << (i == 0 ? level.name : " ");
+            oss << " Zone"
                 << ' ';
             if(maxlvl > 1)
                 oss << (i + 1);
