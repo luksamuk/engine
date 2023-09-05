@@ -18,30 +18,25 @@ namespace Render {
     class ShaderProgram;
 }
 
+namespace Tiled {
+    struct TileData;
+    struct TileMap;
+    struct Level;
+    struct LevelData;
+    struct LevelDataManager;
+}
+
 namespace Resources
-{
-    struct LevelData
-    {
-        std::string name;
-        std::string atlas_path;
-        std::string tiles_path;
-        std::vector<std::string> maps_path;
-    };
-
-    struct LevelDataManager
-    {
-        std::vector<LevelData> data;
-
-        const LevelData *getLevel(std::string name) const;
-        // TODO: loadLevel
-    };
-    
-    typedef std::shared_ptr<Render::Texture>       TexturePtr;
-    typedef std::shared_ptr<Sprite::Animator>      AnimatorPtr;
-    typedef std::shared_ptr<Sprite::Atlas>         AtlasPtr;
-    typedef std::shared_ptr<LevelDataManager>      LevelDataManagerPtr;
-    typedef std::shared_ptr<Render::ShaderProgram> ShaderProgramPtr;
-    typedef std::shared_ptr<Sprite::Font>          FontPtr;
+{   
+    typedef std::shared_ptr<Render::Texture>         TexturePtr;
+    typedef std::shared_ptr<Sprite::Animator>        AnimatorPtr;
+    typedef std::shared_ptr<Sprite::Atlas>           AtlasPtr;
+    typedef std::shared_ptr<Tiled::LevelDataManager> LevelDataManagerPtr;
+    typedef std::shared_ptr<Tiled::TileData>         TileDataPtr;
+    typedef std::shared_ptr<Tiled::TileMap>          TileMapPtr;
+    typedef std::shared_ptr<Tiled::Level>            LevelPtr;
+    typedef std::shared_ptr<Render::ShaderProgram>   ShaderProgramPtr;
+    typedef std::shared_ptr<Sprite::Font>            FontPtr;
 
     class Manager
     {
@@ -55,6 +50,8 @@ namespace Resources
         static void loadLevelDataManager(std::string path);
         static void loadShaderProgram(std::string name, std::vector<const char *> shaders);
         static void loadFont(std::string path, glm::vec2 glyphsize);
+        static void loadTileData(std::string path);
+        static void loadTileMap(std::string path);
 
         static TexturePtr          getTexture(std::string path);
         static AtlasPtr            getAtlas(std::string path);
@@ -62,6 +59,8 @@ namespace Resources
         static LevelDataManagerPtr getLevelDataManager(std::string path);
         static ShaderProgramPtr    getShaderProgram(std::string path);
         static FontPtr             getFont(std::string path);
+        static TileDataPtr         getTileData(std::string path);
+        static TileMapPtr          getTileMap(std::string path);
     };
 
     //AnimatorPtr         loadAnimator(const char *path);

@@ -59,7 +59,7 @@ void LevelSelect::load()
     Render::setClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
-std::pair<Resources::LevelData, unsigned>
+std::pair<Tiled::LevelData, unsigned>
 LevelSelect::fromSelection()
 {
     int currlvl = 0;
@@ -68,14 +68,14 @@ LevelSelect::fromSelection()
         maxlvl = maxlvl == 0 ? 1 : maxlvl;
         for(unsigned i = 0; i < maxlvl; i++) {
             if(currlvl == selection) {
-                return std::pair<Resources::LevelData, unsigned>(level, i);
+                return std::pair<Tiled::LevelData, unsigned>(level, i);
             }
             currlvl++;
         }
     }
 
-    Resources::LevelData l;
-    return std::pair<Resources::LevelData, unsigned>(l, 0);
+    Tiled::LevelData l;
+    return std::pair<Tiled::LevelData, unsigned>(l, 0);
 }
 
 void LevelSelect::update()

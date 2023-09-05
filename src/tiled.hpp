@@ -5,26 +5,13 @@
 #include "collision.hpp"
 #include <optional>
 #include <map>
-
-namespace Tiled
-{
+#include "resources.hpp"
+#include <functional>
 
 // Tools and structure to load Tiled file data
-
-// Relates to .tsx files. Possible data:
-// => tag: tileset
-//    - version
-//    - tiledversion
-//    - name (tileset name)
-//    - tilewidth
-//    - tileheight
-//    - tilecount
-//    - columns
-// => tag: image
-//    - source (filename)
-//    - trans (transparent color)
-//    - width (image width)
-//    - height (image height)
+namespace Tiled
+{
+    // Relates to .tsx files.
     struct TileData
     {
         std::string version;
@@ -43,7 +30,7 @@ namespace Tiled
         ~TileData();
     };
 
-// Relates to a single layer in a .tmx file.
+    // Relates to a single layer in a .tmx file.
     struct LayerData
     {
         int id;
@@ -68,19 +55,7 @@ namespace Tiled
         glm::vec2 position;
     };
 
-// Relates to .tmx files. Possible data:
-// .TMX file:
-// => tag: map
-//    - version
-//    - tiledversion
-//    - orientation
-//    - renderorder
-//    - width
-//    - height
-//    - tilewidth
-//    - infinite (int)
-//    - nextlayerid (?)
-//    - nextobjectid (?)
+    // Relates to .tmx files.
     struct TileMap
     {
         std::string version;
@@ -99,6 +74,41 @@ namespace Tiled
         TileMap(const char *path);
 
         std::optional<MapObject> getObject(std::string name);
+    };
+
+    struct Level
+    {
+        Resources::AtlasPtr    atlas;
+        Resources::TileDataPtr tiledata;
+        Resources::TileMapPtr  map;
+
+        Level(Resources::AtlasPtr atlas,
+              Resources::TileDataPtr tiledata,
+              Resources::TileMapPtr map)
+            : atlas(atlas), tiledata(tiledata), map(map) {}
+
+        void drawFrontLayers(glm::vec2 cameraCenter, glm::vec2 viewportSize, glm::mat4& vp);
+        void drawBackLayers(glm::vec2 cameraCenter, glm::vec2 viewportSize, glm::mat4& vp);
+    private:
+        void drawLayers(std::function<bool(LayerData&)> picker, glm::vec2 cameraCenter, glm::vec2 viewportSize, glm::mat4& vp);
+        void drawLayer(LayerData& layer, glm::vec2 cameraCenter, glm::vec2 viewportSize, glm::mat4& vp);
+    };
+
+    struct LevelData
+    {
+        std::string name;
+        std::string atlas_path;
+        std::string tiles_path;
+        std::vector<std::string> maps_path;
+
+        Resources::LevelPtr    loadLevel(unsigned);
+    };
+
+    struct LevelDataManager
+    {
+        std::vector<LevelData> data;
+
+        const LevelData *getLevel(std::string name) const;
     };
 
 }

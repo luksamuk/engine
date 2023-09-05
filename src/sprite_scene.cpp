@@ -13,10 +13,6 @@
 #include <sstream>
 
 static Resources::AnimatorPtr movie;
-
-static Resources::AtlasPtr  chunks;
-static Tiled::TileData     *tiles;
-static Tiled::TileMap      *map;
 static glm::vec2            cameraCenter;
 static float                direction = 1.0f;
 
@@ -30,9 +26,9 @@ static unsigned ANIM_LOOKUP,
     ANIM_ROLLING;
     
 
-SpriteScene::SpriteScene(Resources::LevelData l, unsigned act)
+SpriteScene::SpriteScene(Tiled::LevelData l, unsigned act)
 {
-    lvl = l;
+    lvldata = l;
     this->act = act;
     animator = nullptr;
     direction = 1.0f;
@@ -87,13 +83,9 @@ SpriteScene::load()
     cameraCenter = viewportSize / 2.0f;
 
     // Loading level data
-    tiles = new Tiled::TileData(lvl.tiles_path.c_str());
-    Resources::Manager::loadAtlas(lvl.atlas_path.c_str(),
-                                  tiles->tilesize);
-    chunks = Resources::Manager::getAtlas(lvl.atlas_path.c_str());
-    map = new Tiled::TileMap(lvl.maps_path[act].c_str());
+    lvl = lvldata.loadLevel(act);
 
-    auto spawnpoint = map->getObject("spawn_sonic");
+    auto spawnpoint = lvl->map->getObject("spawn_sonic");
     if(spawnpoint) {
         cameraCenter = spawnpoint->position;
     }
@@ -103,8 +95,8 @@ SpriteScene::load()
 
 void SpriteScene::unload()
 {
-    delete tiles;
-    delete map;
+    // delete tiles;
+    // delete map;
 }
 
 void SpriteScene::update()
@@ -216,62 +208,9 @@ void SpriteScene::draw()
             << "Gamepad:   " << (Controls::isGamepad() ? "Yes" : "No");
         font->draw(font_mvp, oss.str().c_str());
     }
-    
+
+    glm::mat4 vp = projection * view;
+    lvl->drawFrontLayers(cameraCenter, viewportSize, vp);
     animator->draw(mvp);
-
-    // Draw the level
-    glm::ivec2 windowSize;
-    glm::vec2 tileSize(tiles->tilewidth, tiles->tileheight);
-    for(auto it = map->layers.rbegin(); it != map->layers.rend(); it++) {
-        auto& layer = *it;
-        std::vector<int> window = layer.getTileWindow(
-            cameraCenter,
-            viewportSize,
-            tileSize,
-            windowSize);
-
-        // std::cout << "Window: " << std::endl;
-        // int xx = 0;
-        // for(int i = 0; i < window.size(); i++) {
-        //     if(window[i] == 0)
-        //         std::cout << "___";
-        //     else
-        //         std::cout << std::setw(3) << window[i] - 1;
-        //     std::cout << ' ';
-        //     if(xx++ >= windowSize.x - 1) {
-        //         xx = 0;
-        //         std::cout << std::endl;
-        //     }
-        // }
-        // std::cout << std::endl;
-        
-        int x = 0;
-        int y = 0;
-        for(unsigned i = 0; i < window.size(); i++) {
-            if(window[i] != 0) {
-                glm::vec2 cameraDiff;
-                cameraDiff = glm::trunc(cameraCenter / tileSize) * tileSize;
-                cameraDiff = glm::mod(cameraCenter, tileSize);
-                level_model = glm::translate(
-                    glm::mat4(1.0),
-                    glm::vec3(
-                        (tileSize.x / 2) + ((x - 1) * tileSize.x) - (cameraDiff.x),
-                        (tileSize.y / 2) + (y * tileSize.y) - (cameraDiff.y),
-                        0.0f)
-                    );
-                level_model = glm::scale(
-                    level_model,
-                    glm::vec3(tileSize.x / 2.0f, tileSize.y / 2.0f, 1.0f));
-                chunks->setFrame(window[i] - 1);
-                glm::mat4 levelmvp = projection * view * level_model;
-                chunks->draw(levelmvp);
-            }
-            if(x++ >= windowSize.x - 1) {
-                x = 0;
-                y++;
-            }
-        }
-    }
-
-    //movie->draw(mvp_movie);
+    lvl->drawBackLayers(cameraCenter, viewportSize, vp);
 }

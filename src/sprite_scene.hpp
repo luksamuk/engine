@@ -8,6 +8,7 @@
 #include "render.hpp"
 #include "sprite.hpp"
 #include "resources.hpp"
+#include "tiled.hpp"
 
 class SpriteScene : public Scenes::Scene
 {
@@ -16,7 +17,8 @@ private:
     glm::mat4 model, view, projection;
     Resources::AnimatorPtr animator;
     Resources::FontPtr     font;
-    Resources::LevelData   lvl;
+    Tiled::LevelData       lvldata;
+    Resources::LevelPtr    lvl;
     unsigned  act;
 
     Resources::AnimatorPtr sonicAnim;
@@ -25,7 +27,7 @@ private:
 
     void changeCharacter(unsigned);
 public:
-    SpriteScene(Resources::LevelData l, unsigned act);
+    SpriteScene(Tiled::LevelData l, unsigned act);
     virtual ~SpriteScene();
     virtual void load() override;
     virtual void update() override;

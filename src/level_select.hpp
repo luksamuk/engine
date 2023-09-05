@@ -17,7 +17,7 @@ private:
     std::string       txt;
     int selection = 0;
 
-    std::pair<Resources::LevelData, unsigned> fromSelection();
+    std::pair<Tiled::LevelData, unsigned> fromSelection();
 public:
     LevelSelect();
     virtual ~LevelSelect();

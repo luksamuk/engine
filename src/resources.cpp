@@ -1,6 +1,7 @@
 #include "resources.hpp"
 #include "sprite.hpp"
 #include "render.hpp"
+#include "tiled.hpp"
 #include <toml++/toml.h>
 #include <iostream>
 #include <vector>
@@ -55,14 +56,14 @@ namespace Resources
     LevelDataManagerPtr
     rawLoadLevelDataManager(const char *path)
     {
-        LevelDataManagerPtr mng = std::make_shared<LevelDataManager>();
+        LevelDataManagerPtr mng = std::make_shared<Tiled::LevelDataManager>();
         toml::table tbl;
         try {
             tbl = toml::parse_file(path);
             auto levels_tbl = tbl["levels"].as_array();
             levels_tbl->for_each([&](auto&& el) {
                 toml::table tb = *el.as_table();
-                LevelData datum;
+                Tiled::LevelData datum;
                 datum.name = tb["name"].value_or("");
                 datum.atlas_path = tb["atlas"].value_or("");
                 datum.tiles_path = tb["tiles"].value_or("");
@@ -84,24 +85,14 @@ namespace Resources
         return mng;
     }
 
-    const LevelData *
-    LevelDataManager::getLevel(std::string name) const
-    {
-        for(unsigned i = 0; i < data.size(); i++)
-        {
-            if(data[i].name == name) {
-                return &data[i];
-            }
-        }
-        return nullptr;
-    }
-
     static std::map<std::string, TexturePtr>          _textures;
     static std::map<std::string, AtlasPtr>            _atlases;
     static std::map<std::string, AnimatorPtr>         _animators;
     static std::map<std::string, LevelDataManagerPtr> _levelmanagers;
     static std::map<std::string, ShaderProgramPtr>    _shaderprograms;
     static std::map<std::string, FontPtr>             _fonts;
+    static std::map<std::string, TileDataPtr>         _tiledata;
+    static std::map<std::string, TileMapPtr>          _tilemap;
     
     void
     Manager::dispose()
@@ -112,6 +103,8 @@ namespace Resources
         _levelmanagers.clear();
         _shaderprograms.clear();
         _fonts.clear();
+        _tiledata.clear();
+        _tilemap.clear();
     }
 
     template<typename P>
@@ -144,6 +137,8 @@ namespace Resources
         _rawGC(_levelmanagers);
         _rawGC(_shaderprograms);
         _rawGC(_fonts);
+        _rawGC(_tiledata);
+        _rawGC(_tilemap);
     }
     
     void
@@ -200,6 +195,24 @@ namespace Resources
         }
     }
 
+    void
+    Manager::loadTileData(std::string path)
+    {
+        if(_tiledata.find(path) == _tiledata.end()) {
+            std::cout << "Loading tile data \"" << path << '"' << std::endl;
+            _tiledata[path] = std::make_shared<Tiled::TileData>(path.c_str());
+        }
+    }
+
+    void
+    Manager::loadTileMap(std::string path)
+    {
+        if(_tilemap.find(path) == _tilemap.end()) {
+            std::cout << "Loading tile map \"" << path << '"' << std::endl;
+            _tilemap[path] = std::make_shared<Tiled::TileMap>(path.c_str());
+        }
+    }
+
     TexturePtr
     Manager::getTexture(std::string path)
     {
@@ -240,5 +253,19 @@ namespace Resources
     {
         auto itr = _fonts.find(path);
         return itr == _fonts.end() ? nullptr : itr->second;
+    }
+
+    TileDataPtr
+    Manager::getTileData(std::string path)
+    {
+        auto itr = _tiledata.find(path);
+        return itr == _tiledata.end() ? nullptr : itr->second;
+    }
+
+    TileMapPtr
+    Manager::getTileMap(std::string path)
+    {
+        auto itr = _tilemap.find(path);
+        return itr == _tilemap.end() ? nullptr : itr->second;
     }
 }

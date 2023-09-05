@@ -1,8 +1,11 @@
 #include "tiled.hpp"
 #include "io.hpp"
+#include "sprite.hpp"
 #include <rapidxml/rapidxml.hpp>
 #include <cstring>
 #include <sstream>
+#include <glm/ext.hpp>
+#include <algorithm>
 
 namespace Tiled
 {
@@ -246,5 +249,126 @@ namespace Tiled
         if(it == this->objects.end())
             return std::nullopt;
         return it->second;
+    }
+
+    const LevelData *
+    LevelDataManager::getLevel(std::string name) const
+    {
+        for(unsigned i = 0; i < data.size(); i++)
+        {
+            if(data[i].name == name) {
+                return &data[i];
+            }
+        }
+        return nullptr;
+    }
+
+    Resources::LevelPtr
+    LevelData::loadLevel(unsigned zone)
+    {
+        if(zone >= maps_path.size())
+            return nullptr;
+
+        Resources::Manager::loadTileData(tiles_path.c_str());
+        Resources::Manager::loadTileMap(maps_path[zone].c_str());
+
+        auto tiles = Resources::Manager::getTileData(tiles_path.c_str());
+        auto map   = Resources::Manager::getTileMap(maps_path[zone].c_str());
+
+        Resources::Manager::loadAtlas(atlas_path.c_str(), tiles->tilesize);
+        auto atlas = Resources::Manager::getAtlas(atlas_path.c_str());
+
+        return std::make_shared<Level>(atlas, tiles, map);
+    }
+
+    void
+    Level::drawFrontLayers(glm::vec2 cameraCenter,
+                           glm::vec2 viewportSize,
+                           glm::mat4& vp)
+    {
+        this->drawLayers(
+            [](LayerData& layer) -> bool {
+                return layer.name.rfind("fg") == 0; 
+            },
+            cameraCenter,
+            viewportSize,
+            vp);
+    }
+
+    void
+    Level::drawBackLayers(glm::vec2 cameraCenter,
+                          glm::vec2 viewportSize,
+                          glm::mat4& vp)
+    {
+        this->drawLayers(
+            [](LayerData& layer) -> bool {
+                return layer.name.rfind("bg") == 0; 
+            },
+            cameraCenter,
+            viewportSize,
+            vp);
+    }
+
+    void
+    Level::drawLayers(std::function<bool(LayerData&)> picker,
+                      glm::vec2 cameraCenter,
+                      glm::vec2 viewportSize,
+                      glm::mat4& vp)
+    {
+        std::vector<LayerData> layers;
+        std::copy_if(
+            map->layers.begin(),
+            map->layers.end(),
+            std::back_inserter(layers),
+            picker);
+
+        for(auto it = layers.rbegin(); it != layers.rend(); it++) {
+            this->drawLayer(*it, cameraCenter, viewportSize, vp);
+        }
+    }
+    
+    void
+    Level::drawLayer(LayerData& layer,
+                     glm::vec2 cameraCenter,
+                     glm::vec2 viewportSize,
+                     glm::mat4& vp)
+    {
+        glm::ivec2 windowSize;
+        std::vector<int> window = layer.getTileWindow(
+            cameraCenter,
+            viewportSize,
+            tiledata->tilesize,
+            windowSize);
+
+        // Render each tile on window
+        int x = 0;
+        int y = 0;
+        for(unsigned i = 0; i < window.size(); i++) {
+            if(window[i] != 0) {
+                glm::vec2 cameraDiff;
+                cameraDiff = glm::mod(cameraCenter, tiledata->tilesize);
+                glm::mat4 level_model = glm::translate(
+                    glm::mat4(1.0),
+                    glm::vec3(
+                        (tiledata->tilesize.x / 2) +
+                        ((x - 1) * tiledata->tilesize.x) - (cameraDiff.x),
+                        (tiledata->tilesize.y / 2) +
+                        (y * tiledata->tilesize.y) - (cameraDiff.y),
+                        0.0f)
+                    );
+                level_model = glm::scale(
+                    level_model,
+                    glm::vec3(tiledata->tilesize.x / 2.0f,
+                              tiledata->tilesize.y / 2.0f,
+                              1.0f));
+                atlas->setFrame(window[i] - 1);
+                glm::mat4 levelmvp = vp * level_model;
+                atlas->draw(levelmvp);
+            }
+            if(x++ >= windowSize.x - 1) {
+                x = 0;
+                y++;
+            }
+        }
     }
 }
