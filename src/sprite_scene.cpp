@@ -178,7 +178,7 @@ void SpriteScene::update()
 //#include<iomanip>
 void SpriteScene::draw()
 {
-    glm::mat4 mvp_movie, movie_model, level_model, font_mvp;
+    glm::mat4 mvp_movie, movie_model, font_mvp;
     
     // Sprite MVP
     glm::mat4 mvp = projection * view * model;
