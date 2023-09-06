@@ -133,7 +133,7 @@ void SpriteScene::update(double dt)
     model = glm::translate(model, position);
     model = glm::scale(model, glm::vec3(direction * 30.0f, 30.0f, 1.0f));
 
-    float moveSpeed = 480.0f * dt;
+    float moveSpeed = 240.0f * dt;
 
      if(Controls::pressing(BTN_DIGITAL_ACTIONDOWN)) {
         animator->setAnimation(ANIM_ROLLING);

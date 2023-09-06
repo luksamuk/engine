@@ -1,0 +1,15 @@
+atlas = "resources/sprites/levelselect.png"
+frame_size = [ 48.0, 32.0 ]
+
+[[animations]]
+name           = "Idle"
+frame_duration = 0.096
+min_frame      = 0
+frames         = [
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 2, 3,
+    3, 3, 3, 3, 3, 3, 3, 3, 3,
+    3, 3, 3, 3, 3, 3, 3, 3, 3,
+    3, 2, 1
+]

@@ -224,4 +224,10 @@ namespace Sprite
         }
         return 0;
     }
+
+    glm::vec2
+    Animator::getFramesize() const
+    {
+        return atlas->getFramesize();
+    }
 }

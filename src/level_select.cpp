@@ -14,6 +14,7 @@
 
 //const glm::vec2 viewportSize(320.0f, 224.0f);
 const glm::vec2 viewportSize(480.0f, 336.0f);
+//const glm::vec2 viewportSize(400.0f, 280.0f);
 //const glm::vec2 viewportSize(960.0f, 672.0f);
 
 typedef std::function<Scenes::Scene*()> SceneCreatorFn;
@@ -42,15 +43,13 @@ void LevelSelect::load()
     Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
                                  glm::vec2(10.0f, 10.0f));
     Resources::Manager::loadLevelDataManager("resources/leveldata.toml");
-    Resources::Manager::loadAtlas("resources/background/levelselect.png",
-                                  glm::vec2(96.0f, 64.0f));
+    Resources::Manager::loadAnimator("resources/animation/levelselect.toml");
     
-
+    bganim = Resources::Manager::getAnimator("resources/animation/levelselect.toml");
     manager = Resources::Manager::getLevelDataManager("resources/leveldata.toml");
     font = Resources::Manager::getFont("resources/sprites/fonts/levelselect.png");
-    bg = Resources::Manager::getAtlas("resources/background/levelselect.png");
-    bg->setFrame(0);
-
+    bganim->setAnimation(0);
+    
     vp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
 
     text_mvp = vp *
@@ -58,7 +57,8 @@ void LevelSelect::load()
 
     title_mvp = vp *
         glm::translate(glm::mat4(1.0f), glm::vec3(140.0f, 20.0f, 0.0f));
-
+    //glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 20.0f, 0.0f));
+    
     Render::setClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 }
 
@@ -83,7 +83,8 @@ LevelSelect::fromSelection()
 
 void LevelSelect::update(double dt)
 {
-    const int linesize = 23;
+    //const int linesize = 23;
+    const int linesize = 18;
     
     std::ostringstream oss;
     oss.clear();
@@ -151,6 +152,8 @@ void LevelSelect::update(double dt)
             }
         }
     }
+
+    bganim->update();
 }
 
 void LevelSelect::draw()
@@ -162,18 +165,18 @@ void LevelSelect::draw()
     font->draw(text_mvp, txt.c_str());
 
     glm::mat4 bg_scale = glm::scale(glm::mat4(1.0f),
-                                    glm::vec3(bg->getFramesize() / 2.0f, 1.0f));
+                                    glm::vec3(bganim->getFramesize() / 2.0f, 1.0f));
     for(float x = 0.0f;
-        x < viewportSize.x + bg->getFramesize().x;
-        x += bg->getFramesize().x)
+        x < viewportSize.x + bganim->getFramesize().x;
+        x += bganim->getFramesize().x)
     {
         for(float y = 0.0f;
-            y < viewportSize.y + bg->getFramesize().y;
-            y += bg->getFramesize().y)
+            y < viewportSize.y + bganim->getFramesize().y;
+            y += bganim->getFramesize().y)
         {
             glm::mat4 bg_model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, 0.0f));
             glm::mat4 bg_mvp = vp * bg_model * bg_scale;
-            bg->draw(bg_mvp);
+            bganim->draw(bg_mvp);
         }
     }
 }

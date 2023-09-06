@@ -11,7 +11,7 @@ class LevelSelect : public Scenes::Scene
 private:
     Resources::LevelDataManagerPtr manager;
     Resources::FontPtr             font;
-    Resources::AtlasPtr            bg;
+    Resources::AnimatorPtr         bganim;
     
     glm::mat4         vp, text_mvp, title_mvp;
     std::string       txt;
