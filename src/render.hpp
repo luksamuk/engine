@@ -6,11 +6,12 @@
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include <string>
 
 namespace Render
 {
     void        init(GLFWwindow *);
-    GLFWwindow *initWindow(void);
+    GLFWwindow *initWindow(std::string caption);
     void        disposeWindow(GLFWwindow *&);
     
     struct Texture

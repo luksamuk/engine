@@ -7,6 +7,7 @@
 
 #include "tiled.hpp"
 #include "level_select.hpp"
+#include "core.hpp"
 
 #include <iostream>
 #include <typeinfo>
@@ -99,15 +100,22 @@ void SpriteScene::unload()
     // delete map;
 }
 
-double oldTime = 0.0f;
-
 void SpriteScene::update(double dt)
 {
-    double currentTime = glfwGetTime();
-    if(currentTime - oldTime > 0.0f) {
-        std::cout << 1.0f / (currentTime - oldTime) << std::endl;
-        oldTime = currentTime;
+    static double oldReportTime = 0.0;
+    double currentReportTime = glfwGetTime();
+
+    if(currentReportTime - oldReportTime > 2.0) {
+        if(dt > 0.0f) {
+            std::ostringstream oss;
+            oss.clear();
+            oss << "FPS: " << 1.0 / dt;
+            Core::setWindowCaptionAppendix(oss.str());
+        }
+        oldReportTime = currentReportTime;
     }
+
+
     static glm::vec3 position = glm::vec3(viewportSize / 2.0f, 0.0f);
 
     if(Controls::pressed(BTN_DIGITAL_OPTION)) {

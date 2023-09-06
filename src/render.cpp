@@ -54,7 +54,7 @@ namespace Render
     }
 
     GLFWwindow *
-    initWindow(void)
+    initWindow(std::string caption)
     {
         GLFWwindow* window = nullptr;
 
@@ -70,8 +70,12 @@ namespace Render
         glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-        if((window = glfwCreateWindow(winSize.x, winSize.y, "Engine", nullptr, nullptr)) == nullptr)
-        {
+        if((window = glfwCreateWindow(
+                winSize.x,
+                winSize.y,
+                caption.c_str(),
+                nullptr,
+                nullptr)) == nullptr) {
             glfwTerminate();
             exit(1);
         }

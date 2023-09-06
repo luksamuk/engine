@@ -11,12 +11,20 @@
 namespace Core
 {
     static GLFWwindow *window = nullptr;
+    static std::string _windowCaption = "Engine";
 
+    void
+    init(std::string windowCaption)
+    {
+        _windowCaption = windowCaption;
+        Core::init();
+    }
+    
     void
     init(void)
     {
         if(!window) {
-            window = Render::initWindow();
+            window = Render::initWindow(_windowCaption);
             Render::init(window);
             Controls::init(window);
         }
@@ -65,6 +73,18 @@ namespace Core
         if(window) {
             Scenes::Manager::dispose();
             Render::disposeWindow(window);
+        }
+    }
+
+    void
+    setWindowCaptionAppendix(std::string appendix)
+    {
+        if(window) {
+            std::string caption = (appendix == "")
+                ? _windowCaption
+                : (_windowCaption + " | " + appendix);
+            
+            glfwSetWindowTitle(window, caption.c_str());
         }
     }
 }
