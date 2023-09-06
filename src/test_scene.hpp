@@ -19,7 +19,7 @@ public:
     TestScene();
     virtual ~TestScene();
     virtual void load() override;
-    virtual void update() override;
+    virtual void update(double dt) override;
     virtual void draw() override;
     virtual void unload() override;
 };

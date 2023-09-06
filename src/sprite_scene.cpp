@@ -99,8 +99,15 @@ void SpriteScene::unload()
     // delete map;
 }
 
-void SpriteScene::update()
+double oldTime = 0.0f;
+
+void SpriteScene::update(double dt)
 {
+    double currentTime = glfwGetTime();
+    if(currentTime - oldTime > 0.0f) {
+        std::cout << 1.0f / (currentTime - oldTime) << std::endl;
+        oldTime = currentTime;
+    }
     static glm::vec3 position = glm::vec3(viewportSize / 2.0f, 0.0f);
 
     if(Controls::pressed(BTN_DIGITAL_OPTION)) {
@@ -125,28 +132,30 @@ void SpriteScene::update()
     model = glm::translate(model, position);
     model = glm::scale(model, glm::vec3(direction * 30.0f, 30.0f, 1.0f));
 
+    float moveSpeed = 480.0f * dt;
+
      if(Controls::pressing(BTN_DIGITAL_ACTIONDOWN)) {
         animator->setAnimation(ANIM_ROLLING);
     } else {
          if(Controls::pressing(BTN_DIGITAL_UP)) {
-             cameraCenter.y -= 8.0f;
+             cameraCenter.y -= moveSpeed;
              if(!Controls::pressing(BTN_DIGITAL_LEFT)
                 && !Controls::pressing(BTN_DIGITAL_RIGHT))
                  animator->setAnimation(ANIM_LOOKUP);
          }
          if(Controls::pressing(BTN_DIGITAL_DOWN)) {
-             cameraCenter.y += 8.0f;
+             cameraCenter.y += moveSpeed;
              if(!Controls::pressing(BTN_DIGITAL_LEFT)
                 && !Controls::pressing(BTN_DIGITAL_RIGHT))
                  animator->setAnimation(ANIM_CROUCHDOWN);
          }
          if(Controls::pressing(BTN_DIGITAL_LEFT)) {
-             cameraCenter.x -= 8.0f;
+             cameraCenter.x -= moveSpeed;
              animator->setAnimation(ANIM_RUNNING);
              direction = -1.0f;
          }
          if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
-             cameraCenter.x += 8.0f;
+             cameraCenter.x += moveSpeed;
              animator->setAnimation(ANIM_RUNNING);
              direction = 1.0f;
          }
@@ -157,6 +166,9 @@ void SpriteScene::update()
             !Controls::pressing(BTN_DIGITAL_RIGHT))
              animator->setAnimation(ANIM_IDLE);
      }
+
+     // Camera minimum limits
+     cameraCenter = glm::max(viewportSize / 2.0f, cameraCenter);
 
     
     if(Controls::pressed(BTN_DIGITAL_ACTIONUP)) {

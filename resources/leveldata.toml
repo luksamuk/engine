@@ -39,11 +39,14 @@ maps  = [
       "resources/levels/R3/zone0.tmx"  # Replicated, for now
 ]
 
-# [[levels]]
-# name  = "R4"
-# atlas = ""
-# tiles = ""
-# maps  = []
+[[levels]]
+name  = "Hidden Palace"
+atlas = "resources/levels/R4/chunks.png"
+tiles = "resources/levels/R4/tiles.tsx"
+maps  = [
+      "resources/levels/R4/zone0.tmx",
+      "resources/levels/R4/zone0.tmx"
+]
 
 # [[levels]]
 # name  = "Chaotic Corniche"

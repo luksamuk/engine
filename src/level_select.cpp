@@ -13,6 +13,7 @@
 
 //const glm::vec2 viewportSize(320.0f, 224.0f);
 const glm::vec2 viewportSize(480.0f, 336.0f);
+//const glm::vec2 viewportSize(960.0f, 672.0f);
 
 typedef std::function<Scenes::Scene*()> SceneCreatorFn;
 
@@ -78,7 +79,7 @@ LevelSelect::fromSelection()
     return std::pair<Tiled::LevelData, unsigned>(l, 0);
 }
 
-void LevelSelect::update()
+void LevelSelect::update(double dt)
 {
     const int linesize = 23;
     

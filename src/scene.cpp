@@ -4,11 +4,14 @@
 #include <algorithm>
 #include <queue>
 #include "resources.hpp"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
 namespace Scenes
 {
     static Manager *_manager = nullptr;
     static std::queue<Scene*> newScenes;
+    static double _oldTime = 0.0;
 
     void
     Scene::setShouldUnload(bool state)
@@ -25,7 +28,7 @@ namespace Scenes
     void
     Manager::init(void)
     {
-        // TODO
+        _oldTime = glfwGetTime();
     }
 
     Manager&
@@ -58,6 +61,10 @@ namespace Scenes
     void
     Manager::updateAll()
     {
+        double _currentTime = glfwGetTime();
+        double _deltaTime   = _currentTime - _oldTime;
+        _oldTime = _currentTime;
+        
         std::stack<Scene*> shouldRemove;
         bool shouldRunGC = false;
         for(auto scene : Manager::get()._scenes) {
@@ -65,7 +72,7 @@ namespace Scenes
                 shouldRemove.push(scene);
                 shouldRunGC = true;
             }
-            else scene->update();
+            else scene->update(_deltaTime);
         }
 
         while(!shouldRemove.empty()) {

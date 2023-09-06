@@ -12,7 +12,7 @@ namespace Scenes
     public:
         virtual ~Scene() = 0;
         virtual void load() = 0;
-        virtual void update() = 0;
+        virtual void update(double dt) = 0;
         virtual void draw() = 0;
         virtual void unload() = 0;
 

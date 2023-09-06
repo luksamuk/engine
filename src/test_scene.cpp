@@ -115,7 +115,7 @@ void TestScene::unload()
 }
 
 
-void TestScene::update()
+void TestScene::update(double dt)
 {
     if(Controls::pressed(BTN_DIGITAL_OPTION)) {
         Scenes::Manager::add(new LevelSelect());
