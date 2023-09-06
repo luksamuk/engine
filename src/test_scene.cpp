@@ -184,12 +184,14 @@ void TestScene::update(double dt)
         }
     }
 
+    float spd = 60.0f * dt;
+
     //view = glm::rotate(view, rotationZ, glm::vec3(0.0f, 0.0f, 1.0f));
     //view = glm::rotate(view, rotationY, glm::vec3(0.0f, 1.0f, 0.0f));
     //view = glm::rotate(view, rotationX, glm::vec3(1.0f, 0.0f, 0.0f));
-    view = glm::rotate(view, rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-    view = glm::rotate(view, rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-    view = glm::rotate(view, rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+    view = glm::rotate(view, rotation.z * spd, glm::vec3(0.0f, 0.0f, 1.0f));
+    view = glm::rotate(view, rotation.y * spd, glm::vec3(0.0f, 1.0f, 0.0f));
+    view = glm::rotate(view, rotation.x * spd, glm::vec3(1.0f, 0.0f, 0.0f));
 }
 
 void TestScene::draw()

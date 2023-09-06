@@ -1,5 +1,5 @@
 #version 310 es
-precision mediump float;
+precision highp float;
 
 layout(location=0) uniform mat4 mvp;
 layout(location=1) uniform vec2 framecoord;
