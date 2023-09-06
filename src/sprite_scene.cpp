@@ -13,7 +13,6 @@
 #include <typeinfo>
 #include <sstream>
 
-static Resources::AnimatorPtr movie;
 static glm::vec2            cameraCenter;
 static float                direction = 1.0f;
 
@@ -63,7 +62,6 @@ SpriteScene::changeCharacter(unsigned chara)
 void
 SpriteScene::load()
 {
-    Resources::Manager::loadAnimator("resources/animation/movie.toml");
     Resources::Manager::loadAnimator("resources/animation/sonic.toml");
     Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
     Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
@@ -75,9 +73,6 @@ SpriteScene::load()
     sonicManiaAnim = Resources::Manager::getAnimator("resources/animation/sonic1mania.toml");
     
     changeCharacter(2);
-
-    movie = Resources::Manager::getAnimator("resources/animation/movie.toml");
-    movie->setAnimation(0);
 
     font = Resources::Manager::getFont("resources/sprites/fonts/levelselect.png");
 
@@ -124,8 +119,6 @@ void SpriteScene::update(double dt)
     }
 
     animator->update();
-    
-    //movie->update();
     
     //position.x = 0.9 * glm::cos(1 * (float)glfwGetTime());
     //position.y = 0.9 * glm::sin(2 * (float)glfwGetTime());
@@ -198,19 +191,10 @@ void SpriteScene::update(double dt)
 //#include<iomanip>
 void SpriteScene::draw()
 {
-    glm::mat4 mvp_movie, movie_model, font_mvp;
+    glm::mat4 font_mvp;
     
     // Sprite MVP
     glm::mat4 mvp = projection * view * model;
-
-    // Movie MVP
-    /*
-    movie_model = glm::mat4(1.0f);
-    movie_model = glm::translate(movie_model, glm::vec3(160.0f, 100.0f, 0.0f));
-    movie_model = glm::scale(movie_model, glm::vec3(60.0f, 40.0f, 1.0f));
-    */
-    
-    mvp_movie = projection * view * movie_model;
 
     font_mvp =
         projection *

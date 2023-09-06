@@ -10,6 +10,7 @@
 
 #include "sprite_scene.hpp"
 #include "test_scene.hpp"
+#include "movie_scene.hpp"
 
 //const glm::vec2 viewportSize(320.0f, 224.0f);
 const glm::vec2 viewportSize(480.0f, 336.0f);
@@ -24,6 +25,7 @@ struct SceneEntry {
 
 const std::vector<SceneEntry> extra_scenes = {
     {"Render Test", []() { return new TestScene(); }},
+    {"Animation Test", []() { return new MovieScene(); }},
     {"Exit", [](){ Core::queryClose(); return nullptr; }},
 };
 

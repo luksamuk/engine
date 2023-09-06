@@ -22,6 +22,7 @@ OFILES =\
 	obj/$(OS)/scene.o\
 	obj/$(OS)/test_scene.o\
 	obj/$(OS)/sprite_scene.o\
+	obj/$(OS)/movie_scene.o\
 	obj/$(OS)/level_select.o\
 	obj/$(OS)/core.o\
 	obj/$(OS)/resources.o\
