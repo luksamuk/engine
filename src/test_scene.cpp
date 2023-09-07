@@ -3,6 +3,7 @@
 #include "render.hpp"
 #include "controls.hpp"
 #include "level_select.hpp"
+#include "core.hpp"
 
 #include <glm/ext.hpp>
 
@@ -104,6 +105,8 @@ void TestScene::load()
 
     // Background color
     Render::setClearColor(glm::vec4(0.2f));
+
+    Core::setWindowCaptionAppendix("");
 }
 
 void TestScene::unload()

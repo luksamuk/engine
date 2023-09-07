@@ -54,11 +54,15 @@ maps  = [
 # tiles = ""
 # maps  = []
 
-# [[levels]]
-# name  = "R5"
-# atlas = ""
-# tiles = ""
-# maps  = []
+[[levels]]
+name  = "Techno Tower"
+atlas = "resources/levels/R5/chunks.png"
+tiles = "resources/levels/R5/R5.tsx"
+maps  = [
+      "resources/levels/R5/zone0.tmx",
+      "resources/levels/R5/zone0.tmx"
+]
+
 
 # [[levels]]
 # name  = "Cosmic Colony"
