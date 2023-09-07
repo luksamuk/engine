@@ -22,12 +22,11 @@ maps = [
 # maps  = []
 
 [[levels]]
-name = "Festival Freeway"
+name = "Speed Slider"
 atlas = "resources/levels/R2/chunks.png"
 tiles = "resources/levels/R2/tiles.tsx"
 maps = [
-     "resources/levels/R2/zone0.tmx",
-     "resources/levels/R2/zone1.tmx"
+     "resources/levels/R2/zone0.tmx"
 ]
 
 [[levels]]
