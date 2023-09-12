@@ -81,6 +81,12 @@ SpriteScene::load()
 
     // Loading level data
     lvl = lvldata.loadLevel(act);
+    grid = std::make_unique<Grid>(
+        glm::vec2(lvl->map->width * lvl->atlas->getFramesize().x,
+                  lvl->map->height * lvl->atlas->getFramesize().y),
+        lvl->atlas->getFramesize());
+
+    // TODO: load objects
 
     auto spawnpoint = lvl->map->getObject("spawn_sonic");
     if(spawnpoint) {
@@ -106,6 +112,23 @@ void SpriteScene::update(double dt)
         }
         oldReportTime = currentReportTime;
     }
+
+    // Update objects
+    for(auto objptr : objects) {
+        objptr->update(dt);
+        grid->move(objptr);
+    }
+
+    // Perform collision detection
+    grid->testAll(
+        [](ObjPtr pA, ObjPtr pB) -> std::optional<glm::vec2> {
+            float dist = glm::distance(pA->getCenter(), pB->getCenter());
+            if(dist < (pA->getRadius() + pB->getRadius())) {
+                // TODO: Perform finer test
+            }
+
+            return std::nullopt;
+        });
 
 
     static glm::vec3 position = glm::vec3(viewportSize / 2.0f, 0.0f);
@@ -165,8 +188,8 @@ void SpriteScene::update(double dt)
              animator->setAnimation(ANIM_IDLE);
      }
 
-     // Camera minimum limits
-     //cameraCenter = charPos;
+    // Camera minimum limits
+    //cameraCenter = charPos;
     //auto cameraPadding = viewportSize / 8.0f;
     auto cameraPadding = glm::vec2(64.0f, 64.0f);
     auto levelSize = glm::vec2(
@@ -231,5 +254,9 @@ void SpriteScene::draw()
     glm::mat4 vp = projection * view;
     lvl->drawFrontLayers(cameraCenter, viewportSize, vp);
     animator->draw(mvp);
+    for(auto obj : objects) {
+        // TODO: Only draw stuff within the screen!
+        obj->draw(vp);
+    }
     lvl->drawBackLayers(cameraCenter, viewportSize, vp);
 }

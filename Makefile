@@ -33,6 +33,7 @@ OFILES =\
 	obj/$(OS)/quadtree.o\
 	obj/$(OS)/partitioning.o\
 	obj/$(OS)/partition_test.o\
+	obj/$(OS)/title_screen.o\
 	obj/$(OS)/main.o
 
 .PHONY: dirs clean purge

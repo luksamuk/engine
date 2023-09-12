@@ -9,6 +9,8 @@
 #include "sprite.hpp"
 #include "resources.hpp"
 #include "tiled.hpp"
+#include "game_object.hpp"
+#include "partitioning.hpp"
 
 class SpriteScene : public Scenes::Scene
 {
@@ -24,6 +26,9 @@ private:
     Resources::AnimatorPtr sonicAnim;
     Resources::AnimatorPtr knucklesAnim;
     Resources::AnimatorPtr sonicManiaAnim;
+
+    std::unique_ptr<Grid>  grid;
+    std::vector<ObjPtr>    objects;
 
     void changeCharacter(unsigned);
 public:
