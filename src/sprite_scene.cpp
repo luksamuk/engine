@@ -14,6 +14,7 @@
 #include <sstream>
 
 static glm::vec2            cameraCenter;
+static glm::vec2            charPos;
 static float                direction = 1.0f;
 
 const glm::vec2 viewportSize(320.0f, 224.0f);
@@ -89,11 +90,7 @@ SpriteScene::load()
     Render::setClearColor(glm::vec4(0.392f, 0.584f, 0.929f, 1.0f));
 }
 
-void SpriteScene::unload()
-{
-    // delete tiles;
-    // delete map;
-}
+void SpriteScene::unload() {}
 
 void SpriteScene::update(double dt)
 {
@@ -133,9 +130,9 @@ void SpriteScene::update(double dt)
     model = glm::translate(model, position);
     model = glm::scale(model, glm::vec3(direction * 30.0f, 30.0f, 1.0f));
 
-    float moveSpeed = 240.0f * dt;
+    float moveSpeed = 480.0f * dt;
 
-     if(Controls::pressing(BTN_DIGITAL_ACTIONDOWN)) {
+    if(Controls::pressing(BTN_DIGITAL_ACTIONDOWN)) {
         animator->setAnimation(ANIM_ROLLING);
     } else {
          if(Controls::pressing(BTN_DIGITAL_UP)) {
@@ -169,7 +166,14 @@ void SpriteScene::update(double dt)
      }
 
      // Camera minimum limits
-     cameraCenter = glm::max(viewportSize / 2.0f, cameraCenter);
+     //cameraCenter = charPos;
+    //auto cameraPadding = viewportSize / 8.0f;
+    auto cameraPadding = glm::vec2(64.0f, 64.0f);
+    auto levelSize = glm::vec2(
+        (lvl->map->width - 1) * lvl->tiledata->tilewidth,
+        (lvl->map->height - 1) * lvl->tiledata->tileheight);
+    //cameraCenter = glm::max(cameraPadding, cameraCenter);
+    //cameraCenter = glm::min(levelSize - cameraPadding, cameraCenter);
 
     
     if(Controls::pressed(BTN_DIGITAL_ACTIONUP)) {
@@ -192,8 +196,19 @@ void SpriteScene::update(double dt)
 void SpriteScene::draw()
 {
     glm::mat4 font_mvp;
+
+    glm::mat4 char_model;
+    char_model = glm::mat4(1.0f);
+    char_model = glm::translate(char_model, glm::vec3(charPos, 0.0f));
+    char_model = glm::scale(char_model, glm::vec3(direction * 30.0f, 30.0f, 1.0f));
     
     // Sprite MVP
+    glm::mat4 char_mvp =
+        projection *
+        view *
+        char_model;
+
+    // Camera MVP
     glm::mat4 mvp = projection * view * model;
 
     font_mvp =

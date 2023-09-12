@@ -11,6 +11,7 @@
 #include "sprite_scene.hpp"
 #include "test_scene.hpp"
 #include "movie_scene.hpp"
+#include "partition_test.hpp"
 
 //const glm::vec2 viewportSize(320.0f, 224.0f);
 const glm::vec2 viewportSize(480.0f, 336.0f);
@@ -25,18 +26,15 @@ struct SceneEntry {
 };
 
 const std::vector<SceneEntry> extra_scenes = {
-    {"Render Test", []() { return new TestScene(); }},
+    {"Rendering Test", []() { return new TestScene(); }},
     {"Animation Test", []() { return new MovieScene(); }},
+    {"Collision Test", []() { return new PartitionTest(); }},
     {"Exit", [](){ Core::queryClose(); return nullptr; }},
 };
 
-LevelSelect::LevelSelect()
-{
-}
+LevelSelect::LevelSelect() {}
 
-LevelSelect::~LevelSelect()
-{
-}
+LevelSelect::~LevelSelect() {}
 
 void LevelSelect::load()
 {
@@ -86,7 +84,7 @@ LevelSelect::fromSelection()
 void LevelSelect::update(double dt)
 {
     //const int linesize = 23;
-    const int linesize = 18;
+    const int linesize = 16;
     
     std::ostringstream oss;
     oss.clear();
@@ -105,8 +103,8 @@ void LevelSelect::update(double dt)
             oss << std::left
                 << std::setw(linesize);
             oss << (i == 0 ? level.name : " ");
-            oss << " Zone"
-                << ' ';
+            //oss << " Zone";
+            oss << ' ';
             if(maxlvl > 1)
                 oss << (i + 1);
             oss << std::endl;

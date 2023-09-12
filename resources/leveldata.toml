@@ -1,5 +1,5 @@
 [[levels]]
-name = "Collision Test"
+name = "Playground"
 atlas = "resources/levels/R0/chunks.png"
 tiles = "resources/levels/R0/tiles.tsx"
 maps = [
@@ -15,12 +15,6 @@ maps = [
       "resources/levels/R1/zone1.tmx"
 ]
 
-# [[levels]]
-# name  = "Amazing Aquarium"
-# atlas = ""
-# tiles = ""
-# maps  = []
-
 [[levels]]
 name = "Speed Slider"
 atlas = "resources/levels/R2/chunks.png"
@@ -34,8 +28,7 @@ name  = "Wood"
 atlas = "resources/levels/R3/chunks.png"
 tiles = "resources/levels/R3/tiles.tsx"
 maps  = [
-      "resources/levels/R3/zone0.tmx",
-      "resources/levels/R3/zone0.tmx"  # Replicated, for now
+      "resources/levels/R3/zone0.tmx"
 ]
 
 [[levels]]
@@ -43,25 +36,28 @@ name  = "Hidden Palace"
 atlas = "resources/levels/R4/chunks.png"
 tiles = "resources/levels/R4/tiles.tsx"
 maps  = [
-      "resources/levels/R4/zone0.tmx",
       "resources/levels/R4/zone0.tmx"
 ]
-
-# [[levels]]
-# name  = "Chaotic Corniche"
-# atlas = ""
-# tiles = ""
-# maps  = []
 
 [[levels]]
 name  = "Techno Tower"
 atlas = "resources/levels/R5/chunks.png"
 tiles = "resources/levels/R5/R5.tsx"
 maps  = [
-      "resources/levels/R5/zone0.tmx",
       "resources/levels/R5/zone0.tmx"
 ]
 
+# [[levels]]
+# name  = "Amazing Aquarium"
+# atlas = ""
+# tiles = ""
+# maps  = []
+
+# [[levels]]
+# name  = "Chaotic Corniche"
+# atlas = ""
+# tiles = ""
+# maps  = []
 
 # [[levels]]
 # name  = "Cosmic Colony"

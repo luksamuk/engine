@@ -6,6 +6,9 @@
 #include <sstream>
 #include <glm/ext.hpp>
 #include <algorithm>
+#include <iostream>
+#include <iomanip>
+#include <glm/gtx/string_cast.hpp>
 
 namespace Tiled
 {
@@ -207,9 +210,9 @@ namespace Tiled
 
         // Determine map coordinates of tiles according to adjusted camera
         float left = cameraCenter.x - (tilesize.x * (windowSize.x / 2));
-        float right = cameraCenter.x + (tilesize.x * (windowSize.x / 2));
+        float right = (cameraCenter.x + tilesize.x) + (tilesize.x * (windowSize.x / 2));
         float top = cameraCenter.y - (tilesize.y * (windowSize.y / 2));
-        float bottom = cameraCenter.y + (tilesize.y * (windowSize.y / 2));    
+        float bottom = (cameraCenter.y + tilesize.y) + (tilesize.y * (windowSize.y / 2));    
 
         // Determine actual tile indexes on map grid
         int tileminx = xpostile(left);
@@ -371,4 +374,86 @@ namespace Tiled
             }
         }
     }
+
+    inline void
+    print_window(std::vector<int>& window, glm::ivec2 windowSize)
+    {
+        int x = 0;
+        for(int value : window) {
+            x++;
+            if(value > 0)
+                std::cout << std::setw(3) << value;
+            else
+                std::cout << "___";
+            std::cout << ' ';
+            if(x >= windowSize.x) {
+                std::cout << std::endl;
+                x = 0;
+            }
+        }
+        std::cout << std::endl;
+    }
+
+    // void
+    // Level::drawLayer(LayerData& layer,
+    //                  glm::vec2 cameraCenter,
+    //                  glm::vec2 viewportSize,
+    //                  glm::mat4& vp)
+    // {        
+    //     glm::ivec2 windowSize;
+    //     std::vector<int> window = layer.getTileWindow(
+    //         cameraCenter,
+    //         viewportSize,
+    //         tiledata->tilesize,
+    //         windowSize);
+
+    //     print_window(window, windowSize);
+
+    //     // Calculate starting rendering point
+    //     glm::vec2 startingPoint = glm::vec2(0.0f, 0.0f);
+    //     startingPoint = tiledata->tilesize / 2.0f;
+    //     startingPoint.y += tiledata->tilesize.y;
+    //     //startingPoint = (glm::vec2(windowSize) * tiledata->tilesize) / 2.0f;
+    //     // startingPoint /= 2.0f;
+    //     // startingPoint -= viewportSize / 2.0f;
+    //     // //startingPoint *= -1.0f;
+    //     // startingPoint += tiledata->tilesize / 2.0f; // Compensate for center
+        
+    //     // startingPoint += tiledata->tilesize / 4.0f; // Compensate for center
+    //     // startingPoint.y += tiledata->tilesize.y / 4.0f;
+    //     // startingPoint.y += tiledata->tilesize.y / 8.0f;
+        
+    //     // Camera difference to emulate perfect camera scrolling
+    //     glm::vec2 cameraDiff = glm::vec2(0.0f, 0.0f);
+    //     cameraDiff = glm::mod(cameraCenter, tiledata->tilesize);
+
+    //     std::cout << "startingpoint: " << glm::to_string(startingPoint) << std::endl;
+        
+    //     int x = 0, y = 0;
+    //     for(unsigned i = 0; i < window.size(); i++) {
+    //         if(window[i] != 0) {
+    //             glm::mat4 model = glm::mat4(1.0f);
+    //             //model = glm::translate(model, glm::vec3(-viewportSize / 2.0f, 0.0f));
+    //             model = glm::translate(
+    //                 model,
+    //                 glm::vec3(
+    //                     startingPoint.x - cameraDiff.x + (x * tiledata->tilesize.x),
+    //                     startingPoint.y - cameraDiff.y + (y * tiledata->tilesize.y),
+    //                     0.0f));
+    //             model = glm::scale(
+    //                 model,
+    //                 glm::vec3(
+    //                     tiledata->tilesize.x / 2.0f,
+    //                     tiledata->tilesize.y / 2.0f,
+    //                     1.0f));
+    //             atlas->setFrame(window[i] - 1);
+    //             glm::mat4 mvp = vp * model;
+    //             atlas->draw(mvp);
+    //         }
+
+    //         if(x++ >= windowSize.x - 1) {
+    //             x = 0; y++;
+    //         }
+    //     }
+    // }
 }

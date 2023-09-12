@@ -29,6 +29,10 @@ OFILES =\
 	obj/$(OS)/sprite.o\
 	obj/$(OS)/tiled.o\
 	obj/$(OS)/collision.o\
+	obj/$(OS)/game_object.o\
+	obj/$(OS)/quadtree.o\
+	obj/$(OS)/partitioning.o\
+	obj/$(OS)/partition_test.o\
 	obj/$(OS)/main.o
 
 .PHONY: dirs clean purge
