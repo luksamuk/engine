@@ -2,6 +2,7 @@
 #include "render.hpp"
 #include "controls.hpp"
 #include "level_select.hpp"
+#include "core.hpp"
 
 #include <glm/ext.hpp>
 #include <iostream>
@@ -84,6 +85,19 @@ TestObject::~TestObject() {}
 void TestObject::init() {}
 
 void TestObject::update(double dt) {
+    static double oldReportTime = 0.0;
+    double currentReportTime = glfwGetTime();
+
+    if(currentReportTime - oldReportTime > 2.0) {
+        if(dt > 0.0f) {
+            std::ostringstream oss;
+            oss.clear();
+            oss << "FPS: " << 1.0 / dt;
+            Core::setWindowCaptionAppendix(oss.str());
+        }
+        oldReportTime = currentReportTime;
+    }
+    
     auto pos = viewportSize / 2.0f;
     if(this->getIdx() == 0) {
         pos.x += 80.0f * glm::cos(step * 10.0f);
