@@ -76,7 +76,10 @@ namespace Sprite
     public:
         Font(const char *atlaspath, glm::vec2 glyphsize);
         ~Font();
-        void draw(glm::mat4& mvp, const char *text);
+
+        glm::vec2 getGlyphsize() const;
+        glm::vec2 measure(const char *text);
+        void      draw(glm::mat4& mvp, const char *text);
     };
 }
     

@@ -208,6 +208,39 @@ namespace Sprite
         }
     }
 
+    glm::vec2
+    Font::measure(const char *text)
+    {
+        glm::vec2 size(0.0f, 0.0f);
+        glm::vec2 glyphsize = atlas->getFramesize();
+        int x = 0, max = 0;
+        const char *ptr = text;
+        while(*ptr != '\0') {
+            switch(*ptr) {
+            case '\n':
+                x = 0;
+                size.y += glyphsize.y;
+                break;
+            case 'r': break;
+            default:
+                x++;
+                break;
+            }
+
+            if(x > max) max = x;
+            
+            ptr++;
+        }
+        size.x = glyphsize.x * max;
+        return size;
+    }
+
+    glm::vec2
+    Font::getGlyphsize() const
+    {
+        return atlas->getFramesize();
+    }
+
     void
     Animator::setAnimationByName(std::string name)
     {
