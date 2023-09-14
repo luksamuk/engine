@@ -14,6 +14,7 @@ private:
     Resources::FontPtr   font;
     int                  idx;
     bool                 colliding;
+    int                  collisionCount;
 public:
     TestObject(int i);
     virtual ~TestObject();
@@ -33,8 +34,10 @@ private:
     std::string                collidingmsg;
     
     std::unique_ptr<Grid>       grid;
-    std::shared_ptr<TestObject> obj[5];
+    ObjArray                    objs;
     glm::mat4                   vp;
+
+    bool                        paused;
 public:
     PartitionTest();
     virtual ~PartitionTest();

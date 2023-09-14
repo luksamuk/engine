@@ -108,7 +108,7 @@ void TitleScreen::draw() {
     
     glm::vec3 txtPos((txtVwp / 2.0f)
                      - (textsize / 2.0f)
-                     + (font->getGlyphsize() / 2.0f)
+                     - (font->getGlyphsize() / 2.0f)
                      ,
                      0.0f);
     txtPos.y += txtVwp.y / 16.0f * 6.0f;

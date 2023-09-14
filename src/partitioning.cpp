@@ -137,10 +137,10 @@ Grid::testAll(CollisionTestFn fn)
     
     for(auto set : cells) {
         for(auto itr = set.begin(); itr != set.end(); itr++) {
-            auto itr_next = itr; itr_next++;
-            if(itr_next != set.end()) {
+            auto it2 = itr; it2++;
+            for(; it2 != set.end(); it2++) {
                 auto pA = *itr;
-                auto pB = *itr_next;
+                auto pB = *it2;
                 if((collisions.find(std::make_pair(pA, pB)) == collisions.end())
                    && (collisions.find(std::make_pair(pB, pA)) == collisions.end())) {
                     auto point = fn(pA, pB);

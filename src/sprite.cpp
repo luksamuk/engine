@@ -232,6 +232,7 @@ namespace Sprite
             ptr++;
         }
         size.x = glyphsize.x * max;
+        size -= glyphsize / 2.0f;
         return size;
     }
 
