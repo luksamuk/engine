@@ -30,3 +30,4 @@ GameObject::setRadius(float r)
 {
     this->_radius = r;
 }
+

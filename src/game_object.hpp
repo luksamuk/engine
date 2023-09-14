@@ -7,6 +7,10 @@
 #include <functional>
 #include <optional>
 
+class GameObject;
+
+typedef std::shared_ptr<GameObject>  ObjPtr;
+
 class GameObject
 {
 private:
@@ -20,6 +24,8 @@ public:
     virtual void update(double dt) = 0;
     virtual void draw(glm::mat4& vp) = 0;
 
+    virtual void onCollision(ObjPtr other, glm::vec2 collisionPoint);
+
     glm::vec2 getOldCenter() const;
     glm::vec2 getCenter() const;
     float     getRadius() const;
@@ -27,9 +33,9 @@ public:
     void      setRadius(float);
 };
 
-inline GameObject::~GameObject() {}
+inline      GameObject::~GameObject() {}
+inline void GameObject::onCollision(ObjPtr, glm::vec2) {}
 
-typedef std::shared_ptr<GameObject>  ObjPtr;
 typedef std::vector<ObjPtr>          ObjArray;
 typedef std::function<std::optional<glm::vec2>(ObjPtr, ObjPtr)> CollisionTestFn;
 

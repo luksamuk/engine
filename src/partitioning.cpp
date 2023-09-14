@@ -1,6 +1,7 @@
 #include "partitioning.hpp"
 #include <algorithm>
 #include <iostream>
+#include <map>
 
 inline int
 Grid::coordToArray(glm::vec2 pos)
@@ -132,14 +133,23 @@ Grid::move(ObjPtr obj)
 void
 Grid::testAll(CollisionTestFn fn)
 {
+    std::map<std::pair<ObjPtr, ObjPtr>, std::optional<glm::vec2>> collisions;
+    
     for(auto set : cells) {
         for(auto itr = set.begin(); itr != set.end(); itr++) {
             auto itr_next = itr; itr_next++;
             if(itr_next != set.end()) {
                 auto pA = *itr;
                 auto pB = *itr_next;
-                // TODO: Report collision result to these objects
-                fn(pA, pB);
+                if((collisions.find(std::make_pair(pA, pB)) == collisions.end())
+                   && (collisions.find(std::make_pair(pB, pA)) == collisions.end())) {
+                    auto point = fn(pA, pB);
+                    collisions[std::make_pair(pA, pB)] = point;
+                    if(point != std::nullopt) {
+                        pA->onCollision(pB, *point);
+                        pB->onCollision(pA, *point);
+                    }
+                }
             }
         }
     }

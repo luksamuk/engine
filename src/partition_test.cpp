@@ -16,6 +16,10 @@ PartitionTest::PartitionTest() {}
 PartitionTest::~PartitionTest() {}
 
 void PartitionTest::load() {
+    Resources::Manager::loadFont("resources/sprites/fonts/debugger.png",
+                                 glm::vec2(10.0f, 10.0f));
+    font = Resources::Manager::getFont("resources/sprites/fonts/debugger.png");
+    
     grid = std::make_unique<Grid>(viewportSize, glm::vec2(64.0f, 64.0f));
     for(int i = 0; i < 5; i++) {
         obj[i] = std::make_shared<TestObject>(i);
@@ -35,23 +39,32 @@ void PartitionTest::update(double dt) {
         obj[i]->update(dt);
         grid->move(obj[i]);
     }
+
+    std::ostringstream oss;
+    oss.clear();
     
     step += 0.25f * dt;
     step = glm::mod(step, glm::radians(360.0f));
 
     grid->testAll(
-        [](ObjPtr pA, ObjPtr pB) -> std::optional<glm::vec2> {
+        [&](ObjPtr pA, ObjPtr pB) -> std::optional<glm::vec2> {
             auto a = std::dynamic_pointer_cast<TestObject>(pA);
             auto b = std::dynamic_pointer_cast<TestObject>(pB);
 
             float dist = glm::distance(a->getCenter(), b->getCenter());
             if(dist < (a->getRadius() + b->getRadius())) {
-                a->collide();
-                b->collide();
+                oss << (char)('a' + a->getIdx())
+                    << " X "
+                    << (char)('a' + b->getIdx())
+                    << std::endl;
+                
+                return glm::vec2(0.0f, 0.0f);
             }
             
             return std::nullopt;
         });
+
+    collidingmsg = oss.str();
     
     if(Controls::pressed(BTN_DIGITAL_OPTION)) {
         Scenes::Manager::add(new LevelSelect());
@@ -60,6 +73,11 @@ void PartitionTest::update(double dt) {
 }
 
 void PartitionTest::draw() {
+    glm::mat4 txtmvp = vp *
+        glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 0.0f));
+
+    font->draw(txtmvp, collidingmsg.c_str());
+    
     for(int i = 0; i < 5; i++) {
         obj[i]->draw(vp);
     }
@@ -119,6 +137,7 @@ void TestObject::update(double dt) {
 
 void TestObject::draw(glm::mat4& vp) {
     glm::mat4 mvp = vp * model;
+    
     glm::mat4 txtmvp = vp *
         glm::translate(glm::mat4(1.0f), glm::vec3(this->getCenter(), 0.0f));
     
@@ -134,6 +153,7 @@ int TestObject::getIdx() const {
     return this->idx;
 }
 
-void TestObject::collide() {
+void TestObject::onCollision(ObjPtr, glm::vec2) {
     this->colliding = true;
 }
+

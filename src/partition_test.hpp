@@ -21,13 +21,17 @@ public:
     virtual void update(double dt) override;
     virtual void draw(glm::mat4& vp) override;
 
+    virtual void onCollision(ObjPtr o, glm::vec2 p) override;
+
     int          getIdx() const;
-    void         collide();
 };
 
 class PartitionTest : public Scenes::Scene
 {
 private:
+    Resources::FontPtr         font;
+    std::string                collidingmsg;
+    
     std::unique_ptr<Grid>       grid;
     std::shared_ptr<TestObject> obj[5];
     glm::mat4                   vp;
