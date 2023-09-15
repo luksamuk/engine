@@ -16,7 +16,7 @@
 namespace Render
 {
     //const glm::ivec2 winSize(320, 224);
-    const glm::ivec2 winSize = glm::ivec2(320, 224) * 3;
+    static glm::ivec2 winSize = glm::ivec2(320, 224) * 3;
     const float aspectRatio = (float)winSize.x / (float)winSize.y;
 
     static void
@@ -55,6 +55,13 @@ namespace Render
         int targetWidth = (int)glm::trunc(height * aspectRatio);
         auto newX = (width - targetWidth) / 2;
         glViewport(newX, 0, targetWidth, height);
+        winSize = glm::ivec2(width, height);
+    }
+
+    glm::ivec2
+    windowSize()
+    {
+        return winSize;
     }
 
     GLFWwindow *

@@ -56,12 +56,13 @@ namespace Render
         static unsigned int         elementsSize(void);
     };
 
-    GLuint  raw_load_texture(const char *path, glm::vec2& size);
-    GLuint  raw_load_shader(const char *path);
-    GLuint  raw_link_program(GLuint vs, GLuint fs);
-    GLuint  make_vbo(const void *data, size_t size, GLenum usage);
-    GLuint  make_vao(void);
-    GLuint  make_ebo(const void *data, size_t size, GLenum usage);
+    GLuint      raw_load_texture(const char *path, glm::vec2& size);
+    GLuint      raw_load_shader(const char *path);
+    GLuint      raw_link_program(GLuint vs, GLuint fs);
+    GLuint      make_vbo(const void *data, size_t size, GLenum usage);
+    GLuint      make_vao(void);
+    GLuint      make_ebo(const void *data, size_t size, GLenum usage);
+    glm::ivec2  windowSize();
 
     void    setClearColor(glm::vec4 color);
 }

@@ -27,6 +27,18 @@ public:
     int          getIdx() const;
 };
 
+class MouseHoverObject : public GameObject
+{
+public:
+    MouseHoverObject();
+    virtual ~MouseHoverObject();
+    virtual void init() override;
+    virtual void update(double dt) override;
+    virtual void draw(glm::mat4&) override;
+
+    virtual void onCollision(ObjPtr o, glm::vec2 p) override;
+};
+
 class PartitionTest : public Scenes::Scene
 {
 private:
@@ -37,7 +49,7 @@ private:
     ObjArray                    objs;
     glm::mat4                   vp;
 
-    bool                        paused;
+    ObjPtr                      mouseobj;
 public:
     PartitionTest();
     virtual ~PartitionTest();

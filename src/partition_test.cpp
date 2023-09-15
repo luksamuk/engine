@@ -8,21 +8,28 @@
 #include <iostream>
 #include <sstream>
 
+#include "imgui.h"
+
 //const glm::vec2 viewportSize(320.0f, 224.0f);
 const glm::vec2 viewportSize(480.0f, 336.0f);
 //const glm::vec2 viewportSize(640.0f, 448.0f);
 //const glm::vec2 viewportSize(800.0f, 560.0f);
 
 static float step = 0.0f;
-
+static ObjArray hovered;
 const int numobjs = 10;
+static bool paused;
 
 PartitionTest::PartitionTest() {
     step = 0.0f;
     paused = false;
+    hovered.clear();
+    mouseobj = nullptr;
 }
 
-PartitionTest::~PartitionTest() {}
+PartitionTest::~PartitionTest() {
+    hovered.clear();
+}
 
 void PartitionTest::load() {
     Resources::Manager::loadFont("resources/sprites/fonts/debugger.png",
@@ -37,6 +44,9 @@ void PartitionTest::load() {
         objs.push_back(obj);
         grid->insert(obj);
     }
+    mouseobj = std::make_shared<MouseHoverObject>();
+    grid->insert(mouseobj);
+    
     Render::setClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
     vp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
@@ -67,30 +77,36 @@ void PartitionTest::update(double dt) {
         paused = !paused;
     }
 
-    if(paused) return;
+    mouseobj->update(dt);
+    grid->move(mouseobj);
     
-    for(int i = 0; i < (int)objs.size(); i++) {
-        objs[i]->update(dt);
-        grid->move(objs[i]);
+    if(!paused) {
+        for(int i = 0; i < (int)objs.size(); i++) {
+            objs[i]->update(dt);
+            grid->move(objs[i]);
+        }
+    
+        step += 0.25f * dt;
+        step = glm::mod(step, glm::radians(360.0f));
+
     }
 
     std::ostringstream oss;
     oss.clear();
     
-    step += 0.25f * dt;
-    step = glm::mod(step, glm::radians(360.0f));
-
     grid->testAll(
         [&](ObjPtr pA, ObjPtr pB) -> std::optional<glm::vec2> {
-            auto a = std::dynamic_pointer_cast<TestObject>(pA);
-            auto b = std::dynamic_pointer_cast<TestObject>(pB);
+            float dist = glm::distance(pA->getCenter(), pB->getCenter());
+            if(dist < (pA->getRadius() + pB->getRadius())) {
 
-            float dist = glm::distance(a->getCenter(), b->getCenter());
-            if(dist < (a->getRadius() + b->getRadius())) {
-                oss << (char)('a' + a->getIdx())
-                    << 'X'
-                    << (char)('a' + b->getIdx())
-                    << std::endl;
+                auto a = std::dynamic_pointer_cast<TestObject>(pA);
+                auto b = std::dynamic_pointer_cast<TestObject>(pB);
+                if(a && b) {
+                    oss << (char)('A' + a->getIdx())
+                        << 'x'
+                        << (char)('A' + b->getIdx())
+                        << std::endl;
+                }
                 
                 return glm::vec2(0.0f, 0.0f);
             }
@@ -99,6 +115,26 @@ void PartitionTest::update(double dt) {
         });
 
     collidingmsg = oss.str();
+}
+
+static bool window_active = true;
+
+void
+draw_debug_window()
+{    
+    ImGui::Begin("Object options", &window_active, ImGuiWindowFlags_MenuBar);
+
+    ImGui::Text("MousePos: {%0.2f, %0.2f}",
+                Controls::mousePos().x,
+                Controls::mousePos().y);
+
+    for(auto ptr : hovered) {
+        if(ptr) {
+            auto h = std::dynamic_pointer_cast<TestObject>(ptr);
+            ImGui::Text("Object: %c", (char)('A' + h->getIdx()));
+        }
+    }
+    ImGui::End();
 }
 
 void PartitionTest::draw() {
@@ -111,6 +147,7 @@ void PartitionTest::draw() {
         objs[i]->draw(vp);
     }
 
+    draw_debug_window();
 }
 
 
@@ -208,8 +245,41 @@ int TestObject::getIdx() const {
     return this->idx;
 }
 
-void TestObject::onCollision(ObjPtr, glm::vec2) {
-    this->colliding = true;
-    collisionCount++;
+void TestObject::onCollision(ObjPtr o, glm::vec2) {
+    if(std::dynamic_pointer_cast<TestObject>(o)) {
+        this->colliding = true;
+    }
+    
+    if(!paused) {
+        collisionCount++;
+    }
+}
+
+// =============================================
+
+MouseHoverObject::MouseHoverObject() {
+    this->setRadius(2.0f);
+}
+
+MouseHoverObject::~MouseHoverObject() {}
+void MouseHoverObject::init() {}
+void MouseHoverObject::draw(glm::mat4&) {}
+
+void
+MouseHoverObject::update(double dt)
+{
+    hovered.clear();
+
+    glm::vec2 objpos =
+        (Controls::mousePos() / glm::vec2(Render::windowSize())) *
+        viewportSize;
+    
+    this->setCenter(objpos);
+}
+
+void
+MouseHoverObject::onCollision(ObjPtr o, glm::vec2)
+{
+    hovered.push_back(o);
 }
 
