@@ -8,6 +8,10 @@
 #include "controls.hpp"
 #include "scene.hpp"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 namespace Core
 {
     static GLFWwindow *window = nullptr;
@@ -27,6 +31,7 @@ namespace Core
             window = Render::initWindow(_windowCaption);
             Render::init(window);
             Controls::init(window);
+            Render::initGui(window);
         }
     }
 
@@ -47,19 +52,18 @@ namespace Core
         }
     
         while(!glfwWindowShouldClose(window)) {
-            Scenes::Manager::updateAll();
-
-            /* draw */
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+
+            Scenes::Manager::updateAll();
             Scenes::Manager::drawAll();
 
-            // post-drawing
-            // glUseProgram(0);
-            // glBindVertexArray(0);
-            // glBindBuffer(GL_ARRAY_BUFFER, 0);
-            // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+            
             /* post-processing */
             glfwSwapBuffers(window);
             Controls::process();

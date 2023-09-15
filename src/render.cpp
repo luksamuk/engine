@@ -1,7 +1,11 @@
+#include "imgui.h"
+#include <glad/glad.h>
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 #include "io.hpp"
 #include "render.hpp"
 #include <iostream>
-#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -67,7 +71,7 @@ namespace Render
         glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
-        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_ANY_PROFILE);
+        glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
         if((window = glfwCreateWindow(
@@ -88,6 +92,10 @@ namespace Render
     void
     disposeWindow(GLFWwindow *&window)
     {
+        ImGui_ImplOpenGL3_Shutdown();
+        ImGui_ImplGlfw_Shutdown();
+        ImGui::DestroyContext();
+        
         glfwDestroyWindow(window);
         window = nullptr;
         glfwTerminate();
@@ -119,6 +127,21 @@ namespace Render
                   << glGetString(GL_SHADING_LANGUAGE_VERSION)
                   << std::endl;
     };
+
+    void
+    initGui(GLFWwindow *window)
+    {
+        // Setup ImGui
+        IMGUI_CHECKVERSION();
+        ImGui::CreateContext();
+        ImGuiIO& io = ImGui::GetIO();
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
+        io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
+        //io.ConfigFlags |= ImGuiConfigFlags_NavNoCaptureKeyboard;
+        //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+        ImGui_ImplGlfw_InitForOpenGL(window, true);
+        ImGui_ImplOpenGL3_Init("#version 100");
+    }
 
     void
     setClearColor(glm::vec4 color)

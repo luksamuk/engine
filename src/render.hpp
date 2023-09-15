@@ -11,6 +11,7 @@
 namespace Render
 {
     void        init(GLFWwindow *);
+    void        initGui(GLFWwindow *);
     GLFWwindow *initWindow(std::string caption);
     void        disposeWindow(GLFWwindow *&);
     
