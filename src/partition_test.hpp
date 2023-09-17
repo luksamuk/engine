@@ -25,6 +25,7 @@ public:
     virtual void onCollision(ObjPtr o, glm::vec2 p) override;
 
     int          getIdx() const;
+    int          getCollisionCount() const;
 };
 
 class MouseHoverObject : public GameObject
@@ -47,7 +48,8 @@ private:
     ObjArray                    objs;
     glm::mat4                   vp;
 
-    ObjPtr                      mouseobj;
+    // ObjPtr                      mouseobj;
+    void draw_debug_window();
 public:
     PartitionTest();
     virtual ~PartitionTest();
