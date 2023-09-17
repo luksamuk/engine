@@ -12,6 +12,8 @@ namespace Controls
     static ButtonState old_state;
 
     static int kbdmap[GLFW_KEY_LAST + 1];
+    static int mousebtns[3];
+    static int oldmousebtns[3];
     static bool using_gamepad = false;
 
     static void
@@ -54,7 +56,30 @@ namespace Controls
         int action,
         int mods)
     {
-        // TODO
+        UNUSED(window);
+        UNUSED(mods);
+        
+        bool pressed = (action == GLFW_PRESS) || (action == GLFW_REPEAT);
+
+        MouseButton btn;
+        switch(button) {
+        case GLFW_MOUSE_BUTTON_LEFT:
+            btn = BTN_MOUSE_LEFT;
+            break;
+        case GLFW_MOUSE_BUTTON_MIDDLE:
+            btn = BTN_MOUSE_MIDDLE;
+            break;
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            btn = BTN_MOUSE_RIGHT;
+            break;
+        default:
+            btn = BTN_MOUSE_UNKNOWN;
+            break;
+        }
+
+        if(btn != BTN_MOUSE_UNKNOWN) {
+            mousebtns[btn] = pressed;
+        }
     }
 
     void
@@ -80,6 +105,8 @@ namespace Controls
         memset(&current_state, 0, sizeof(ButtonState));
         memset(&old_state, 0, sizeof(ButtonState));
         memset(&kbdmap, -1, sizeof(kbdmap));
+        memset(mousebtns, 0, sizeof(mousebtns));
+        memset(oldmousebtns, 0, sizeof(oldmousebtns));
         mouse_pos = glm::vec2(0.0f, 0.0f);
 
         loadDefaultMappings();
@@ -95,6 +122,7 @@ namespace Controls
     process(void)
     {
         memcpy(&old_state, &current_state, sizeof(ButtonState));
+        memcpy(&oldmousebtns, &mousebtns, sizeof(mousebtns));
         
         // Gamepad controls
         if(glfwJoystickIsGamepad(GLFW_JOYSTICK_1)) {
@@ -136,6 +164,18 @@ namespace Controls
     mousePos(void)
     {
         return mouse_pos;
+    }
+
+    bool
+    mousePressing(MouseButton btn)
+    {
+        return mousebtns[btn];
+    }
+
+    bool
+    mousePressed(MouseButton btn)
+    {
+        return mousebtns[btn] && !oldmousebtns[btn];
     }
 
     bool

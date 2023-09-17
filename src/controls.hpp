@@ -20,6 +20,13 @@ enum DigitalButton: int {
     BTN_DIGITAL_SHOULDERR   = 11,
 };
 
+enum MouseButton: int {
+    BTN_MOUSE_UNKNOWN = -1,
+    BTN_MOUSE_LEFT    = 0,
+    BTN_MOUSE_MIDDLE  = 1,
+    BTN_MOUSE_RIGHT   = 2,
+};
+
 namespace Controls
 {
     struct ButtonState {
@@ -53,6 +60,8 @@ namespace Controls
     glm::vec2 mousePos(void);
     bool      isGamepad(void);
 
+    bool      mousePressing(MouseButton);
+    bool      mousePressed(MouseButton);
 }
     
 #endif
