@@ -15,8 +15,9 @@ const glm::vec2 viewportSize(480.0f, 336.0f);
 //const glm::vec2 viewportSize(640.0f, 448.0f);
 //const glm::vec2 viewportSize(800.0f, 560.0f);
 
-static float step = 0.0f;
+static float step = 0.0f; 
 static ObjArray hovered;
+static std::vector<std::pair<std::pair<ObjPtr, ObjPtr>, glm::vec2>> collisions;
 const int numobjs = 10;
 static bool paused;
 
@@ -24,12 +25,11 @@ PartitionTest::PartitionTest() {
     step = 0.0f;
     paused = false;
     hovered.clear();
+    collisions.clear();
     mouseobj = nullptr;
 }
 
-PartitionTest::~PartitionTest() {
-    hovered.clear();
-}
+PartitionTest::~PartitionTest() {}
 
 void PartitionTest::load() {
     Resources::Manager::loadFont("resources/sprites/fonts/debugger.png",
@@ -39,10 +39,11 @@ void PartitionTest::load() {
     grid = std::make_unique<Grid>(viewportSize, glm::vec2(64.0f, 64.0f));
     for(int i = 0; i < numobjs; i++) {
         auto obj = std::make_shared<TestObject>(i);
-        obj->setRadius(32.0f);
+        obj->setRadius(12.0f + (i * (20.0f / numobjs)));
         obj->setCenter(glm::vec2(32.0f, 32.0f) + (64.0f * i));
         objs.push_back(obj);
         grid->insert(obj);
+        hovered.push_back(obj);
     }
     mouseobj = std::make_shared<MouseHoverObject>();
     grid->insert(mouseobj);
@@ -52,7 +53,10 @@ void PartitionTest::load() {
     vp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
 }
 
-void PartitionTest::unload() {}
+void PartitionTest::unload() {
+    hovered.clear();
+    collisions.clear();
+}
 
 void PartitionTest::update(double dt) {
     static double oldReportTime = 0.0;
@@ -91,58 +95,108 @@ void PartitionTest::update(double dt) {
 
     }
 
-    std::ostringstream oss;
-    oss.clear();
+    collisions.clear();
     
     grid->testAll(
         [&](ObjPtr pA, ObjPtr pB) -> std::optional<glm::vec2> {
             float dist = glm::distance(pA->getCenter(), pB->getCenter());
             if(dist < (pA->getRadius() + pB->getRadius())) {
 
+                auto average = (pA->getCenter() + pB->getCenter()) / 2.0f;
+                
                 auto a = std::dynamic_pointer_cast<TestObject>(pA);
                 auto b = std::dynamic_pointer_cast<TestObject>(pB);
                 if(a && b) {
-                    oss << (char)('A' + a->getIdx())
-                        << 'x'
-                        << (char)('A' + b->getIdx())
-                        << std::endl;
+                    collisions.push_back(
+                        std::make_pair(
+                            std::make_pair(pA, pB),
+                            average));
                 }
                 
-                return glm::vec2(0.0f, 0.0f);
+                return average;
             }
             
             return std::nullopt;
         });
 
-    collidingmsg = oss.str();
 }
 
 static bool window_active = true;
 
 void
 draw_debug_window()
-{    
+{
+    ObjArray removed;
     ImGui::Begin("Object options", &window_active, ImGuiWindowFlags_MenuBar);
 
-    ImGui::Text("MousePos: {%0.2f, %0.2f}",
-                Controls::mousePos().x,
-                Controls::mousePos().y);
-
-    for(auto ptr : hovered) {
-        if(ptr) {
-            auto h = std::dynamic_pointer_cast<TestObject>(ptr);
-            ImGui::Text("Object: %c", (char)('A' + h->getIdx()));
+    ImGuiTabBarFlags tabflags = ImGuiTabBarFlags_None;
+    if(ImGui::BeginTabBar("Tabs", tabflags)) {
+        if(ImGui::BeginTabItem("General")) {
+            ImGui::Text("Step: %0.2f", step);
+            ImGui::Text("Mouse: {%0.2f, %0.2f}",
+                        Controls::mousePos().x,
+                        Controls::mousePos().y);
+            ImGui::EndTabItem();
         }
+
+        if(ImGui::BeginTabItem("Objects")) {
+            if(hovered.size() > 0) {
+                for(int i = 0; i < (int)hovered.size(); i++) {
+                    auto ptr = hovered[i];
+                    if(ptr) {
+                        auto h = std::dynamic_pointer_cast<TestObject>(ptr);
+                        ImGui::SetNextItemOpen(true, ImGuiCond_Once);
+                        if(ImGui::TreeNode((void*)(intptr_t)i, "%c", (char)('A' + h->getIdx()))) {
+                            ImGui::Text("Center: {%0.2f, %0.2f}",
+                                        h->getCenter().x,
+                                        h->getCenter().y);
+                            ImGui::Text("Radius: %0.2f", h->getRadius());
+                            if(ImGui::SmallButton("Remove")) {
+                                removed.push_back(ptr);
+                            }
+                            ImGui::TreePop();
+                        }
+                    }
+                }
+            }
+            ImGui::EndTabItem();
+        }
+
+        if(ImGui::BeginTabItem("Collisions")) {
+            static ImGuiTableFlags tableflags = ImGuiTableFlags_SizingFixedFit | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_Borders;
+            if(ImGui::BeginTable("collisions", 3, tableflags)) {
+                ImGui::TableSetupColumn("First", ImGuiTableColumnFlags_WidthFixed);
+                ImGui::TableSetupColumn("Second", ImGuiTableColumnFlags_WidthFixed);
+                ImGui::TableSetupColumn("Collision point", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableHeadersRow();
+                for(auto pair : collisions) {
+                    auto pA = std::dynamic_pointer_cast<TestObject>(pair.first.first);
+                    auto pB = std::dynamic_pointer_cast<TestObject>(pair.first.second);
+                    if(pA && pB) {
+                        ImGui::TableNextRow();
+                        ImGui::TableSetColumnIndex(0);
+                        ImGui::Text("%c", (char)('A' + pA->getIdx()));
+                        ImGui::TableSetColumnIndex(1);
+                        ImGui::Text("%c", (char)('A' + pB->getIdx()));
+                        ImGui::TableSetColumnIndex(2);
+                        ImGui::Text("{%0.2f, %0.2f}", pair.second.x, pair.second.y);
+                    }
+                }
+                ImGui::EndTable();
+            }
+            ImGui::EndTabItem();
+        }
+        
+        ImGui::EndTabBar();
     }
     ImGui::End();
+
+    for(auto ptr : removed) {
+        hovered.erase(std::find(hovered.begin(), hovered.end(), ptr));
+    }
 }
 
 void PartitionTest::draw() {
-    glm::mat4 txtmvp = vp *
-        glm::translate(glm::mat4(1.0f), glm::vec3(10.0f, 10.0f, 0.0f));
-
-    font->draw(txtmvp, collidingmsg.c_str());
-    
     for(int i = 0; i < (int)objs.size(); i++) {
         objs[i]->draw(vp);
     }
@@ -266,9 +320,9 @@ void MouseHoverObject::init() {}
 void MouseHoverObject::draw(glm::mat4&) {}
 
 void
-MouseHoverObject::update(double dt)
+MouseHoverObject::update(double)
 {
-    hovered.clear();
+    //hovered.clear();
 
     glm::vec2 objpos =
         (Controls::mousePos() / glm::vec2(Render::windowSize())) *
@@ -280,6 +334,12 @@ MouseHoverObject::update(double dt)
 void
 MouseHoverObject::onCollision(ObjPtr o, glm::vec2)
 {
-    hovered.push_back(o);
+    auto io = ImGui::GetIO();
+    if(Controls::mousePressed(BTN_MOUSE_LEFT) && !io.WantCaptureMouse) {
+        auto it = std::find(hovered.begin(), hovered.end(), o);
+        if(it == hovered.end())
+            hovered.push_back(o);
+        else hovered.erase(it);
+    }
 }
 

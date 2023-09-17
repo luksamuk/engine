@@ -42,9 +42,7 @@ public:
 class PartitionTest : public Scenes::Scene
 {
 private:
-    Resources::FontPtr         font;
-    std::string                collidingmsg;
-    
+    Resources::FontPtr          font;
     std::unique_ptr<Grid>       grid;
     ObjArray                    objs;
     glm::mat4                   vp;
