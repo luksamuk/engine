@@ -19,6 +19,10 @@ struct Speed {
 
 struct PlayerControl{};
 
+struct AutoControl{
+    float step;
+};
+
 struct SphereRender{};
 
 class EntityTest : public Scenes::Scene

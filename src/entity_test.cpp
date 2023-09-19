@@ -16,6 +16,9 @@ EntityTest::EntityTest() {
     ecs.component<Speed>()
         .member<float>("x")
         .member<float>("y");
+
+    ecs.component<AutoControl>()
+        .member<float>("step");
 }
 
 EntityTest::~EntityTest() {}
@@ -45,9 +48,20 @@ void EntityTest::load() {
                 t[i].y += s[i].y * it.delta_time();
             }
         });
-        // .each([](Transform& t, const Speed& s) {
-        //     t.position += glm::vec2(s.x, s.y);
-        // });
+
+    ecs.system<AutoControl>("AutoControlStep")
+        .iter([](flecs::iter& it, AutoControl *c) {
+            for(auto i : it) {
+                c[i].step += 60.0f * it.delta_time();
+            }
+        });
+
+    ecs.system<AutoControl, Transform>("PlayerAutoMove")
+        .each([&](AutoControl& c, Transform& t) {
+            glm::vec2 center = viewportSize / 2.0f;
+            t.x = center.x + (50.0f * glm::cos(glm::radians(c.step)));
+            t.y = center.y + (50.0f * glm::sin(glm::radians(c.step)));
+        });
 
     ecs.system<const PlayerControl, Speed>("PlayerMove")
         .iter([](flecs::iter& it, const PlayerControl*, Speed *s) {
@@ -104,6 +118,11 @@ void EntityTest::load() {
         .set(Transform{viewportSize.x / 2.0f, viewportSize.y / 2.0f})
         .set(Speed{0.0f, 0.0f})
         .add<PlayerControl>()
+        .add<SphereRender>();
+
+    flecs::entity Bleh = ecs.entity("Bleh")
+        .set(Transform{viewportSize.x / 2.0f, viewportSize.y / 2.0f})
+        .set(AutoControl{0.0f})
         .add<SphereRender>();
 }
 
