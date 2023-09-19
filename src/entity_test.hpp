@@ -6,10 +6,29 @@
 #include <memory>
 #include <flecs.h>
 
+struct Transform {
+    float x, y;
+};
+
+// typedef glm::vec2 Transform;
+// typedef glm::vec2 Speed;
+
+struct Speed {
+    float x, y;
+};
+
+struct PlayerControl{};
+
+struct SphereRender{};
+
 class EntityTest : public Scenes::Scene
 {
 private:
-    flecs::world ecs;
+    glm::mat4            fontmvp;
+    Resources::FontPtr   font;
+    Resources::AtlasPtr  atlas;
+    
+    flecs::world       ecs;
 public:
     EntityTest();
     virtual ~EntityTest();
