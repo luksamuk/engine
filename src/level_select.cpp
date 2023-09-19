@@ -13,6 +13,7 @@
 #include "movie_scene.hpp"
 #include "partition_test.hpp"
 #include "title_screen.hpp"
+#include "entity_test.hpp"
 
 //const glm::vec2 viewportSize(320.0f, 224.0f);
 const glm::vec2 viewportSize(480.0f, 336.0f);
@@ -30,6 +31,7 @@ const std::vector<SceneEntry> extra_scenes = {
     {"Rendering Test", []() { return new TestScene();     }},
     {"Animation Test", []() { return new MovieScene();    }},
     {"Collision Test", []() { return new PartitionTest(); }},
+    {"Entity Test",    []() { return new EntityTest();    }},
     {"Title Screen",   []() { return new TitleScreen();   }},
     {"Exit",           []() {
         Core::queryClose();

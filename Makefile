@@ -2,22 +2,26 @@ OS?=linux
 
 ifeq ($(OS),windows)
 # Make sure you have GLFW and GLM for MinGW
-	CXX = x86_64-w64-mingw32-g++
-	LIBS = -lopengl32 -lglu32 -lglfw3 -lmingw32
-	BIN = bin/$(OS)/game.exe
+	CXX  = x86_64-w64-mingw32-g++
+	CC   = x86_64-w64-mingw32-gcc
+	LIBS = -lopengl32 -lglu32 -lglfw3 -lmingw32 -lWs2_32
+	BIN  = bin/$(OS)/game.exe
 else
-	CXX = g++
+	CXX  = g++
+	CC   = gcc
 	LIBS = -lGL -lglfw -ltomlplusplus
-	BIN = bin/$(OS)/game
+	BIN  = bin/$(OS)/game
 endif
 
 IMGUIDIR=./imgui-1.89.9
+FLECSDIR=./flecs-3.2.7
 
 DEFS =\
 	-DIMGUI_IMPL_OPENGL_ES2
 
-INCLUDES = -I./include -I$(IMGUIDIR) -I$(IMGUIDIR)/backends
+INCLUDES = -I./include -I$(IMGUIDIR) -I$(IMGUIDIR)/backends -I$(FLECSDIR)
 CXXFLAGS = --std=c++20 -g -Wall $(INCLUDES) $(DEFS)
+CCFLAGS  = --std=gnu99
 
 OFILES =\
 	obj/$(OS)/glad.o\
@@ -39,6 +43,7 @@ OFILES =\
 	obj/$(OS)/partitioning.o\
 	obj/$(OS)/partition_test.o\
 	obj/$(OS)/title_screen.o\
+	obj/$(OS)/entity_test.o\
 	obj/$(OS)/main.o
 
 IMGUIFILES=\
@@ -50,10 +55,16 @@ IMGUIFILES=\
 	obj/$(OS)/imgui_impl_glfw.o\
 	obj/$(OS)/imgui_impl_opengl3.o
 
+FLECSFILES=\
+	obj/$(OS)/flecs.o
+
 .PHONY: dirs clean purge
 
-all: dirs $(OFILES) $(IMGUIFILES)
-	$(CXX) $(CXXFLAGS) -o $(BIN) $(OFILES) $(IMGUIFILES) $(LIBS)
+all: dirs $(OFILES) $(IMGUIFILES) $(FLECSFILES)
+	$(CXX) $(CXXFLAGS) -o $(BIN) $(OFILES) $(IMGUIFILES) $(FLECSFILES) $(LIBS)
+
+obj/$(OS)/flecs.o: $(FLECSDIR)/flecs.c
+	$(CC) $(CCFLAGS) -c -o $@ $<
 
 obj/$(OS)/imgui.o: $(IMGUIDIR)/imgui.cpp
 	$(CXX) $(CXXFLAGS) -c -o $@ $<
