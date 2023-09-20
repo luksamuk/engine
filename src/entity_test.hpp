@@ -7,14 +7,14 @@
 #include <flecs.h>
 
 struct Transform {
-    float x, y;
+    glm::vec2 pos;
 };
 
 // typedef glm::vec2 Transform;
 // typedef glm::vec2 Speed;
 
 struct Speed {
-    float x, y;
+    glm::vec2 speed;
 };
 
 struct PlayerControl{};
