@@ -9,13 +9,15 @@
 const glm::vec2 viewportSize(320.0f, 224.0f);
 
 EntityTest::EntityTest() {
-    ecs.component<Transform>()
+    ecs.component<glm::vec2>()
         .member<float>("x")
         .member<float>("y");
     
+    ecs.component<Transform>()
+        .member<glm::vec2>("pos");
+    
     ecs.component<Speed>()
-        .member<float>("x")
-        .member<float>("y");
+        .member<glm::vec2>("speed");
 
     ecs.component<AutoControl>()
         .member<float>("step");
@@ -44,8 +46,7 @@ void EntityTest::load() {
     ecs.system<Transform, const Speed>("Move")
         .iter([](flecs::iter& it, Transform *t, const Speed *s) {
             for(auto i : it) {
-                t[i].x += s[i].x * it.delta_time();
-                t[i].y += s[i].y * it.delta_time();
+                t[i].pos += s[i].speed * it.delta_time();
             }
         });
 
@@ -59,8 +60,11 @@ void EntityTest::load() {
     ecs.system<AutoControl, Transform>("PlayerAutoMove")
         .each([&](AutoControl& c, Transform& t) {
             glm::vec2 center = viewportSize / 2.0f;
-            t.x = center.x + (50.0f * glm::cos(glm::radians(c.step)));
-            t.y = center.y + (50.0f * glm::sin(glm::radians(c.step)));
+            t.pos = center +
+                (50.0f *
+                 glm::vec2(
+                     glm::cos(glm::radians(c.step)),
+                     glm::sin(glm::radians(c.step))));
         });
 
     ecs.system<const PlayerControl, Speed>("PlayerMove")
@@ -73,33 +77,33 @@ void EntityTest::load() {
             for(auto i : it) {
                 // Acceleration
                 if(Controls::pressing(BTN_DIGITAL_LEFT))
-                    s[i].x -= accel * dt;
+                    s[i].speed.x -= accel * dt;
                 if(Controls::pressing(BTN_DIGITAL_RIGHT))
-                    s[i].x += accel * dt;
+                    s[i].speed.x += accel * dt;
                 if(Controls::pressing(BTN_DIGITAL_UP))
-                    s[i].y -= accel * dt;
+                    s[i].speed.y -= accel * dt;
                 if(Controls::pressing(BTN_DIGITAL_DOWN))
-                    s[i].y += accel * dt;
+                    s[i].speed.y += accel * dt;
 
                 // Deceleration
-                if(glm::abs(s[i].x) >= decel * dt) {
+                if(glm::abs(s[i].speed.x) >= decel * dt) {
                     if(!Controls::pressing(BTN_DIGITAL_LEFT)
                        && !Controls::pressing(BTN_DIGITAL_RIGHT)) {
-                        s[i].x -= glm::sign(s[i].x) * decel * dt;
+                        s[i].speed.x -= glm::sign(s[i].speed.x) * decel * dt;
 
-                        if(glm::abs(s[i].x) < decel * dt) {
-                            s[i].x = 0.0f;
+                        if(glm::abs(s[i].speed.x) < decel * dt) {
+                            s[i].speed.x = 0.0f;
                         }
                     }
                 }
                 
-                if(glm::abs(s[i].y) >= decel * dt) {
+                if(glm::abs(s[i].speed.y) >= decel * dt) {
                     if(!Controls::pressing(BTN_DIGITAL_UP)
                        && !Controls::pressing(BTN_DIGITAL_DOWN)) {
-                        s[i].y -= glm::sign(s[i].y) * decel * dt;
+                        s[i].speed.y -= glm::sign(s[i].speed.y) * decel * dt;
 
-                        if(glm::abs(s[i].y) < decel * dt) {
-                            s[i].y = 0.0f;
+                        if(glm::abs(s[i].speed.y) < decel * dt) {
+                            s[i].speed.y = 0.0f;
                         }
                     }
                 }
@@ -109,19 +113,19 @@ void EntityTest::load() {
     ecs.system<const SphereRender, const Transform>("DrawACircle")
         .each([&](const SphereRender&, const Transform& t) {
             glm::mat4 mvp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
-            mvp = glm::translate(mvp, glm::vec3(t.x, t.y, 0.0f));
+            mvp = glm::translate(mvp, glm::vec3(t.pos, 0.0f));
             mvp = glm::scale(mvp, glm::vec3(32.0f, 32.0f, 1.0f));
             atlas->draw(mvp);
         });
 
     flecs::entity Blah = ecs.entity("Blah")
-        .set(Transform{viewportSize.x / 2.0f, viewportSize.y / 2.0f})
-        .set(Speed{0.0f, 0.0f})
+        .set(Transform{viewportSize / 2.0f})
+        .set(Speed{glm::vec2(0.0f, 0.0f)})
         .add<PlayerControl>()
         .add<SphereRender>();
 
     flecs::entity Bleh = ecs.entity("Bleh")
-        .set(Transform{viewportSize.x / 2.0f, viewportSize.y / 2.0f})
+        .set(Transform{viewportSize / 2.0f})
         .set(AutoControl{0.0f})
         .add<SphereRender>();
 }
