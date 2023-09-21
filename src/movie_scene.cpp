@@ -29,7 +29,7 @@ void MovieScene::load()
     
 }
 
-void MovieScene::update(double dt)
+void MovieScene::update(double)
 {
     movie->update();
 
