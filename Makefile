@@ -45,6 +45,7 @@ OFILES =\
 	obj/$(OS)/title_screen.o\
 	obj/$(OS)/entity_test.o\
 	obj/$(OS)/sound.o\
+	obj/$(OS)/sound_test.o\
 	obj/$(OS)/main.o
 
 IMGUIFILES=\

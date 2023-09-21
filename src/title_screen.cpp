@@ -51,7 +51,7 @@ void TitleScreen::load() {
 
 void TitleScreen::unload() {}
 
-void TitleScreen::update(double dt) {
+void TitleScreen::update(double) {
     if(Controls::pressed(BTN_DIGITAL_START)) {
         if(debugmode && Controls::pressing(BTN_DIGITAL_ACTIONDOWN)) {
             Scenes::Manager::add(new LevelSelect());

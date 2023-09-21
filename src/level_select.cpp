@@ -14,6 +14,7 @@
 #include "partition_test.hpp"
 #include "title_screen.hpp"
 #include "entity_test.hpp"
+#include "sound_test.hpp"
 
 //const glm::vec2 viewportSize(320.0f, 224.0f);
 const glm::vec2 viewportSize(480.0f, 336.0f);
@@ -28,6 +29,7 @@ struct SceneEntry {
 };
 
 const std::vector<SceneEntry> extra_scenes = {
+    {"Sound Test",     []() { return new SoundTest();     }},
     {"Rendering Test", []() { return new TestScene();     }},
     {"Animation Test", []() { return new MovieScene();    }},
     {"Collision Test", []() { return new PartitionTest(); }},

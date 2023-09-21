@@ -216,6 +216,7 @@ void
 Sound::AudioSource::play(Resources::AudioPtr audio)
 {
     alSourcei(source, AL_BUFFER, audio->buffer);
+    alSourcei(source, AL_GAIN, this->gain);
     alSourcei(source, AL_LOOPING, audio->loops);
     alSourcePlay(source);
     current = audio;
