@@ -4,12 +4,12 @@ ifeq ($(OS),windows)
 # Make sure you have GLFW and GLM for MinGW
 	CXX  = x86_64-w64-mingw32-g++
 	CC   = x86_64-w64-mingw32-gcc
-	LIBS = -lopengl32 -lglu32 -lglfw3 -lmingw32 -lWs2_32
+	LIBS = -lopengl32 -lglu32 -lglfw3 -lOpenAL32 -logg_static -lvorbis_static -lvorbisfile_static -lmingw32 -lWs2_32
 	BIN  = bin/$(OS)/game.exe
 else
 	CXX  = g++
 	CC   = gcc
-	LIBS = -lGL -lglfw -ltomlplusplus
+	LIBS = -lGL -lglfw -ltomlplusplus -lopenal -logg -lvorbis -lvorbisfile
 	BIN  = bin/$(OS)/game
 endif
 
@@ -44,6 +44,7 @@ OFILES =\
 	obj/$(OS)/partition_test.o\
 	obj/$(OS)/title_screen.o\
 	obj/$(OS)/entity_test.o\
+	obj/$(OS)/sound.o\
 	obj/$(OS)/main.o
 
 IMGUIFILES=\

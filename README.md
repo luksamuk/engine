@@ -10,6 +10,9 @@ Libraries and frameworks:
 - RapidXML
 - dear imgui 3.2.7 (included)
 - Flecs 1.89.9 (included)
+- OpenAL v1.23.1
+- OGG v1.3.5
+- Vorbis v1.3.7
 
 Tools:
 
