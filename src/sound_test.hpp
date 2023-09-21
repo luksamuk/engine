@@ -17,6 +17,7 @@ private:
     glm::mat4                vp;
     std::string              txt;
     int selection;
+    Resources::AtlasPtr      atlas;
 public:
     SoundTest();
     virtual ~SoundTest();
