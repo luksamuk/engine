@@ -1,12 +1,15 @@
 #include "core.hpp"
 
 #include <iostream>
+#include <thread>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
 #include "render.hpp"
 #include "controls.hpp"
 #include "scene.hpp"
+#include "sound.hpp"
+
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -14,8 +17,9 @@
 
 namespace Core
 {
-    static GLFWwindow *window = nullptr;
-    static std::string _windowCaption = "Engine";
+    static GLFWwindow *window                       = nullptr;
+    static std::string _windowCaption               = "Engine";
+    static std::unique_ptr<std::thread> _audiothread;
 
     void
     init(std::string windowCaption)
@@ -32,6 +36,7 @@ namespace Core
             Render::init(window);
             Controls::init(window);
             Render::initGui(window);
+            Sound::init();
         }
     }
 
@@ -50,6 +55,9 @@ namespace Core
             std::cerr << "Core was not initialized" << std::endl;
             return;
         }
+
+        std::cout << "Starting sound control thread" << std::endl;
+        _audiothread = std::make_unique<std::thread>(Sound::loop);
     
         while(!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -69,6 +77,11 @@ namespace Core
             Controls::process();
             glfwPollEvents();
         }
+
+        std::cout << "Halting sound control thread" << std::endl;
+        Sound::halt();
+        _audiothread->join();
+        _audiothread = nullptr;
     }
 
     void
@@ -78,6 +91,7 @@ namespace Core
             Scenes::Manager::dispose();
             Render::disposeWindow(window);
         }
+        Sound::dispose();
     }
 
     void

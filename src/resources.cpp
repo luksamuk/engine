@@ -2,6 +2,7 @@
 #include "sprite.hpp"
 #include "render.hpp"
 #include "tiled.hpp"
+#include "sound.hpp"
 #include <toml++/toml.h>
 #include <iostream>
 #include <vector>
@@ -85,6 +86,34 @@ namespace Resources
         return mng;
     }
 
+    BGMTablePtr
+    rawLoadBGMTable(const char *path)
+    {
+        BGMTablePtr ptr = std::make_shared<Sound::BGMTable>();
+        toml::table tbl;
+        try {
+            tbl = toml::parse_file(path);
+            tbl.for_each([&](const toml::key& key, auto&& val)
+                {
+                    Sound::BGMTableEntry entry;
+                    auto tb = *val.as_table();
+                    entry.file = tb["file"].value_or("");
+                    entry.loopend = tb["loop-end"].value_or(-1.0f);
+                    entry.loopstart = tb["loop-start"].value_or(-1.0f);
+                    std::string bgmname(key.data());
+                    ptr->entries[bgmname] = entry;
+                });
+        } catch(const toml::parse_error& err) {
+            std::cerr << "Error loading BGM table \""
+                      << path
+                      << "\": "
+                      << err
+                      << std::endl;
+            return nullptr;
+        }
+        return ptr;
+    }
+
     static std::map<std::string, TexturePtr>          _textures;
     static std::map<std::string, AtlasPtr>            _atlases;
     static std::map<std::string, AnimatorPtr>         _animators;
@@ -93,6 +122,8 @@ namespace Resources
     static std::map<std::string, FontPtr>             _fonts;
     static std::map<std::string, TileDataPtr>         _tiledata;
     static std::map<std::string, TileMapPtr>          _tilemap;
+    static std::map<std::string, AudioPtr>            _audios;
+    static std::map<std::string, BGMTablePtr>         _bgmtables;
     
     void
     Manager::dispose()
@@ -105,6 +136,8 @@ namespace Resources
         _fonts.clear();
         _tiledata.clear();
         _tilemap.clear();
+        _bgmtables.clear();
+        _audios.clear();
     }
 
     template<typename P>
@@ -139,6 +172,8 @@ namespace Resources
         _rawGC(_fonts);
         _rawGC(_tiledata);
         _rawGC(_tilemap);
+        _rawGC(_bgmtables);
+        _rawGC(_audios);
     }
     
     void
@@ -213,6 +248,33 @@ namespace Resources
         }
     }
 
+    void
+    Manager::loadAudio(std::string path, float loopend, float loopstart)
+    {
+        if(_audios.find(path) == _audios.end()) {
+            std::cout << "Loading audio \"" << path << '"' << std::endl;
+            // An audio loops if there is a valid loop end
+            auto audio = Sound::rawLoadAudio(
+                path.c_str(),
+                (loopend >= 0.0f),
+                loopend,
+                loopstart);
+            if(audio != nullptr) _audios[path] = audio;
+        }
+    }
+
+    void
+    Manager::loadBGMTable(std::string path)
+    {
+        if(_bgmtables.find(path) == _bgmtables.end()) {
+            std::cout << "Loading BGM table \"" << path << '"' << std::endl;
+            auto table = rawLoadBGMTable(path.c_str());
+            if(table != nullptr) _bgmtables[path] = table;
+        }
+    }
+
+    
+
     TexturePtr
     Manager::getTexture(std::string path)
     {
@@ -267,5 +329,19 @@ namespace Resources
     {
         auto itr = _tilemap.find(path);
         return itr == _tilemap.end() ? nullptr : itr->second;
+    }
+
+    AudioPtr
+    Manager::getAudio(std::string path)
+    {
+        auto itr = _audios.find(path);
+        return itr == _audios.end() ? nullptr : itr->second;
+    }
+
+    BGMTablePtr
+    Manager::getBGMTable(std::string path)
+    {
+        auto itr = _bgmtables.find(path);
+        return itr == _bgmtables.end() ? nullptr : itr->second;
     }
 }
