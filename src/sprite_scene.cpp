@@ -72,7 +72,7 @@ SpriteScene::load()
     
     auto bgmtable = Resources::Manager::getBGMTable("resources/bgmdata.toml");
     bgm = bgmtable->load(lvldata.bgm);
-    bgmplayer = Sound::makeSource();
+    channel = Sound::getChannel();
 
     sonicAnim    = Resources::Manager::getAnimator("resources/animation/sonic.toml");
     knucklesAnim = Resources::Manager::getAnimator("resources/animation/knuckles.toml");
@@ -100,10 +100,12 @@ SpriteScene::load()
 
     Render::setClearColor(glm::vec4(0.392f, 0.584f, 0.929f, 1.0f));
     if(bgm != nullptr)
-        bgmplayer->play(bgm);
+        Sound::channelOf(channel)->play(bgm);
 }
 
-void SpriteScene::unload() {}
+void SpriteScene::unload() {
+    Sound::releaseChannel(channel);
+}
 
 void SpriteScene::update(double dt)
 {

@@ -11,7 +11,7 @@ class SoundTest : public Scenes::Scene
 {
 private:
     Resources::BGMTablePtr   table;
-    Sound::AudioSourcePtr    source;
+    Sound::AudioSourceIndex  channel;
     Resources::AudioPtr      bgm;
     Resources::FontPtr       font;
     glm::mat4                vp;

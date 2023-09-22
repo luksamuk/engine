@@ -62,8 +62,8 @@ FLECSFILES=\
 
 .PHONY: dirs clean purge
 
-all: dirs $(OFILES) $(IMGUIFILES) $(FLECSFILES)
-	$(CXX) $(CXXFLAGS) -o $(BIN) $(OFILES) $(IMGUIFILES) $(FLECSFILES) $(LIBS)
+all: dirs $(IMGUIFILES) $(FLECSFILES) $(OFILES)
+	$(CXX) $(CXXFLAGS) -o $(BIN) $(IMGUIFILES) $(FLECSFILES) $(OFILES) $(LIBS)
 
 obj/$(OS)/flecs.o: $(FLECSDIR)/flecs.c
 	$(CC) $(CCFLAGS) -c -o $@ $<

@@ -30,7 +30,7 @@ SoundTest::load()
     atlas->setFrame(0);
     
     vp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
-    source = Sound::makeSource();
+    channel = Sound::getChannel();
     bgm = nullptr;
     selection = 0;
 
@@ -39,7 +39,9 @@ SoundTest::load()
     }
 }
 
-void SoundTest::unload() {}
+void SoundTest::unload() {
+    Sound::releaseChannel(channel);
+}
 
 void
 SoundTest::update(double)
@@ -66,14 +68,14 @@ SoundTest::update(double)
     txt = oss.str();
 
     if(Controls::pressed(BTN_DIGITAL_START)) {
-        source->stop();
+        Sound::channelOf(channel)->stop();
         Resources::Manager::garbageCollect();
 
         if(selection > 0) {
             std::cout << "Loading song \"" << txt << "\"..." << std::endl;
             bgm = table->load(txt);
             if(bgm != nullptr)
-                source->play(bgm);
+                Sound::channelOf(channel)->play(bgm);
         }
     }
 }

@@ -5,14 +5,24 @@
 #include <iostream>
 #include <chrono>
 #include <thread>
+#include <set>
+#include <stack>
 #include "resources.hpp"
 
 #include <vorbis/vorbisfile.h>
 
+#define MAX_CHANNELS 32
+
 // Global data
-static ALCdevice     *_device    = nullptr;
-static ALCcontext    *_context   = nullptr;
-static bool          _shouldHalt = false;
+static ALCdevice                                       *_device    = nullptr;
+static ALCcontext                                      *_context   = nullptr;
+static bool                                             _shouldHalt = false;
+static std::set<Sound::AudioSourcePtr>                  _looping;
+static std::stack<Sound::AudioSourcePtr>                _addstack;
+static std::stack<Sound::AudioSourcePtr>                _removestack;
+static size_t                                           _newestChannel;
+static Sound::AudioSourcePtr                            _channels[MAX_CHANNELS];
+static std::stack<int>                                  _availableChannels;
 
 void
 Sound::init(void)
@@ -20,11 +30,23 @@ Sound::init(void)
     _device = alcOpenDevice(nullptr);
     _context = alcCreateContext(_device, nullptr);
     alcMakeContextCurrent(_context);
+    while(!_addstack.empty()) _addstack.pop();
+    while(!_removestack.empty()) _removestack.pop();
+    _looping.clear();
+    std::fill_n(_channels, MAX_CHANNELS, nullptr);
+    _newestChannel = 0;
+    while(!_availableChannels.empty()) _availableChannels.pop();
 }
 
 void
 Sound::dispose(void)
 {
+    while(!_addstack.empty()) _addstack.pop();
+    while(!_removestack.empty()) _removestack.pop();
+    _looping.clear();
+    std::fill_n(_channels, MAX_CHANNELS, nullptr);
+    _newestChannel = 0;
+    while(!_availableChannels.empty()) _availableChannels.pop();
     alcDestroyContext(_context);
     alcCloseDevice(_device);
     _context    = nullptr;
@@ -37,6 +59,32 @@ Sound::loop()
 {
     // TODO
     while(!_shouldHalt) {
+        while(!_addstack.empty()) {
+            auto src = _addstack.top();
+            _addstack.pop();
+            _looping.insert(src);
+        }
+
+        while(!_removestack.empty()) {
+            auto target = _removestack.top();
+            _removestack.pop();
+            auto itr = _looping.find(target);
+            if(itr != _looping.end())
+                _looping.erase(itr);
+        }
+
+        for(auto src : _looping) {
+            if(src->current != nullptr
+               && src->current->loops
+               && src->current->loopend > 0.0f) {
+                if(src->getElapsedTime() >= src->current->loopend)
+                    src->setElapsedTime(
+                        (src->current->loopstart > 0.0f)
+                        ? src->current->loopstart
+                        : 0.0f);
+            }
+        }
+        
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
 }
@@ -207,6 +255,7 @@ Sound::makeSource()
 
 Sound::AudioSource::~AudioSource()
 {
+    this->stop();
     if(source != (ALuint)-1) {
         alDeleteSources(1, &source);
     }
@@ -220,6 +269,10 @@ Sound::AudioSource::play(Resources::AudioPtr audio)
     alSourcei(source, AL_LOOPING, audio->loops);
     alSourcePlay(source);
     current = audio;
+
+    // TODO: Does this work as intended?
+    if((current != nullptr) && (managedIdx >= 0))
+        _addstack.push(Sound::channelOf(managedIdx));
 }
 
 void
@@ -232,6 +285,9 @@ void
 Sound::AudioSource::stop(void)
 {
     alSourceStop(source);
+    // TODO: Does this work as intended?
+    if((current != nullptr) && (managedIdx >= 0))
+        _removestack.push(Sound::channelOf(managedIdx));
     current = nullptr;
 }
 
@@ -247,6 +303,19 @@ Sound::AudioSource::rewind(void)
     alSourceRewind(source);
 }
 
+float
+Sound::AudioSource::getElapsedTime()
+{
+    float seconds;
+    alGetSourcef(source, AL_SEC_OFFSET, &seconds);
+    return seconds;
+}
+
+void
+Sound::AudioSource::setElapsedTime(float seconds)
+{
+    alSourcef(source, AL_SEC_OFFSET, seconds);
+}
 
 // ==================== Audio Table (Info only) ======================
 
@@ -260,4 +329,48 @@ Sound::BGMTable::load(std::string key)
         it->second.loopend.value_or(-1.0f),
         it->second.loopstart.value_or(-1.0f));
     return Resources::Manager::getAudio(it->second.file);
+}
+
+// =================== Managed channels ==============================
+
+Sound::AudioSourceIndex
+Sound::getChannel()
+{
+    int idx;
+    if(!_availableChannels.empty()) {
+        idx = _availableChannels.top();
+        _availableChannels.pop();
+        goto makechannel;
+    }
+
+    if(_newestChannel >= MAX_CHANNELS) return -1;
+
+    idx = _newestChannel;
+    _newestChannel++;
+    
+makechannel:
+    _channels[idx] = Sound::makeSource();
+    _channels[idx]->managedIdx = idx;
+    return idx;
+}
+
+
+void
+Sound::releaseChannel(Sound::AudioSourceIndex channel)
+{
+    if(channel < 0 || channel >= MAX_CHANNELS)
+        return;
+
+    _channels[channel]->stop();
+    _channels[channel] = nullptr;
+    _availableChannels.push(channel);
+}
+
+Sound::AudioSourcePtr
+Sound::channelOf(Sound::AudioSourceIndex channel)
+{
+    if(channel < 0 || channel >= MAX_CHANNELS)
+        return nullptr;
+
+    return _channels[channel];
 }
