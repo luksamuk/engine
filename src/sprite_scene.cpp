@@ -68,6 +68,11 @@ SpriteScene::load()
     Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
     Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
                                  glm::vec2(10.0f, 10.0f));
+    Resources::Manager::loadBGMTable("resources/bgmdata.toml");
+    
+    auto bgmtable = Resources::Manager::getBGMTable("resources/bgmdata.toml");
+    bgm = bgmtable->load(lvldata.bgm);
+    bgmplayer = Sound::makeSource();
 
     sonicAnim    = Resources::Manager::getAnimator("resources/animation/sonic.toml");
     knucklesAnim = Resources::Manager::getAnimator("resources/animation/knuckles.toml");
@@ -94,6 +99,8 @@ SpriteScene::load()
     }
 
     Render::setClearColor(glm::vec4(0.392f, 0.584f, 0.929f, 1.0f));
+    if(bgm != nullptr)
+        bgmplayer->play(bgm);
 }
 
 void SpriteScene::unload() {}

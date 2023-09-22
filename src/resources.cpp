@@ -66,6 +66,7 @@ namespace Resources
                 toml::table tb = *el.as_table();
                 Tiled::LevelData datum;
                 datum.name = tb["name"].value_or("");
+                datum.bgm  = tb["bgm"].value_or("00");
                 datum.atlas_path = tb["atlas"].value_or("");
                 datum.tiles_path = tb["tiles"].value_or("");
                 auto maps_arr = tb["maps"].as_array();
