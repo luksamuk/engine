@@ -26,13 +26,13 @@ namespace Sound
     
     struct AudioSource
     {
-        ALuint    source    = -1;
-        ALuint    pitch;
-        ALuint    gain;
-        glm::vec3 position;
-        glm::vec3 velocity;
-        
-        Resources::AudioPtr  current = nullptr;
+        ALuint               source     = -1;
+        ALuint               pitch;
+        ALuint               gain;
+        glm::vec3            position;
+        glm::vec3            velocity;
+        int                  managedIdx = -1;
+        Resources::AudioPtr  current    = nullptr;
 
         ~AudioSource();
         void play(Resources::AudioPtr);
@@ -40,9 +40,13 @@ namespace Sound
         void stop(void);
         void pause(void);
         void rewind(void);
+
+        float getElapsedTime();
+        void  setElapsedTime(float);
     };
 
     typedef std::shared_ptr<AudioSource> AudioSourcePtr;
+    typedef int                          AudioSourceIndex;
 
     struct BGMTableEntry
     {
@@ -65,6 +69,9 @@ namespace Sound
 
     Resources::AudioPtr rawLoadAudio(const char*, bool, float, float);
     AudioSourcePtr      makeSource();
+    AudioSourceIndex    getChannel();
+    void                releaseChannel(AudioSourceIndex);
+    AudioSourcePtr      channelOf(AudioSourceIndex);
 }
 
 #endif

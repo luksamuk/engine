@@ -31,8 +31,8 @@ private:
     std::unique_ptr<Grid>  grid;
     std::vector<ObjPtr>    objects;
 
-    Sound::AudioSourcePtr  bgmplayer;
-    Resources::AudioPtr    bgm;
+    Sound::AudioSourceIndex channel;
+    Resources::AudioPtr     bgm;
 
     void changeCharacter(unsigned);
 public:
