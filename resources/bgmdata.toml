@@ -1,4 +1,3 @@
-
 [01]
 file       = "resources/audio/bgm/titlescreen.ogg"
 
@@ -34,3 +33,18 @@ loop-end   = 17.233
 file       = "resources/audio/bgm/chaoticcanyon.ogg"
 loop-start = 8.799
 loop-end   = 78.616
+
+[09]
+file       = "resources/audio/bgm/hyperhyper.ogg"
+loop-start = 11.351
+loop-end   = 41.420
+
+[0A]
+file       = "resources/audio/bgm/hiddenpalace.ogg"
+loop-start = 0.612
+loop-end   = 52.679
+
+[0B]
+file       = "resources/audio/bgm/speedslider.ogg"
+loop-start = 0.075
+loop-end   = 72.077

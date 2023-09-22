@@ -97,6 +97,7 @@ namespace Tiled
     struct LevelData
     {
         std::string name;
+        std::string bgm;
         std::string atlas_path;
         std::string tiles_path;
         std::vector<std::string> maps_path;

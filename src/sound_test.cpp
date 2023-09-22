@@ -62,7 +62,7 @@ SoundTest::update(double)
 
     std::ostringstream oss;
     oss.str("");
-    oss << std::setfill('0') << std::setw(2) << std::hex << selection;
+    oss << std::setfill('0') << std::setw(2) << std::uppercase << std::hex << selection;
     txt = oss.str();
 
     if(Controls::pressed(BTN_DIGITAL_START)) {
@@ -70,6 +70,7 @@ SoundTest::update(double)
         Resources::Manager::garbageCollect();
 
         if(selection > 0) {
+            std::cout << "Loading song \"" << txt << "\"..." << std::endl;
             bgm = table->load(txt);
             if(bgm != nullptr)
                 source->play(bgm);

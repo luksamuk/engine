@@ -11,6 +11,7 @@
 #include "tiled.hpp"
 #include "game_object.hpp"
 #include "partitioning.hpp"
+#include "sound.hpp"
 
 class SpriteScene : public Scenes::Scene
 {
@@ -29,6 +30,9 @@ private:
 
     std::unique_ptr<Grid>  grid;
     std::vector<ObjPtr>    objects;
+
+    Sound::AudioSourcePtr  bgmplayer;
+    Resources::AudioPtr    bgm;
 
     void changeCharacter(unsigned);
 public:
