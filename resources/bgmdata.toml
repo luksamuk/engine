@@ -19,3 +19,18 @@ loop-end   = 124.528
 file       = "resources/audio/bgm/amazingaquarium.ogg"
 loop-start = 11.009
 loop-end   = 87.848
+
+[06]
+file       = "resources/audio/bgm/cybercity.ogg"
+loop-start = 6.438
+loop-end   = 67.231
+
+[07]
+file       = "resources/audio/bgm/walkin.ogg"
+loop-start = 1.080
+loop-end   = 17.233
+
+[08]
+file       = "resources/audio/bgm/chaoticcanyon.ogg"
+loop-start = 8.799
+loop-end   = 78.616
