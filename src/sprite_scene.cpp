@@ -68,9 +68,9 @@ SpriteScene::load()
     Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
     Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
                                  glm::vec2(10.0f, 10.0f));
-    Resources::Manager::loadBGMTable("resources/bgmdata.toml");
+    Resources::Manager::loadBGMTable("resources/audiodata.toml");
     
-    auto bgmtable = Resources::Manager::getBGMTable("resources/bgmdata.toml");
+    auto bgmtable = Resources::Manager::getBGMTable("resources/audiodata.toml");
     bgm = bgmtable->load(lvldata.bgm);
     channel = Sound::getChannel();
 

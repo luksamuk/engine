@@ -18,13 +18,13 @@ SoundTest::~SoundTest() {}
 void
 SoundTest::load()
 {
-    Resources::Manager::loadBGMTable("resources/bgmdata.toml");
+    Resources::Manager::loadBGMTable("resources/audiodata.toml");
     Resources::Manager::loadFont("resources/sprites/fonts/hud.png",
                                  glm::vec2(10.0f, 18.0f));
     Resources::Manager::loadAtlas("resources/sprites/soundtest.png",
                                   glm::vec2(320.0f, 224.0f));
     
-    table = Resources::Manager::getBGMTable("resources/bgmdata.toml");
+    table = Resources::Manager::getBGMTable("resources/audiodata.toml");
     font  = Resources::Manager::getFont("resources/sprites/fonts/hud.png");
     atlas = Resources::Manager::getAtlas("resources/sprites/soundtest.png");
     atlas->setFrame(0);
@@ -67,7 +67,7 @@ SoundTest::update(double)
     oss << std::setfill('0') << std::setw(2) << std::uppercase << std::hex << selection;
     txt = oss.str();
 
-    if(Controls::pressed(BTN_DIGITAL_START)) {
+    if(Controls::pressed(BTN_DIGITAL_ACTIONDOWN)) {
         Sound::channelOf(channel)->stop();
         Resources::Manager::garbageCollect();
 
