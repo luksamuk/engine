@@ -145,7 +145,7 @@ void LevelSelect::update(double dt)
     if(selection >= currlvl) selection = 0;
     if(selection < 0) selection = currlvl - 1;
 
-    if(Controls::pressed(BTN_DIGITAL_START)) {
+    if(Controls::pressed(BTN_DIGITAL_START) || Controls::pressed(BTN_DIGITAL_ACTIONDOWN)) {
         if(selection < numlvls) {
             auto lvldata = fromSelection();
             if(lvldata.first.maps_path.size() > 0) {
