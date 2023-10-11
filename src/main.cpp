@@ -3,7 +3,6 @@
 
 #include "test_scene.hpp"
 #include "sprite_scene.hpp"
-//#include "level_select.hpp"
 #include "title_screen.hpp"
 
 int
@@ -11,7 +10,6 @@ main(void)
 {
     Core::init();
 
-    //Scenes::Manager::add(new LevelSelect());
     Scenes::Manager::add(new TitleScreen());
     
     Core::gameLoop();
