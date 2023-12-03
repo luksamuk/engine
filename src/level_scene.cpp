@@ -30,7 +30,6 @@ LevelScene::load() {
     flecs::entity player = ecs.entity("Sonic")
         .add<Components::Speed>()
         .add<Components::GroundSpeed>()
-        .add<Components::Accelerator>()
         //.add<Components::Sensors>()
         .set(Components::Sensors { true, false, false, false })
         .set(Components::Transform {

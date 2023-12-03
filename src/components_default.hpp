@@ -27,10 +27,6 @@ namespace Components
         float gsp;
     };
 
-    struct Accelerator {
-        glm::vec2 accel;
-    };
-
     struct ViewportInfo {
         glm::vec2 size;
     };

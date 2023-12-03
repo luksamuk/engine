@@ -9,6 +9,7 @@ namespace Components
 {
     // Prototypes
     void RegisterDefaultSystems(flecs::world &ecs);
+    void RegisterPlayerMovementSystems(flecs::world &ecs);
 
 
     /* impl */
@@ -25,9 +26,6 @@ namespace Components
 
         ecs.component<GroundSpeed>()
             .member<float>("gsp");
-
-        ecs.component<Accelerator>()
-            .member<glm::vec2>("accel");
 
         ecs.component<ViewportInfo>()
             .member<glm::vec2>("size");
@@ -65,6 +63,7 @@ namespace Components
 
         // Default behaviour for components
         RegisterDefaultSystems(ecs);
+        RegisterPlayerMovementSystems(ecs);
     }
 
     void
@@ -78,7 +77,11 @@ namespace Components
                 mvp = glm::scale(mvp, glm::vec3(r.radius, r.radius, 1.0f));
                 r.atlas->draw(mvp);
             });
-        
+    }
+
+    void
+    RegisterPlayerMovementSystems(flecs::world &ecs)
+    {
         // Default system for movement according to speed
         ecs.system<Transform, const Speed>("ApplySpeed")
             .iter([](flecs::iter& it, Transform *t, const Speed *s) {
@@ -87,153 +90,155 @@ namespace Components
                 }
             });
 
-        // Convert ground speed to speed when grounded
-        ecs.system<Speed, const Transform, const GroundSpeed, const Sensors>("ApplyGroundSpeed")
-            .iter([](flecs::iter& it,
+        // Default system for converting ground speed to speed.
+        // GSP is converted to SPD if and only if the entity is not on ground.
+        ecs.system<Speed,
+                   const GroundSpeed,
+                   const Transform,
+                   const Sensors>("ConvertGroundSpeed")
+            .each([](Speed &spd,
+                     const GroundSpeed &gsp,
+                     const Transform &t,
+                     const Sensors &sensors) {
+                if(sensors.ground) {
+                    spd.speed.x = gsp.gsp * glm::cos(t.angle);
+                    spd.speed.y = gsp.gsp * -glm::sin(t.angle);
+                }
+            });
+
+        // Apply airborne movement.
+        // See https://info.sonicretro.org/SPG:Air_State
+        // See https://info.sonicretro.org/SPG:Jumping#Variable_Jump_Height
+        ecs.system<Speed, const Sensors, const Player::Constants>("AirborneMovement")
+            .iter([](flecs::iter &it,
                      Speed *spd,
-                     const Transform *t,
-                     const GroundSpeed *gsp,
-                     const Sensors *sensors) {
-                for(auto i : it) {
-                    // Only transform speed when grounded.
-                    // Air speed is directly transformed
-                    if(sensors[i].ground) {
-                        spd[i].speed.x = gsp[i].gsp * glm::cos(t[i].angle);
-                        spd[i].speed.y = gsp[i].gsp * -glm::sin(t[i].angle);
-                    }
-                }
-            });
-
-        // Transform speed with respect to acceleration (air accel / Y accel)
-        ecs.system<Speed, const Accelerator, const Sensors>("ApplyAirAcceleration")
-            .each([](Speed &s, const Accelerator &a, const Sensors &sensors) {
-                if(!sensors.ground)
-                    s.speed.x += a.accel.x;
-                s.speed.y += a.accel.y;
-            });
-
-        // Transform speed with respect to acceleration (ground accel)
-        ecs.system<GroundSpeed, const Accelerator, const Sensors>("ApplyGroundAcceleration")
-            .each([](GroundSpeed &s, const Accelerator &a, const Sensors &sensors) {
-                if(sensors.ground)
-                    s.gsp += a.accel.x;
-            });
-
-        // Transform acceleration with respect to sensors
-        ecs.system<Accelerator, const Sensors, const Player::Constants>("AccelerateFromSensors")
-            .iter([](flecs::iter& it,
-                     Accelerator *a,
-                     const Sensors *sensors,
-                     const Player::Constants *constants) {
-                float delta = it.delta_time() * Player::BaseFrameRate;
-                for(auto i : it) {
-                    if(!sensors[i].ground) {
-                        // Apply gravity
-                        a[i].accel.y = constants[i].gravity * delta;
-                    } else {
-                        a[i].accel.y = 0.0f;
-                    }
-                }
-            });
-
-
-        // Transform player movement speed with respect to user input
-        ecs.system<const PlayerControl,
-                   Accelerator,
-                   Speed,
-                   const Sensors,
-                   const Player::Constants>("PlayerAirMovement")
-            .iter([](flecs::iter& it,
-                     const PlayerControl*,
-                     Accelerator *a,
-                     Speed *s,
                      const Sensors *sensors,
                      const Player::Constants *constants) {
                 for(auto i : it) {
-                    // Ignore if not airborne
                     if(sensors[i].ground) continue;
-
                     float delta = it.delta_time() * Player::BaseFrameRate;
+                    float air_accel = constants[i].air_acceleration * delta;
+                    float top_speed = constants[i].top_x_speed * delta;
+                    float gravity = constants[i].gravity * delta;
+                    float min_jump_force = constants[i].min_jump_strength * delta;
 
-                    // Acceleration
+                    /* X Movement */
+                    if(Controls::pressing(BTN_DIGITAL_LEFT)) {
+                        if(spd[i].speed.x > -top_speed) {
+                            spd[i].speed.x -= air_accel;
+                            if(spd[i].speed.x <= -top_speed)
+                                spd[i].speed.x = -top_speed;
+                        }
+                    }
+
+                    if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
+                        if(spd[i].speed.x < top_speed) {
+                            spd[i].speed.x += air_accel;
+                            if(spd[i].speed.x >= top_speed)
+                                spd[i].speed.x = top_speed;
+                        }
+                    }
+
+                    /* Y Movement */
+
+                    // Variable jump height.
+                    // TODO: This should relate to an action, not just Y speed.
+                    // The way it is programmed right now, this will interfere
+                    // with gimmicks such as springs, etc.
+                    // NOTE: min_jump_force is negative on this engine.
+                    if(!Controls::pressing(BTN_DIGITAL_ACTIONDOWN)
+                       && (spd[i].speed.y < min_jump_force)) {
+                        spd[i].speed.y = min_jump_force;
+                    }
+
+                    // Apply gravity
+                    spd[i].speed.y += gravity;
+
+                    // TODO: Add Top Y Speed? Value is 16 * delta.
+
+                    // TODO: Air rotation! Smoothly rotate player until
+                    // reaching 0.
+                }
+            });
+
+        // Apply ground X movement.
+        // See https://info.sonicretro.org/SPG:Running
+        ecs.system<GroundSpeed, const Sensors, const Player::Constants>("GroundXMovement")
+            .iter([](flecs::iter &it,
+                     GroundSpeed *spd,
+                     const Sensors *sensors,
+                     const Player::Constants *constants) {
+                for(auto i : it) {
+                    if(!sensors[i].ground) continue;
+                    
+                    float delta = it.delta_time() * Player::BaseFrameRate;
+                    float decel = constants[i].deceleration * delta;
                     float accel = constants[i].acceleration * delta;
-                    if(Controls::pressing(BTN_DIGITAL_LEFT))
-                        a[i].accel.x = -accel;
-                    else if(Controls::pressing(BTN_DIGITAL_RIGHT))
-                        a[i].accel.x = accel;
+                    float top_speed = constants[i].top_x_speed * delta;
+                    float friction = constants[i].friction * delta;
 
-                    // Deceleration
-                    float decel = constants[i].deceleration * it.delta_time();
-                    if(glm::abs(s[i].speed.x) > 0.0) {
-                        if(!Controls::pressing(BTN_DIGITAL_LEFT)
-                           && !Controls::pressing(BTN_DIGITAL_RIGHT)) {
-                            a[i].accel.x = -glm::sign(s[i].speed.x) * decel;
-
-                            // Halt if abs speed is lower than deceleration.
-                            // This is the only place where we change the speed
-                            // directly
-                            if(glm::abs(s[i].speed.x) < decel) {
-                                a[i].accel.x = 0.0f;
-                                s[i].speed.x = 0.0f;
+                    /* X Movement */
+                    
+                    if(Controls::pressing(BTN_DIGITAL_LEFT)) {
+                        if(spd[i].gsp > 0.0f) {
+                            spd[i].gsp -= decel;
+                            if(spd[i].gsp <= 0.0f)
+                                spd[i].gsp = -0.5f * delta;
+                        } else if(spd[i].gsp > -top_speed) {
+                            spd[i].gsp -= accel;
+                            if(spd[i].gsp <= -top_speed) {
+                                spd[i].gsp = -top_speed;
                             }
                         }
                     }
 
-                    // Jump limiter
-                    float minjump = constants[i].min_jump_strength * delta;
-                    if(!Controls::pressing(BTN_DIGITAL_ACTIONDOWN)
-                       && (s[i].speed.y < minjump))
-                        s[i].speed.y = minjump;
+                    if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
+                        if(spd[i].gsp < 0.0f) {
+                            spd[i].gsp += decel;
+                            if(spd[i].gsp >= 0)
+                                spd[i].gsp = 0.5f * delta;
+                        } else if(spd[i].gsp < top_speed) {
+                            spd[i].gsp += accel;
+                            if(spd[i].gsp >= top_speed) {
+                                spd[i].gsp = top_speed;
+                            }
+                        }
+                    }
+
+                    if(!Controls::pressing(BTN_DIGITAL_LEFT) &&
+                       !Controls::pressing(BTN_DIGITAL_RIGHT)) {
+                        spd[i].gsp -=
+                            glm::min(glm::abs(spd[i].gsp), friction)
+                            * glm::sign(spd[i].gsp);
+                    }
                 }
             });
 
-        ecs.system<const PlayerControl,
-                   Accelerator,
-                   Speed,
-                   GroundSpeed,
-                   Sensors,
-                   const Player::Constants>("PlayerGroundMovement")
-            .iter([](flecs::iter& it,
-                     const PlayerControl*,
-                     Accelerator *a,
-                     Speed *airspd,
-                     GroundSpeed *s,
+        // Apply ground Y movement.
+        // See https://info.sonicretro.org/SPG:Jumping#Jump_Velocity
+        ecs.system<Transform, Speed, Sensors, const Player::Constants>("GroundYMovement")
+            .iter([](flecs::iter &it,
+                     Transform *t,
+                     Speed *spd,
                      Sensors *sensors,
                      const Player::Constants *constants) {
                 for(auto i : it) {
-                    // Ignore if not on ground
                     if(!sensors[i].ground) continue;
 
                     float delta = it.delta_time() * Player::BaseFrameRate;
+                    float jump_force = constants[i].jump_strength * delta;
 
-                    // X Acceleration
-                    float accel = constants[i].acceleration * delta;
-                    if(Controls::pressing(BTN_DIGITAL_LEFT))
-                        a[i].accel.x = -accel;
-                    if(Controls::pressing(BTN_DIGITAL_RIGHT))
-                        a[i].accel.x = accel;
-
-                    // X Deceleration
-                    float decel = constants[i].deceleration * it.delta_time();
-                    if(glm::abs(s[i].gsp) > 0.0) {
-                        if(!Controls::pressing(BTN_DIGITAL_LEFT)
-                           && !Controls::pressing(BTN_DIGITAL_RIGHT)) {
-                            a[i].accel.x = -glm::sign(s[i].gsp) * decel;
-
-                            // Halt if abs speed is lower than deceleration.
-                            // This is the only place where we change the speed
-                            // directly
-                            if(glm::abs(s[i].gsp) < decel) {
-                                a[i].accel.x = 0.0f;
-                                s[i].gsp = 0.0f;
-                            }
-                        }
-                    }
-
-                    // Jump
+                    // Start jump physics.
+                    // NOTE: This does not control variable jump height, since
+                    // it is mostly related to airborne state
                     if(Controls::pressed(BTN_DIGITAL_ACTIONDOWN)) {
                         sensors[i].ground = false;
-                        airspd[i].speed.y = constants[i].jump_strength * delta;
+                        // (jump variables are always negative in this engine)
+                        spd[i].speed.x += jump_force * glm::sin(t[i].angle);
+                        spd[i].speed.y += jump_force * glm::cos(t[i].angle);
+
+                        // reset angle before airborne state
+                        t[i].angle = 0.0f; // TODO: remove when introducing air rotation
                     }
                 }
             });

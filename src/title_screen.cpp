@@ -3,7 +3,7 @@
 
 #include "controls.hpp"
 #include "level_select.hpp"
-#include "sprite_scene.hpp"
+#include "level_scene.hpp"
 #include "core.hpp"
 
 //const glm::vec2 viewportSize(1280.0f, 896.0f);
@@ -65,7 +65,7 @@ void TitleScreen::update(double) {
                     auto manager =
                         Resources::Manager::getLevelDataManager("resources/leveldata.toml");
                     if(manager->data.size() > 0) {
-                        Scenes::Manager::add(new SpriteScene(manager->data[0], 0));
+                        Scenes::Manager::add(new LevelScene(manager->data[0], 0));
                         setShouldUnload(true);
                     }
                 }
