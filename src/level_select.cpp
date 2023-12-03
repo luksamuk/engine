@@ -8,6 +8,7 @@
 
 #include <glm/ext.hpp>
 
+#include "level_scene.hpp"
 #include "sprite_scene.hpp"
 #include "test_scene.hpp"
 #include "movie_scene.hpp"
@@ -34,6 +35,7 @@ const std::vector<SceneEntry> extra_scenes = {
     {"Animation Test", []() { return new MovieScene();    }},
     {"Collision Test", []() { return new PartitionTest(); }},
     {"Entity Test",    []() { return new EntityTest();    }},
+    {"Component Test", []() { return new LevelScene({},0); }},
     {"Title Screen",   []() { return new TitleScreen();   }},
     {"Exit",           []() {
         Core::queryClose();

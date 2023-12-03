@@ -18,7 +18,7 @@ EntityTest::EntityTest() {
     
     ecs.component<Speed>()
         .member<glm::vec2>("speed");
-
+    
     ecs.component<AutoControl>()
         .member<float>("step");
 }

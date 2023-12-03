@@ -31,6 +31,7 @@ OFILES =\
 	obj/$(OS)/scene.o\
 	obj/$(OS)/test_scene.o\
 	obj/$(OS)/sprite_scene.o\
+	obj/$(OS)/level_scene.o\
 	obj/$(OS)/movie_scene.o\
 	obj/$(OS)/level_select.o\
 	obj/$(OS)/core.o\
@@ -46,6 +47,10 @@ OFILES =\
 	obj/$(OS)/entity_test.o\
 	obj/$(OS)/sound.o\
 	obj/$(OS)/sound_test.o\
+	obj/$(OS)/player_constants.o\
+	obj/$(OS)/components_base.o\
+	obj/$(OS)/components_default.o\
+	obj/$(OS)/components.o\
 	obj/$(OS)/main.o
 
 IMGUIFILES=\
