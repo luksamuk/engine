@@ -32,8 +32,8 @@ namespace Components
     };
 
     struct DebugCircleRender {
-        Resources::AtlasPtr atlas;
         float               radius;
+        Resources::AtlasPtr atlas;
     };
     
 
@@ -49,7 +49,13 @@ namespace Components
 
     // Player components
     
-    struct PlayerControl {};
+    struct FakeGround {
+        float ypos;
+    };
+
+    struct PlayerAnimation {
+        Resources::AnimatorPtr animator;
+    };
 
 
     // Functions

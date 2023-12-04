@@ -15,8 +15,8 @@ namespace Player
         float top_x_speed;
         float jump_strength;
         float min_jump_strength;
-        float airdrag_factor;
-        float airdrag_min_x_speed;
+        float airdrag_division_factor;
+        float airdrag_rem_factor;
         float airdrag_min_y_speed;
         float slope_factor;
         float rolling_friction;
@@ -41,6 +41,20 @@ namespace Player
         Normal,
         Underwater,
         SpeedShoes
+    };
+
+    enum class ActionKind : unsigned
+    {
+        Idle,
+        Jumping,
+        Rolling,
+        Skidding
+    };
+
+    struct State
+    {
+        ActionKind action;
+        float      direction = 1.0f;
     };
 
     Constants GetConstants(Character, PhysicsMode);

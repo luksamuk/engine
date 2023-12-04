@@ -56,10 +56,15 @@ namespace Components
             .member<float>("rolling_min_x_speed")
             .member<float>("unroll_min_x_speed");
 
+        ecs.component<Player::State>()
+            .member<unsigned>("action")
+            .member<float>("direction");
+
         ecs.component<DebugCircleRender>()
             .member<float>("radius");
 
-        ecs.component<PlayerControl>();
+        ecs.component<FakeGround>()
+            .member<float>("ypos");
 
         // Default behaviour for components
         RegisterDefaultSystems(ecs);
@@ -106,12 +111,43 @@ namespace Components
                 }
             });
 
+        // Fake ground
+        ecs.system<Transform,
+                   Speed,
+                   GroundSpeed,
+                   Sensors,
+                   Player::State,
+                   const FakeGround>("LandOnFakeGround")
+            .each([](Transform &t,
+                     Speed &s,
+                     GroundSpeed &gsp,
+                     Sensors &sen,
+                     Player::State &state,
+                     const FakeGround &g) {
+                // Land on fake solid ground
+                if(t.position.y >= g.ypos && s.speed.y > 0.0f && !sen.ground) {
+                    t.position.y = g.ypos;
+                    s.speed.y = 0.0f;
+                    sen.ground = true;
+                    state.action = Player::ActionKind::Idle;
+
+                    // "Partial" implementation of landing on ground.
+                    // We always assume a flat ground, after all.
+                    // See https://info.sonicretro.org/SPG:Slope_Physics#Landing_On_The_Ground
+                    gsp.gsp = s.speed.x;
+                }
+            });
+
         // Apply airborne movement.
         // See https://info.sonicretro.org/SPG:Air_State
         // See https://info.sonicretro.org/SPG:Jumping#Variable_Jump_Height
-        ecs.system<Speed, const Sensors, const Player::Constants>("AirborneMovement")
+        ecs.system<Speed,
+                   Player::State,
+                   const Sensors,
+                   const Player::Constants>("AirborneMovement")
             .iter([](flecs::iter &it,
                      Speed *spd,
+                     Player::State *state,
                      const Sensors *sensors,
                      const Player::Constants *constants) {
                 for(auto i : it) {
@@ -121,6 +157,7 @@ namespace Components
                     float top_speed = constants[i].top_x_speed * delta;
                     float gravity = constants[i].gravity * delta;
                     float min_jump_force = constants[i].min_jump_strength * delta;
+                    float air_drag_min_y = constants[i].airdrag_min_y_speed * delta;
 
                     /* X Movement */
                     if(Controls::pressing(BTN_DIGITAL_LEFT)) {
@@ -142,11 +179,12 @@ namespace Components
                     /* Y Movement */
 
                     // Variable jump height.
-                    // TODO: This should relate to an action, not just Y speed.
-                    // The way it is programmed right now, this will interfere
-                    // with gimmicks such as springs, etc.
+                    // This should relate to an action, not just Y speed.
+                    // This way, it will not interfere with gimmicks such as
+                    // springs, etc.
                     // NOTE: min_jump_force is negative on this engine.
-                    if(!Controls::pressing(BTN_DIGITAL_ACTIONDOWN)
+                    if((state[i].action == Player::ActionKind::Jumping)
+                       && !Controls::pressing(BTN_DIGITAL_ACTIONDOWN)
                        && (spd[i].speed.y < min_jump_force)) {
                         spd[i].speed.y = min_jump_force;
                     }
@@ -156,6 +194,15 @@ namespace Components
 
                     // TODO: Add Top Y Speed? Value is 16 * delta.
 
+                    // Air drag
+                    if((spd[i].speed.y < 0.0f) && (spd[i].speed.y > air_drag_min_y)) {
+                        spd[i].speed.x -= (
+                            std::remainder(spd[i].speed.x, constants[i].airdrag_rem_factor)
+                            / constants[i].airdrag_division_factor)
+                            * delta;
+                    }
+                    
+                    
                     // TODO: Air rotation! Smoothly rotate player until
                     // reaching 0.
                 }
@@ -163,9 +210,13 @@ namespace Components
 
         // Apply ground X movement.
         // See https://info.sonicretro.org/SPG:Running
-        ecs.system<GroundSpeed, const Sensors, const Player::Constants>("GroundXMovement")
+        ecs.system<GroundSpeed,
+                   Player::State,
+                   const Sensors,
+                   const Player::Constants>("GroundXMovement")
             .iter([](flecs::iter &it,
                      GroundSpeed *spd,
+                     Player::State *state,
                      const Sensors *sensors,
                      const Player::Constants *constants) {
                 for(auto i : it) {
@@ -176,15 +227,15 @@ namespace Components
                     float accel = constants[i].acceleration * delta;
                     float top_speed = constants[i].top_x_speed * delta;
                     float friction = constants[i].friction * delta;
-
-                    /* X Movement */
                     
                     if(Controls::pressing(BTN_DIGITAL_LEFT)) {
                         if(spd[i].gsp > 0.0f) {
                             spd[i].gsp -= decel;
-                            if(spd[i].gsp <= 0.0f)
+                            if(spd[i].gsp <= 0.0f) {
                                 spd[i].gsp = -0.5f * delta;
+                            }
                         } else if(spd[i].gsp > -top_speed) {
+                            state[i].direction = -1.0f;
                             spd[i].gsp -= accel;
                             if(spd[i].gsp <= -top_speed) {
                                 spd[i].gsp = -top_speed;
@@ -195,9 +246,11 @@ namespace Components
                     if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
                         if(spd[i].gsp < 0.0f) {
                             spd[i].gsp += decel;
-                            if(spd[i].gsp >= 0)
+                            if(spd[i].gsp >= 0) {
                                 spd[i].gsp = 0.5f * delta;
+                            }
                         } else if(spd[i].gsp < top_speed) {
+                            state[i].direction = 1.0f;
                             spd[i].gsp += accel;
                             if(spd[i].gsp >= top_speed) {
                                 spd[i].gsp = top_speed;
@@ -216,11 +269,16 @@ namespace Components
 
         // Apply ground Y movement.
         // See https://info.sonicretro.org/SPG:Jumping#Jump_Velocity
-        ecs.system<Transform, Speed, Sensors, const Player::Constants>("GroundYMovement")
+        ecs.system<Transform,
+                   Speed,
+                   Sensors,
+                   Player::State,
+                   const Player::Constants>("GroundYMovement")
             .iter([](flecs::iter &it,
                      Transform *t,
                      Speed *spd,
                      Sensors *sensors,
+                     Player::State *state,
                      const Player::Constants *constants) {
                 for(auto i : it) {
                     if(!sensors[i].ground) continue;
@@ -233,6 +291,7 @@ namespace Components
                     // it is mostly related to airborne state
                     if(Controls::pressed(BTN_DIGITAL_ACTIONDOWN)) {
                         sensors[i].ground = false;
+                        state[i].action = Player::ActionKind::Jumping;
                         // (jump variables are always negative in this engine)
                         spd[i].speed.x += jump_force * glm::sin(t[i].angle);
                         spd[i].speed.y += jump_force * glm::cos(t[i].angle);
@@ -242,6 +301,60 @@ namespace Components
                     }
                 }
             });
+
+        // Apply animation.
+        ecs.system<const ViewportInfo,
+                   const Transform,
+                   const GroundSpeed,
+                   const Speed,
+                   const Player::State,
+                   PlayerAnimation>("AnimatePlayer")
+            .iter([](flecs::iter &it,
+                     const ViewportInfo *vwp,
+                     const Transform *t,
+                     const GroundSpeed *gsp,
+                     const Speed *s,
+                     const Player::State *state,
+                     PlayerAnimation *anim) {
+                for(auto i : it) {
+                    float delta = it.delta_time() * Player::BaseFrameRate;
+                    float abs_gsp = glm::abs(gsp[i].gsp);
+                    
+                    // TODO
+                    switch(state[i].action) {
+                    case Player::ActionKind::Jumping:
+                        anim[i].animator->setAnimationByName("Rolling");
+                        break;
+                    default:
+                        // Idle
+                        if(abs_gsp == 0.0f) {
+                            anim[i].animator->setAnimationByName("Idle");
+                        } else if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
+                            anim[i].animator->setAnimationByName("Walking");
+                        } else if(abs_gsp >= 6.0f) {
+                            anim[i].animator->setAnimationByName("Running");
+                        }
+                        break;
+                    }
+
+                    anim[i].animator->update();
+                
+                    // DEBUG!
+                    // Projection and View should probably be in another component.
+                    glm::mat4 projection, view, model;
+                
+                    projection = glm::ortho(0.0f, vwp[i].size.x, vwp[i].size.y, 0.0f, 1.0f, -1.0f);
+
+                    view = glm::mat4(1.0f);
+                
+                    model = glm::mat4(1.0f);
+                    model = glm::translate(model, glm::vec3(t[i].position, 0.0f));
+                    model = glm::scale(model, glm::vec3(state[i].direction * 30.0f, 30.0f, 1.0f));
+
+                    glm::mat4 mvp = projection * view * model;
+                    anim[i].animator->draw(mvp);
+                }
+            });
     }
 
     DebugCircleRender
@@ -249,6 +362,6 @@ namespace Components
         Resources::Manager::loadAtlas("resources/sprites/circle.png", glm::vec2(64.0f, 64.0f));
         auto atlas = Resources::Manager::getAtlas("resources/sprites/circle.png");
         atlas->setFrame(0);
-        return { atlas, radius };
+        return { radius, atlas };
     }
 }

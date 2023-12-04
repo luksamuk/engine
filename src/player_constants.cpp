@@ -10,8 +10,8 @@ const Player::Constants default_values = {
     6.0f,       // Top X Speed
     -6.5f,      // Jump Strength
     -4.0f,      // Minimum Jump Strength
-    0.96875f,   // Air Drag Factor
-    0.0125f,    // Air Drag Minimum X value
+    256.0f,     // Air Drag Division Factor
+    0.125f,     // Air Drag Remainder Factor
     -4.0f,      // Air Drag Minimum Y value
     0.125f,     // Slope Factor
 
@@ -33,8 +33,8 @@ const Player::Constants speedshoes_values = {
     12.0f,
     -6.5f,
     -4.0f,
-    0.96875f,
-    0.0125f,
+    256.0f,
+    0.125f,
     -4.0f,
     0.125f,
 
@@ -55,8 +55,8 @@ const Player::Constants underwater_values = {
     3.0f,        // Top X Speed
     -3.5f,
     -2.0f,
-    0.96875f,
-    0.0125f,
+    256.0f,
+    0.125f,
     -4.0f,
     0.125f,
 
@@ -77,8 +77,8 @@ const Player::Constants super_values = {
     10.0f,     // Top X Speed
     -8.0f,     // Jump Strength
     -4.0f,
-    0.96875f,
-    0.0125f,
+    256.0f,
+    0.125f,
     -4.0f,
     0.125f,
 
@@ -99,8 +99,8 @@ const Player::Constants super_underwater_values = {
     5.0f,      // Top X Speed
     -3.5f,
     -2.0f,
-    0.96875f,
-    0.0125f,
+    256.0f,
+    0.125f,
     -4.0f,
     0.125f,
 
