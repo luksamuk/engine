@@ -153,6 +153,14 @@ namespace Sprite
         }
     }
 
+    void
+    Animator::setFrameDuration(float duration)
+    {
+        if(duration > 0.0f) {
+            _frameDuration = duration;
+        }
+    }
+
     unsigned int
     Animator::getAnimation(void)
     {

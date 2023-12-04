@@ -61,6 +61,7 @@ namespace Sprite
     
         void          setAnimation(int);
         void          setAnimationByName(std::string name);
+        void          setFrameDuration(float);
         unsigned int  getAnimation(void);
         unsigned int  getAnimationByName(std::string name);
         glm::vec2     getFramesize() const;

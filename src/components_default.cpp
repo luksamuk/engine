@@ -46,8 +46,8 @@ namespace Components
             .member<float>("top_x_speed")
             .member<float>("jump_strength")
             .member<float>("min_jump_strength")
-            .member<float>("airdrag_factor")
-            .member<float>("airdrag_min_x_speed")
+            .member<float>("airdrag_division_factor")
+            .member<float>("airdrag_rem_factor")
             .member<float>("airdrag_min_y_speed")
             .member<float>("slope_factor")
             .member<float>("rolling_friction")
@@ -162,6 +162,7 @@ namespace Components
                     /* X Movement */
                     if(Controls::pressing(BTN_DIGITAL_LEFT)) {
                         if(spd[i].speed.x > -top_speed) {
+                            state[i].direction = -1.0f;
                             spd[i].speed.x -= air_accel;
                             if(spd[i].speed.x <= -top_speed)
                                 spd[i].speed.x = -top_speed;
@@ -170,6 +171,7 @@ namespace Components
 
                     if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
                         if(spd[i].speed.x < top_speed) {
+                            state[i].direction = 1.0f;
                             spd[i].speed.x += air_accel;
                             if(spd[i].speed.x >= top_speed)
                                 spd[i].speed.x = top_speed;
@@ -319,20 +321,27 @@ namespace Components
                 for(auto i : it) {
                     float delta = it.delta_time() * Player::BaseFrameRate;
                     float abs_gsp = glm::abs(gsp[i].gsp);
+                    float duration;
                     
                     // TODO
                     switch(state[i].action) {
                     case Player::ActionKind::Jumping:
                         anim[i].animator->setAnimationByName("Rolling");
+                        duration = glm::floor(glm::max(0.0f, 4.0f - glm::abs(gsp[i].gsp)));
+                        anim[i].animator->setFrameDuration(duration / Player::BaseFrameRate);
                         break;
                     default:
                         // Idle
                         if(abs_gsp == 0.0f) {
                             anim[i].animator->setAnimationByName("Idle");
-                        } else if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
-                            anim[i].animator->setAnimationByName("Walking");
-                        } else if(abs_gsp >= 6.0f) {
-                            anim[i].animator->setAnimationByName("Running");
+                        } else {
+                            if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
+                                anim[i].animator->setAnimationByName("Walking");
+                            } else if(abs_gsp >= 6.0f) {
+                                anim[i].animator->setAnimationByName("Running");
+                            }
+                            duration = glm::floor(glm::max(0.0f, 8.0f - glm::abs(gsp[i].gsp)));
+                            anim[i].animator->setFrameDuration(duration / Player::BaseFrameRate);
                         }
                         break;
                     }
