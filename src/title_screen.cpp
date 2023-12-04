@@ -47,9 +47,20 @@ void TitleScreen::load() {
     // font = Resources::Manager::getFont("resources/sprites/fonts/levelselect.png");
 
     vp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
+
+
+    // Start music
+    Resources::Manager::loadBGMTable("resources/audiodata.toml");
+    auto bgmtable = Resources::Manager::getBGMTable("resources/audiodata.toml");
+    bgm = bgmtable->load("01");
+    channel = Sound::getChannel();
+    if(bgm != nullptr)
+        Sound::channelOf(channel)->play(bgm);
 }
 
-void TitleScreen::unload() {}
+void TitleScreen::unload() {
+    Sound::releaseChannel(channel);
+}
 
 void TitleScreen::update(double) {
     if(Controls::pressed(BTN_DIGITAL_START) || Controls::pressed(BTN_DIGITAL_ACTIONDOWN)) {

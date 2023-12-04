@@ -71,6 +71,14 @@ void LevelSelect::load()
     Render::setClearColor(glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 
     Core::setWindowCaptionAppendix("");
+
+    // Start music
+    Resources::Manager::loadBGMTable("resources/audiodata.toml");
+    auto bgmtable = Resources::Manager::getBGMTable("resources/audiodata.toml");
+    bgm = bgmtable->load("02");
+    channel = Sound::getChannel();
+    if(bgm != nullptr)
+        Sound::channelOf(channel)->play(bgm);
 }
 
 std::pair<Tiled::LevelData, unsigned>
@@ -194,6 +202,5 @@ void LevelSelect::draw()
 
 void LevelSelect::unload()
 {
-    //delete font;
-    //delete bg;
+    Sound::releaseChannel(channel);
 }

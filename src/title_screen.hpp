@@ -2,6 +2,7 @@
 #define TITLE_SCREEN_HPP_INCLUDED
 
 #include "scene.hpp"
+#include "sound.hpp"
 #include "resources.hpp"
 #include "sprite.hpp"
 #include <glm/glm.hpp>
@@ -9,8 +10,10 @@
 class TitleScreen : public Scenes::Scene
 {
 private:
-    Resources::AtlasPtr atlas;
-    Resources::FontPtr  font;
+    Resources::AtlasPtr     atlas;
+    Resources::FontPtr      font;
+    Sound::AudioSourceIndex channel;
+    Resources::AudioPtr     bgm;
     glm::mat4 vp;
 public:
     TitleScreen();
