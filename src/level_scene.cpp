@@ -40,7 +40,7 @@ LevelScene::load() {
         .add<Components::Sensors>()
         //.set(Components::Sensors { true, false, false, false })
         .set(Components::Transform {
-                glm::vec2(100.0f, 100.0f),
+                glm::vec2(50.0f, 100.0f),
                 0.0f
             })
         .set(Player::GetConstants(Player::Character::Sonic,

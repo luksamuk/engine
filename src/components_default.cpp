@@ -355,9 +355,14 @@ namespace Components
                     projection = glm::ortho(0.0f, vwp[i].size.x, vwp[i].size.y, 0.0f, 1.0f, -1.0f);
 
                     view = glm::mat4(1.0f);
+
+                    // DEBUG! Reposition at center of screen
+                    glm::vec2 position = t[i].position;
+                    if(position.x > vwp[i].size.x / 2.0f)
+                        position.x = vwp[i].size.x / 2.0;
                 
                     model = glm::mat4(1.0f);
-                    model = glm::translate(model, glm::vec3(t[i].position, 0.0f));
+                    model = glm::translate(model, glm::vec3(position, 0.0f));
                     model = glm::scale(model, glm::vec3(state[i].direction * 30.0f, 30.0f, 1.0f));
 
                     glm::mat4 mvp = projection * view * model;
