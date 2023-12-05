@@ -351,7 +351,8 @@ namespace Components
                             else
                                 anim[i].animator->setAnimationByName("Idle");
                         } else {
-                            if(state[i].braking && (glm::sign(gsp[i].gsp) == state[i].direction))
+                            if(state[i].braking
+                               && (glm::sign(gsp[i].gsp) == state[i].direction))
                                 anim[i].animator->setAnimationByName("Skidding");
                             else if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
                                 anim[i].animator->setAnimationByName("Walking");
