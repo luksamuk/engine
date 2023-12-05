@@ -236,9 +236,14 @@ namespace Components
                             if(spd[i].gsp <= 0.0f) {
                                 spd[i].gsp = -0.5f * delta;
                             }
+
+                            if(glm::abs(spd[i].gsp) >= 4.0f) {
+                                state[i].braking = true;
+                            }
                         } else if(spd[i].gsp > -top_speed) {
                             state[i].direction = -1.0f;
                             spd[i].gsp -= accel;
+                            state[i].braking = false;
                             if(spd[i].gsp <= -top_speed) {
                                 spd[i].gsp = -top_speed;
                             }
@@ -251,9 +256,14 @@ namespace Components
                             if(spd[i].gsp >= 0) {
                                 spd[i].gsp = 0.5f * delta;
                             }
+
+                            if(glm::abs(spd[i].gsp) >= 4.0f) {
+                                state[i].braking = true;
+                            }
                         } else if(spd[i].gsp < top_speed) {
                             state[i].direction = 1.0f;
                             spd[i].gsp += accel;
+                            state[i].braking = false;
                             if(spd[i].gsp >= top_speed) {
                                 spd[i].gsp = top_speed;
                             }
@@ -293,6 +303,7 @@ namespace Components
                     // it is mostly related to airborne state
                     if(Controls::pressed(BTN_DIGITAL_ACTIONDOWN)) {
                         sensors[i].ground = false;
+                        state[i].braking = false;
                         state[i].action = Player::ActionKind::Jumping;
                         // (jump variables are always negative in this engine)
                         spd[i].speed.x += jump_force * glm::sin(t[i].angle);
@@ -340,13 +351,16 @@ namespace Components
                             else
                                 anim[i].animator->setAnimationByName("Idle");
                         } else {
-                            if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
+                            if(state[i].braking && (glm::sign(gsp[i].gsp) == state[i].direction))
+                                anim[i].animator->setAnimationByName("Skidding");
+                            else if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
                                 anim[i].animator->setAnimationByName("Walking");
                             } else if(abs_gsp >= 6.0f) {
                                 anim[i].animator->setAnimationByName("Running");
                             }
                             duration = glm::floor(glm::max(0.0f, 8.0f - glm::abs(gsp[i].gsp)));
-                            anim[i].animator->setFrameDuration(duration / Player::BaseFrameRate);
+                            if(!state[i].braking)
+                                anim[i].animator->setFrameDuration(duration / Player::BaseFrameRate);
                         }
                         break;
                     }

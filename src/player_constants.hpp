@@ -55,6 +55,7 @@ namespace Player
     {
         ActionKind action;
         float      direction = 1.0f;
+        bool       braking = false;
     };
 
     Constants GetConstants(Character, PhysicsMode);
