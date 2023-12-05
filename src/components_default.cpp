@@ -76,9 +76,14 @@ namespace Components
     {
         // Render debug circle
         ecs.system<const DebugCircleRender, const Transform, const ViewportInfo>("DebugCircle")
+            .kind(flecs::PostUpdate)
             .each([](const DebugCircleRender &r, const Transform &t, const ViewportInfo &v) {
+                glm::vec2 position = t.position;
+                if(position.x > v.size.x / 2.0f)
+                    position.x = v.size.x / 2.0;
+                    
                 glm::mat4 mvp = glm::ortho(0.0f, v.size.x, v.size.y, 0.0f, 1.0f, -1.0f);
-                mvp = glm::translate(mvp, glm::vec3(t.position, 0.0f));
+                mvp = glm::translate(mvp, glm::vec3(position, 0.0f));
                 mvp = glm::scale(mvp, glm::vec3(r.radius, r.radius, 1.0f));
                 r.atlas->draw(mvp);
             });
@@ -322,6 +327,7 @@ namespace Components
                    const Speed,
                    const Player::State,
                    PlayerAnimation>("AnimatePlayer")
+            .kind(flecs::PostUpdate)
             .iter([](flecs::iter &it,
                      const ViewportInfo *vwp,
                      const Transform *t,
