@@ -327,13 +327,18 @@ namespace Components
                     switch(state[i].action) {
                     case Player::ActionKind::Jumping:
                         anim[i].animator->setAnimationByName("Rolling");
-                        duration = glm::floor(glm::max(0.0f, 4.0f - glm::abs(gsp[i].gsp)));
+                        duration = glm::floor(glm::max(0.0f, 2.0f - glm::abs(gsp[i].gsp)));
                         anim[i].animator->setFrameDuration(duration / Player::BaseFrameRate);
                         break;
                     default:
                         // Idle
                         if(abs_gsp == 0.0f) {
-                            anim[i].animator->setAnimationByName("Idle");
+                            if(Controls::pressing(BTN_DIGITAL_DOWN))
+                                anim[i].animator->setAnimationByName("Crouching Down");
+                            else if(Controls::pressing(BTN_DIGITAL_UP))
+                                anim[i].animator->setAnimationByName("Looking Up");
+                            else
+                                anim[i].animator->setAnimationByName("Idle");
                         } else {
                             if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
                                 anim[i].animator->setAnimationByName("Walking");

@@ -30,13 +30,13 @@ struct SceneEntry {
 };
 
 const std::vector<SceneEntry> extra_scenes = {
-    {"Sound Test",     []() { return new SoundTest();     }},
-    {"Rendering Test", []() { return new TestScene();     }},
-    {"Animation Test", []() { return new MovieScene();    }},
-    {"Collision Test", []() { return new PartitionTest(); }},
-    {"Entity Test",    []() { return new EntityTest();    }},
-    {"Component Test", []() { return new LevelScene({},0); }},
-    {"Title Screen",   []() { return new TitleScreen();   }},
+    {"Sound Test",     []() { return new SoundTest();       }},
+    {"Level Template", []() { return new LevelScene({}, 0); }},
+    {"Rendering Test", []() { return new TestScene();       }},
+    {"Animation Test", []() { return new MovieScene();      }},
+    {"Collision Test", []() { return new PartitionTest();   }},
+    {"Entity Test",    []() { return new EntityTest();      }},
+    {"Title Screen",   []() { return new TitleScreen();     }},
     {"Exit",           []() {
         Core::queryClose();
         return nullptr;

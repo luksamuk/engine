@@ -9,6 +9,8 @@
 
 #include "level_select.hpp"
 
+#include "imgui.h"
+
 LevelScene::LevelScene(Tiled::LevelData l, unsigned act)
 {
     // IF debug
@@ -57,10 +59,68 @@ LevelScene::load() {
 void
 LevelScene::unload() {}
 
+static bool dbg_window_active = true;
+
 void
 LevelScene::update(double dt)
 {
     ecs.progress(dt);
+
+    // Debug panel
+    flecs::filter<const Components::Transform,
+                  const Components::Speed,
+                  const Components::GroundSpeed> f =
+        ecs.filter<const Components::Transform,
+                   const Components::Speed,
+                   const Components::GroundSpeed>();
+
+    ImGui::SetNextWindowPos(ImVec2(6, 15), ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize(ImVec2(400, 200), ImGuiCond_FirstUseEver);
+
+    static ImGuiTableFlags tableflags =
+        ImGuiTableFlags_SizingFixedFit
+        | ImGuiTableFlags_RowBg
+        | ImGuiTableFlags_BordersOuter
+        | ImGuiTableFlags_Borders;
+
+    ImGui::Begin("Debug", &dbg_window_active, ImGuiWindowFlags_NoFocusOnAppearing);
+    if(ImGui::BeginTable("Entities", 7, tableflags)) {
+        ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
+        //ImGui::TableSetupColumn("Position", ImGuiTableColumnFlags_WidthStretch);
+        ImGui::TableSetupColumn("Xpos",  ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Ypos",  ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Theta", ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Xsp",   ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Ysp",   ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableSetupColumn("Gsp",   ImGuiTableColumnFlags_WidthFixed);
+        ImGui::TableHeadersRow();
+        f.iter([](flecs::iter &it,
+                  const Components::Transform *t,
+                  const Components::Speed *s,
+                  const Components::GroundSpeed *g){
+            for(auto i : it) {
+                ImGui::TableNextRow();
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text("%s", std::string(it.entity(i).name()).c_str());
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%0.4f", t[i].position.x);
+                ImGui::TableSetColumnIndex(2);
+                ImGui::Text("%0.4f", t[i].position.y);
+                ImGui::TableSetColumnIndex(3);
+                ImGui::Text("%0.1f", t[i].angle);
+                ImGui::TableSetColumnIndex(4);
+                ImGui::Text("%0.4f", s[i].speed.x);
+                ImGui::TableSetColumnIndex(5);
+                ImGui::Text("%0.4f", s[i].speed.y);
+                ImGui::TableSetColumnIndex(6);
+                ImGui::Text("%0.4f", g[i].gsp);
+            }
+        });
+        ImGui::EndTable();
+    }
+
+    ImGui::End();
+    
 
     if(Controls::pressed(BTN_DIGITAL_OPTION)) {
         Scenes::Manager::add(new LevelSelect());
