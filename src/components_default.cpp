@@ -60,8 +60,23 @@ namespace Components
             .member<unsigned>("action")
             .member<float>("direction");
 
+        ecs.component<PlayerControls>()
+            .member<bool>("up")
+            .member<bool>("down")
+            .member<bool>("left")
+            .member<bool>("right")
+            .member<bool>("jump")
+            .member<bool>("pressUp")
+            .member<bool>("pressDown")
+            .member<bool>("pressLeft")
+            .member<bool>("pressRight")
+            .member<bool>("pressJump");
+
+        ecs.component<PlayerUseJoypad>();
+
         ecs.component<DebugCircleRender>()
-            .member<float>("radius");
+            .member<float>("radius")
+            .member<bool>("visible");
 
         ecs.component<FakeGround>()
             .member<float>("ypos");
@@ -78,6 +93,8 @@ namespace Components
         ecs.system<const DebugCircleRender, const Transform, const ViewportInfo>("DebugCircle")
             .kind(flecs::PostUpdate)
             .each([](const DebugCircleRender &r, const Transform &t, const ViewportInfo &v) {
+                if(!r.visible) return;
+                
                 glm::vec2 position = t.position;
                 if(position.x > v.size.x / 2.0f)
                     position.x = v.size.x / 2.0;
@@ -143,17 +160,64 @@ namespace Components
                 }
             });
 
+        // Apply joypad controls
+        ecs.system<PlayerControls, const PlayerUseJoypad>("PlayerUpdateJoypad")
+            .each([](PlayerControls &ctrl, const PlayerUseJoypad) {
+                ctrl.up = Controls::pressing(BTN_DIGITAL_UP);
+                ctrl.down = Controls::pressing(BTN_DIGITAL_DOWN);
+                ctrl.left = Controls::pressing(BTN_DIGITAL_LEFT);
+                ctrl.right = Controls::pressing(BTN_DIGITAL_RIGHT);
+                ctrl.jump = Controls::pressing(BTN_DIGITAL_ACTIONDOWN);
+
+                ctrl.pressUp = Controls::pressed(BTN_DIGITAL_UP);
+                ctrl.pressDown = Controls::pressed(BTN_DIGITAL_DOWN);
+                ctrl.pressLeft = Controls::pressed(BTN_DIGITAL_LEFT);
+                ctrl.pressRight = Controls::pressed(BTN_DIGITAL_RIGHT);
+                ctrl.pressJump = Controls::pressed(BTN_DIGITAL_ACTIONDOWN);
+            });
+
+        // Apply follower controls
+        ecs.system<PlayerControls,
+                   const Transform,
+                   const Sensors,
+                   const GroundSpeed,
+                   const PlayerFollowEntity>("PlayerUpdateFollow")
+            .each([](PlayerControls &ctrl,
+                     const Transform &t,
+                     const Sensors &sensors,
+                     const GroundSpeed &gsp,
+                     const PlayerFollowEntity &follow) {
+                auto followt = follow.e.get<Transform>();
+                auto followc = follow.e.get<PlayerControls>();
+                
+                if(followt == nullptr || followc == nullptr) return;
+
+                ctrl.right = (t.position.x < (followt->position.x - 30.0f));
+                ctrl.left = (t.position.x > (followt->position.x + 30.0f));
+
+                auto withinJumpRange = glm::abs(t.position.x - followt->position.x) <= 100.0f;
+                auto shouldJump = sensors.ground && (followt->position.y <= (t.position.y - 40.0f));
+                auto remainJumping = !sensors.ground && (followt->position.y < (t.position.y - 20.0f));
+                ctrl.pressJump = withinJumpRange && shouldJump;
+                ctrl.jump = withinJumpRange && (shouldJump || remainJumping);
+
+                ctrl.up = followc->up && sensors.ground && (gsp.gsp == 0.0f);
+                ctrl.down = followc->down && sensors.ground && (gsp.gsp == 0.0f);
+            });
+
         // Apply airborne movement.
         // See https://info.sonicretro.org/SPG:Air_State
         // See https://info.sonicretro.org/SPG:Jumping#Variable_Jump_Height
         ecs.system<Speed,
                    Player::State,
                    const Sensors,
+                   const PlayerControls,
                    const Player::Constants>("AirborneMovement")
             .iter([](flecs::iter &it,
                      Speed *spd,
                      Player::State *state,
                      const Sensors *sensors,
+                     const PlayerControls *ctrl,
                      const Player::Constants *constants) {
                 for(auto i : it) {
                     if(sensors[i].ground) continue;
@@ -165,7 +229,7 @@ namespace Components
                     float air_drag_min_y = constants[i].airdrag_min_y_speed * delta;
 
                     /* X Movement */
-                    if(Controls::pressing(BTN_DIGITAL_LEFT)) {
+                    if(ctrl[i].left) {
                         if(spd[i].speed.x > -top_speed) {
                             state[i].direction = -1.0f;
                             spd[i].speed.x -= air_accel;
@@ -174,7 +238,7 @@ namespace Components
                         }
                     }
 
-                    if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
+                    if(ctrl[i].right) {
                         if(spd[i].speed.x < top_speed) {
                             state[i].direction = 1.0f;
                             spd[i].speed.x += air_accel;
@@ -191,7 +255,7 @@ namespace Components
                     // springs, etc.
                     // NOTE: min_jump_force is negative on this engine.
                     if((state[i].action == Player::ActionKind::Jumping)
-                       && !Controls::pressing(BTN_DIGITAL_ACTIONDOWN)
+                       && !ctrl[i].jump
                        && (spd[i].speed.y < min_jump_force)) {
                         spd[i].speed.y = min_jump_force;
                     }
@@ -220,11 +284,13 @@ namespace Components
         ecs.system<GroundSpeed,
                    Player::State,
                    const Sensors,
+                   const PlayerControls,
                    const Player::Constants>("GroundXMovement")
             .iter([](flecs::iter &it,
                      GroundSpeed *spd,
                      Player::State *state,
                      const Sensors *sensors,
+                     const PlayerControls *ctrl,
                      const Player::Constants *constants) {
                 for(auto i : it) {
                     if(!sensors[i].ground) continue;
@@ -235,7 +301,7 @@ namespace Components
                     float top_speed = constants[i].top_x_speed * delta;
                     float friction = constants[i].friction * delta;
                     
-                    if(Controls::pressing(BTN_DIGITAL_LEFT)) {
+                    if(ctrl[i].left) {
                         if(spd[i].gsp > 0.0f) {
                             spd[i].gsp -= decel;
                             if(spd[i].gsp <= 0.0f) {
@@ -255,7 +321,7 @@ namespace Components
                         }
                     }
 
-                    if(Controls::pressing(BTN_DIGITAL_RIGHT)) {
+                    if(ctrl[i].right) {
                         if(spd[i].gsp < 0.0f) {
                             spd[i].gsp += decel;
                             if(spd[i].gsp >= 0) {
@@ -275,8 +341,7 @@ namespace Components
                         }
                     }
 
-                    if(!Controls::pressing(BTN_DIGITAL_LEFT) &&
-                       !Controls::pressing(BTN_DIGITAL_RIGHT)) {
+                    if(!ctrl[i].left && !ctrl[i].right) {
                         spd[i].gsp -=
                             glm::min(glm::abs(spd[i].gsp), friction)
                             * glm::sign(spd[i].gsp);
@@ -290,12 +355,14 @@ namespace Components
                    Speed,
                    Sensors,
                    Player::State,
+                   const PlayerControls,
                    const Player::Constants>("GroundYMovement")
             .iter([](flecs::iter &it,
                      Transform *t,
                      Speed *spd,
                      Sensors *sensors,
                      Player::State *state,
+                     const PlayerControls *ctrl,
                      const Player::Constants *constants) {
                 for(auto i : it) {
                     if(!sensors[i].ground) continue;
@@ -306,7 +373,7 @@ namespace Components
                     // Start jump physics.
                     // NOTE: This does not control variable jump height, since
                     // it is mostly related to airborne state
-                    if(Controls::pressed(BTN_DIGITAL_ACTIONDOWN)) {
+                    if(ctrl[i].pressJump) {
                         sensors[i].ground = false;
                         state[i].braking = false;
                         state[i].action = Player::ActionKind::Jumping;
@@ -326,6 +393,7 @@ namespace Components
                    const GroundSpeed,
                    const Speed,
                    const Player::State,
+                   const PlayerControls,
                    PlayerAnimation>("AnimatePlayer")
             .kind(flecs::PostUpdate)
             .iter([](flecs::iter &it,
@@ -334,6 +402,7 @@ namespace Components
                      const GroundSpeed *gsp,
                      const Speed *s,
                      const Player::State *state,
+                     const PlayerControls *ctrl,
                      PlayerAnimation *anim) {
                 for(auto i : it) {
                     float delta = it.delta_time() * Player::BaseFrameRate;
@@ -350,9 +419,9 @@ namespace Components
                     default:
                         // Idle
                         if(abs_gsp == 0.0f) {
-                            if(Controls::pressing(BTN_DIGITAL_DOWN))
+                            if(ctrl[i].down)
                                 anim[i].animator->setAnimationByName("Crouching Down");
-                            else if(Controls::pressing(BTN_DIGITAL_UP))
+                            else if(ctrl[i].up)
                                 anim[i].animator->setAnimationByName("Looking Up");
                             else
                                 anim[i].animator->setAnimationByName("Idle");
@@ -384,8 +453,9 @@ namespace Components
 
                     // DEBUG! Reposition at center of screen
                     glm::vec2 position = t[i].position;
-                    if(position.x > vwp[i].size.x / 2.0f)
-                        position.x = vwp[i].size.x / 2.0;
+                    // if(position.x > vwp[i].size.x / 2.0f)
+                    //     position.x = vwp[i].size.x / 2.0;
+                    position.y -= 8.0f;
                 
                     model = glm::mat4(1.0f);
                     model = glm::translate(model, glm::vec3(position, 0.0f));
@@ -402,6 +472,6 @@ namespace Components
         Resources::Manager::loadAtlas("resources/sprites/circle.png", glm::vec2(64.0f, 64.0f));
         auto atlas = Resources::Manager::getAtlas("resources/sprites/circle.png");
         atlas->setFrame(0);
-        return { radius, atlas };
+        return { radius, false, atlas };
     }
 }

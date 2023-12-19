@@ -24,34 +24,73 @@ LevelScene::LevelScene(Tiled::LevelData l, unsigned act)
 
 LevelScene::~LevelScene() {}
 
-void
-LevelScene::load() {
-    Render::setClearColor(glm::vec4(0.392f, 0.584f, 0.929f, 1.0f));
-    
+flecs::entity
+LevelScene::makePlayer(const char *name, flecs::entity *follow)
+{
     glm::vec2 viewportSize(320.0f, 224.0f);
-
-    // Player animation
-    Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
-    auto animator = Resources::Manager::getAnimator("resources/animation/sonic1mania.toml");
-    animator->setAnimation(0);
     
-    // TODO
-    flecs::entity player = ecs.entity("Sonic")
+    // Player animation
+    Resources::AnimatorPtr animator;
+    if(follow == nullptr)
+        animator = Resources::Manager::makeAnimator("resources/animation/sonic1mania.toml");
+    else animator = Resources::Manager::makeAnimator("resources/animation/knuckles.toml");
+    animator->setAnimation(0);
+
+    flecs::entity player;
+
+    player = ecs.entity(name);
+    
+    player
         .add<Components::Speed>()
         .add<Components::GroundSpeed>()
         .add<Components::Sensors>()
-        //.set(Components::Sensors { true, false, false, false })
-        .set(Components::Transform {
-                glm::vec2(50.0f, 100.0f),
-                0.0f
-            })
         .set(Player::GetConstants(Player::Character::Sonic,
                                   Player::PhysicsMode::Normal))
         .add<Player::State>()
         .set(Components::ViewportInfo { viewportSize })
-        //.set(Components::MakeCircleRenderer(15.0f))
+        .set(Components::MakeCircleRenderer(16.0f))
         .set(Components::FakeGround { 200.0f })
-        .set(Components::PlayerAnimation { animator });
+        .set(Components::PlayerAnimation { animator })
+        .add<Components::PlayerControls>();
+
+    if(follow == nullptr) {
+        player
+            .set(Components::Transform {
+                glm::vec2(100.0f, 100.0f),
+                0.0f
+            })
+            .add<Components::PlayerUseJoypad>();
+    } else {
+        auto t = follow->get<Components::Transform>();
+        if(t != nullptr) {
+            player.set(Components::Transform {
+                    glm::vec2(t->position.x - 30.0f, t->position.y),
+                    0.0f
+                });
+        } else {
+            player.set(Components::Transform {
+                    glm::vec2(100.0f, 100.0f),
+                    0.0f
+                });
+        }
+        
+        player.set(Components::PlayerFollowEntity { *follow });
+    }
+
+    return player;
+}
+
+void
+LevelScene::load() {
+    Render::setClearColor(glm::vec4(0.392f, 0.584f, 0.929f, 1.0f));
+
+    Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
+    Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
+    
+    // TODO
+    flecs::entity player = makePlayer("Sonic", nullptr);
+    flecs::entity follower = makePlayer("Follower1", &player);
+    //flecs::entity follower2 = makePlayer("Follower2", &follower);
     
     std::cout << "Sonic entity: " << player << std::endl;
 }

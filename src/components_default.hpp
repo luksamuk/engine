@@ -33,6 +33,7 @@ namespace Components
 
     struct DebugCircleRender {
         float               radius;
+        bool                visible = false;
         Resources::AtlasPtr atlas;
     };
     
@@ -55,6 +56,26 @@ namespace Components
 
     struct PlayerAnimation {
         Resources::AnimatorPtr animator;
+    };
+
+    struct PlayerUseJoypad {};
+
+    struct PlayerFollowEntity {
+        flecs::entity e;
+    };
+
+    struct PlayerControls {
+        bool up;
+        bool down;
+        bool left;
+        bool right;
+        bool jump;
+
+        bool pressUp;
+        bool pressDown;
+        bool pressLeft;
+        bool pressRight;
+        bool pressJump;
     };
 
 

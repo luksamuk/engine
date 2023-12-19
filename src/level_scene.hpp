@@ -12,6 +12,8 @@ class LevelScene : public Scenes::Scene
 {
 private:
     flecs::world ecs;
+
+    flecs::entity makePlayer(const char *name, flecs::entity *follow);
 public:
     LevelScene(Tiled::LevelData l, unsigned act);
     virtual ~LevelScene();

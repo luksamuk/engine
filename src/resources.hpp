@@ -67,6 +67,7 @@ namespace Resources
         
         static TexturePtr          getTexture(std::string path);
         static AtlasPtr            getAtlas(std::string path);
+        static AnimatorPtr         makeAnimator(std::string path);
         static AnimatorPtr         getAnimator(std::string path);
         static LevelDataManagerPtr getLevelDataManager(std::string path);
         static ShaderProgramPtr    getShaderProgram(std::string path);

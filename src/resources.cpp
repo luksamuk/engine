@@ -289,6 +289,12 @@ namespace Resources
         auto itr = _atlases.find(path);
         return itr == _atlases.end() ? nullptr : itr->second;
     }
+
+    AnimatorPtr
+    Manager::makeAnimator(std::string path)
+    {
+        return rawLoadAnimator(path.c_str());
+    }
     
     AnimatorPtr
     Manager::getAnimator(std::string path)
