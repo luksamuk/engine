@@ -63,7 +63,7 @@ SpriteScene::changeCharacter(unsigned chara)
 void
 SpriteScene::load()
 {
-    Resources::Manager::loadAnimator("resources/animation/sonic.toml");
+    Resources::Manager::loadAnimator("resources/animation/tails.toml");
     Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
     Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
     Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
@@ -74,7 +74,7 @@ SpriteScene::load()
     bgm = bgmtable->load(lvldata.bgm);
     channel = Sound::getChannel();
 
-    sonicAnim    = Resources::Manager::getAnimator("resources/animation/sonic.toml");
+    sonicAnim    = Resources::Manager::getAnimator("resources/animation/tails.toml");
     knucklesAnim = Resources::Manager::getAnimator("resources/animation/knuckles.toml");
     sonicManiaAnim = Resources::Manager::getAnimator("resources/animation/sonic1mania.toml");
     
