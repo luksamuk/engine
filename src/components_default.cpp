@@ -177,47 +177,61 @@ namespace Components
             });
 
         // Apply follower controls
+        // http://info.sonicretro.org/SPG:Player_2
         ecs.system<PlayerControls,
-                   const Transform,
+                   Transform,
                    const Sensors,
-                   const Speed,
                    const GroundSpeed,
-                   const Player::Constants,
+                   Player::State,
                    const PlayerFollowEntity>("PlayerUpdateFollow")
             .each([](PlayerControls &ctrl,
-                     const Transform &t,
+                     Transform &t,
                      const Sensors &sensors,
-                     const Speed &spd,
                      const GroundSpeed &gsp,
-                     const Player::Constants &constants,
+                     Player::State &state,
                      const PlayerFollowEntity &follow) {
                 auto followg = follow.e.get<GroundSpeed>();
                 auto followt = follow.e.get<Transform>();
                 auto followc = follow.e.get<PlayerControls>();
                 auto follows = follow.e.get<Speed>();
+                auto followstate = follow.e.get<Player::State>();
+
+                const float near_factor = 48.0f;
                 
-                if(!followg || !followt || !followc) return;
+                if(!followg || !followt || !followc || !follows || !followstate)
+                    return;
 
-                // Press left/right to follow if target is too far.
-                // Only works if movement direction corresponds to the direction
-                // one should go
-                ctrl.right = (t.position.x < (followt->position.x - 20.0f));
-                ctrl.left = (t.position.x > (followt->position.x + 20.0f));
+                ctrl.left = ctrl.right = false;
 
-                // If target is on the other direction and we're moving way too
-                // fast, backtrack immediately
-                if(glm::abs(spd.speed.x) >= (constants.top_x_speed * 0.75)) {
-                    if((follows->speed.x < spd.speed.x) && (t.position.x > followt->position.x)) {
+                if(t.position.x > followt->position.x) {
+                    if(glm::abs(t.position.x - followt->position.x) > near_factor) {
                         ctrl.left = true;
                         ctrl.right = false;
                     }
-                    
-                    if((follows->speed.x > spd.speed.x) && (t.position.x < followt->position.x)) {
-                        ctrl.left = false;
-                        ctrl.right = true;
+
+                    if((gsp.gsp != 0.0f) && (state.direction < 0.0f)) {
+                        // TODO: Make sure we're not pushing
+                        t.position.x -= 1.0f;
                     }
                 }
 
+                if(t.position.x < followt->position.x) {
+                    if(glm::abs(t.position.x - followt->position.x) > near_factor) {
+                        ctrl.left = false;
+                        ctrl.right = true;
+                    }
+
+                    if((gsp.gsp != 0.0f) && (state.direction < 0.0f)) {
+                        // TODO: Make sure we're not pushing
+                        t.position.x += 1.0f;
+                    }
+                }
+
+                if(glm::abs(t.position.x - followt->position.x) < near_factor) {
+                    if(gsp.gsp == 0.0f)
+                        state.direction = followstate->direction;
+                }
+                
                 // Jumping
                 auto withinJumpRange = glm::abs(t.position.x - followt->position.x) <= 200.0f;
                 auto shouldJump = sensors.ground && (followt->position.y <= (t.position.y - 40.0f));
