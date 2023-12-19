@@ -96,8 +96,8 @@ namespace Components
                 if(!r.visible) return;
                 
                 glm::vec2 position = t.position;
-                if(position.x > v.size.x / 2.0f)
-                    position.x = v.size.x / 2.0;
+                // if(position.x > v.size.x / 2.0f)
+                //     position.x = v.size.x / 2.0;
                     
                 glm::mat4 mvp = glm::ortho(0.0f, v.size.x, v.size.y, 0.0f, 1.0f, -1.0f);
                 mvp = glm::translate(mvp, glm::vec3(position, 0.0f));
@@ -180,27 +180,52 @@ namespace Components
         ecs.system<PlayerControls,
                    const Transform,
                    const Sensors,
+                   const Speed,
                    const GroundSpeed,
+                   const Player::Constants,
                    const PlayerFollowEntity>("PlayerUpdateFollow")
             .each([](PlayerControls &ctrl,
                      const Transform &t,
                      const Sensors &sensors,
+                     const Speed &spd,
                      const GroundSpeed &gsp,
+                     const Player::Constants &constants,
                      const PlayerFollowEntity &follow) {
+                auto followg = follow.e.get<GroundSpeed>();
                 auto followt = follow.e.get<Transform>();
                 auto followc = follow.e.get<PlayerControls>();
+                auto follows = follow.e.get<Speed>();
                 
-                if(followt == nullptr || followc == nullptr) return;
+                if(!followg || !followt || !followc) return;
 
-                ctrl.right = (t.position.x < (followt->position.x - 30.0f));
-                ctrl.left = (t.position.x > (followt->position.x + 30.0f));
+                // Press left/right to follow if target is too far.
+                // Only works if movement direction corresponds to the direction
+                // one should go
+                ctrl.right = (t.position.x < (followt->position.x - 37.5f));
+                ctrl.left = (t.position.x > (followt->position.x + 37.5f));
 
-                auto withinJumpRange = glm::abs(t.position.x - followt->position.x) <= 100.0f;
+                // If target is on the other direction and we're moving way too
+                // fast, backtrack immediately
+                if(glm::abs(spd.speed.x) >= (constants.top_x_speed * 0.75)) {
+                    if((follows->speed.x < spd.speed.x) && (t.position.x > followt->position.x)) {
+                        ctrl.left = true;
+                        ctrl.right = false;
+                    }
+                    
+                    if((follows->speed.x > spd.speed.x) && (t.position.x < followt->position.x)) {
+                        ctrl.left = false;
+                        ctrl.right = true;
+                    }
+                }
+
+                // Jumping
+                auto withinJumpRange = glm::abs(t.position.x - followt->position.x) <= 200.0f;
                 auto shouldJump = sensors.ground && (followt->position.y <= (t.position.y - 40.0f));
                 auto remainJumping = !sensors.ground && (followt->position.y < (t.position.y - 20.0f));
                 ctrl.pressJump = withinJumpRange && shouldJump;
                 ctrl.jump = withinJumpRange && (shouldJump || remainJumping);
 
+                // Look up and down
                 ctrl.up = followc->up && sensors.ground && (gsp.gsp == 0.0f);
                 ctrl.down = followc->down && sensors.ground && (gsp.gsp == 0.0f);
             });

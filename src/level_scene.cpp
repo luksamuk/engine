@@ -25,15 +25,21 @@ LevelScene::LevelScene(Tiled::LevelData l, unsigned act)
 LevelScene::~LevelScene() {}
 
 flecs::entity
-LevelScene::makePlayer(const char *name, flecs::entity *follow)
+LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *follow)
 {
     glm::vec2 viewportSize(320.0f, 224.0f);
     
     // Player animation
     Resources::AnimatorPtr animator;
-    if(follow == nullptr)
+
+    switch(c) {
+    default:
         animator = Resources::Manager::makeAnimator("resources/animation/sonic1mania.toml");
-    else animator = Resources::Manager::makeAnimator("resources/animation/knuckles.toml");
+        break;
+    case Player::Character::Knuckles:
+        animator = Resources::Manager::makeAnimator("resources/animation/knuckles.toml");
+        break;
+    }
     animator->setAnimation(0);
 
     flecs::entity player;
@@ -44,8 +50,7 @@ LevelScene::makePlayer(const char *name, flecs::entity *follow)
         .add<Components::Speed>()
         .add<Components::GroundSpeed>()
         .add<Components::Sensors>()
-        .set(Player::GetConstants(Player::Character::Sonic,
-                                  Player::PhysicsMode::Normal))
+        .set(Player::GetConstants(c, Player::PhysicsMode::Normal))
         .add<Player::State>()
         .set(Components::ViewportInfo { viewportSize })
         .set(Components::MakeCircleRenderer(16.0f))
@@ -88,9 +93,9 @@ LevelScene::load() {
     Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
     
     // TODO
-    flecs::entity player = makePlayer("Sonic", nullptr);
-    flecs::entity follower = makePlayer("Follower1", &player);
-    //flecs::entity follower2 = makePlayer("Follower2", &follower);
+    flecs::entity player = makePlayer("Sonic", Player::Character::Sonic, nullptr);
+    //flecs::entity follower = makePlayer("Tails", Player::Character::Tails, &player);
+    flecs::entity follower2 = makePlayer("Knuckles", Player::Character::Knuckles, &player);
     
     std::cout << "Sonic entity: " << player << std::endl;
 }

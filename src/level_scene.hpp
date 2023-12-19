@@ -7,13 +7,14 @@
 
 #include "scene.hpp"
 #include "tiled.hpp"
+#include "player_constants.hpp"
 
 class LevelScene : public Scenes::Scene
 {
 private:
     flecs::world ecs;
 
-    flecs::entity makePlayer(const char *name, flecs::entity *follow);
+    flecs::entity makePlayer(const char *, Player::Character, flecs::entity*);
 public:
     LevelScene(Tiled::LevelData l, unsigned act);
     virtual ~LevelScene();
