@@ -31,7 +31,11 @@ struct SceneEntry {
 
 const std::vector<SceneEntry> extra_scenes = {
     {"Sound Test",     []() { return new SoundTest();       }},
-    {"Level Template", []() { return new LevelScene({}, 0); }},
+    {"Level Template", []() {
+        return new LevelScene({}, 0, {
+                Player::Character::Sonic
+            });
+    }},
     {"Rendering Test", []() { return new TestScene();       }},
     {"Animation Test", []() { return new MovieScene();      }},
     {"Collision Test", []() { return new PartitionTest();   }},

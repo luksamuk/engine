@@ -13,10 +13,11 @@ class LevelScene : public Scenes::Scene
 {
 private:
     flecs::world ecs;
+    std::vector<Player::Character> chars;
 
     flecs::entity makePlayer(const char *, Player::Character, flecs::entity*);
 public:
-    LevelScene(Tiled::LevelData l, unsigned act);
+    LevelScene(Tiled::LevelData l, unsigned act, std::vector<Player::Character>);
     virtual ~LevelScene();
     virtual void load() override;
     virtual void update(double dt) override;

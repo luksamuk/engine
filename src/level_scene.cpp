@@ -6,18 +6,20 @@
 #include "components.hpp"
 
 #include <iostream>
+#include <sstream>
 
 #include "level_select.hpp"
 
 #include "imgui.h"
 
-LevelScene::LevelScene(Tiled::LevelData l, unsigned act)
+LevelScene::LevelScene(Tiled::LevelData l, unsigned act, std::vector<Player::Character> chars)
 {
     // IF debug
     ecs.set<flecs::Rest>({});
     ecs.import<flecs::monitor>();
     std::cerr << "REST server: https://localhost:27750/entity/flecs" << std::endl
               << "Monitor: https://flecs.dev/explorer" << std::endl;
+    this->chars = chars;
 
     Components::RegisterComponents(ecs);
 }
@@ -61,7 +63,8 @@ LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *fol
         .set(Components::PlayerAnimation { animator })
         .add<Components::PlayerControls>();
 
-    if(follow == nullptr) {
+    if(!follow) {
+        std::cout << "Not following anything" << std::endl;
         player
             .set(Components::Transform {
                 glm::vec2(100.0f, 100.0f),
@@ -95,15 +98,27 @@ LevelScene::load() {
     Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
     Resources::Manager::loadAnimator("resources/animation/tails.toml");
     Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
+
+    flecs::entity last;
+    for(unsigned i = 0; i < this->chars.size(); i++) {
+        std::ostringstream ss;
+        ss.clear();
+        ss << "Player " << i;
+        auto name = ss.str();
+        if(i == 0)
+            last = makePlayer(name.c_str(), this->chars[i], nullptr);
+        else last = makePlayer(name.c_str(), this->chars[i], &last);
+        std::cout << name << ": " << last << std::endl;
+    }
     
     // TODO
-    flecs::entity player = makePlayer("Sonic", Player::Character::Sonic, nullptr);
-    flecs::entity tails = makePlayer("Tails", Player::Character::Tails, &player);
-    flecs::entity knuckles = makePlayer("Knuckles", Player::Character::Knuckles, &tails);
+    // flecs::entity player = makePlayer("Sonic", Player::Character::Sonic, nullptr);
+    // flecs::entity tails = makePlayer("Tails", Player::Character::Tails, &player);
+    // flecs::entity knuckles = makePlayer("Knuckles", Player::Character::Knuckles, &tails);
     
-    std::cout << "Sonic entity: " << player << std::endl
-              << "Tails entity: " << tails << std::endl
-              << "Knuckles entity: " << knuckles << std::endl;
+    // std::cout << "Sonic entity: " << player << std::endl
+    //           << "Tails entity: " << tails << std::endl
+    //           << "Knuckles entity: " << knuckles << std::endl;
 }
 
 void
