@@ -32,8 +32,9 @@ frame_duration = 0.064
 
 [[animations]]
 name           = "Skidding"
-frames         = [ 33, 34, 35 ]
-min_frame      = 2
+frames         = [ 33, 34 ]
+min_frame      = 1
+frame_duration = 0.064
 
 [[animations]]
 name           = "Pushing"

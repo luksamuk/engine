@@ -36,6 +36,9 @@ LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *fol
     default:
         animator = Resources::Manager::makeAnimator("resources/animation/sonic1mania.toml");
         break;
+    case Player::Character::Tails:
+        animator = Resources::Manager::makeAnimator("resources/animation/tails.toml");
+        break;
     case Player::Character::Knuckles:
         animator = Resources::Manager::makeAnimator("resources/animation/knuckles.toml");
         break;
@@ -69,7 +72,7 @@ LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *fol
         auto t = follow->get<Components::Transform>();
         if(t != nullptr) {
             player.set(Components::Transform {
-                    glm::vec2(t->position.x - 30.0f, t->position.y),
+                    glm::vec2(t->position.x - 20.0f, t->position.y),
                     0.0f
                 });
         } else {
@@ -90,14 +93,17 @@ LevelScene::load() {
     Render::setClearColor(glm::vec4(0.392f, 0.584f, 0.929f, 1.0f));
 
     Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
+    Resources::Manager::loadAnimator("resources/animation/tails.toml");
     Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
     
     // TODO
     flecs::entity player = makePlayer("Sonic", Player::Character::Sonic, nullptr);
-    //flecs::entity follower = makePlayer("Tails", Player::Character::Tails, &player);
-    flecs::entity follower2 = makePlayer("Knuckles", Player::Character::Knuckles, &player);
+    flecs::entity tails = makePlayer("Tails", Player::Character::Tails, &player);
+    flecs::entity knuckles = makePlayer("Knuckles", Player::Character::Knuckles, &tails);
     
-    std::cout << "Sonic entity: " << player << std::endl;
+    std::cout << "Sonic entity: " << player << std::endl
+              << "Tails entity: " << tails << std::endl
+              << "Knuckles entity: " << knuckles << std::endl;
 }
 
 void

@@ -201,8 +201,8 @@ namespace Components
                 // Press left/right to follow if target is too far.
                 // Only works if movement direction corresponds to the direction
                 // one should go
-                ctrl.right = (t.position.x < (followt->position.x - 37.5f));
-                ctrl.left = (t.position.x > (followt->position.x + 37.5f));
+                ctrl.right = (t.position.x < (followt->position.x - 20.0f));
+                ctrl.left = (t.position.x > (followt->position.x + 20.0f));
 
                 // If target is on the other direction and we're moving way too
                 // fast, backtrack immediately

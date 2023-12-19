@@ -1,0 +1,55 @@
+# Sprites by SEGA, ripped by Paraemon and Triangly
+
+atlas = "resources/sprites/tails.png"
+frame_size = [ 60.0, 60.0 ]
+
+[[animations]]
+name = "Idle"
+frames = [
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 2, 3, 3, 4, 5, 6, 5, 6, 5, 6, 5,
+    4
+]
+frame_duration = 0.128
+min_frame = 26
+
+[[animations]]
+name = "Walking"
+frames = [ 9, 10, 11, 12, 13, 14, 15, 16 ]
+frame_duration = 0.096
+
+[[animations]]
+name = "Running"
+frames = [ 17, 18, 19, 20 ]
+frame_duration = 0.064
+
+[[animations]]
+name = "Rolling"
+frames = [ 23, 24, 25 ]
+frame_duration = 0.064
+
+[[animations]]
+name = "Skidding"
+frames = [ 26, 27 ]
+min_frame = 1
+frame_duration = 0.064
+
+[[animations]]
+name = "Pushing"
+frames = [ 28, 29, 30, 31 ]
+frame_duration = 0.25
+
+[[animations]]
+name = "Crouching Down"
+frames = [ 8 ]
+frame_duration = 0.128
+
+[[animations]]
+name = "Looking Up"
+frames = [ 7 ]
+frame_duration = 0.128
+
+[[animations]]
+name = "Death"
+frames = [ 32 ]
