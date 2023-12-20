@@ -22,26 +22,62 @@ const glm::vec2 viewportSize(480.0f, 336.0f);
 //const glm::vec2 viewportSize(400.0f, 280.0f);
 //const glm::vec2 viewportSize(960.0f, 672.0f);
 
-typedef std::function<Scenes::Scene*()> SceneCreatorFn;
+typedef std::function<Scenes::Scene*(int)> SceneCreatorFn;
 
 struct SceneEntry {
     std::string name;
     SceneCreatorFn spawner;
 };
 
+static int player_selection = 0;
+
+const std::vector<std::vector<Player::Character>> char_opts = {
+    {Player::Character::Sonic},
+    {Player::Character::Sonic, Player::Character::Tails},
+    {Player::Character::Sonic, Player::Character::Knuckles},
+    {Player::Character::Sonic, Player::Character::Tails, Player::Character::Knuckles},
+    {Player::Character::Sonic, Player::Character::Knuckles, Player::Character::Tails},
+    {Player::Character::Tails},
+    {Player::Character::Tails, Player::Character::Sonic},
+    {Player::Character::Tails, Player::Character::Knuckles},
+    {Player::Character::Tails, Player::Character::Sonic, Player::Character::Knuckles},
+    {Player::Character::Tails, Player::Character::Knuckles, Player::Character::Sonic},
+    {Player::Character::Knuckles},
+    {Player::Character::Knuckles, Player::Character::Sonic},
+    {Player::Character::Knuckles, Player::Character::Tails},
+    {Player::Character::Knuckles, Player::Character::Sonic, Player::Character::Tails},
+    {Player::Character::Knuckles, Player::Character::Tails, Player::Character::Sonic},
+};
+
+const std::vector<std::string> charoptnames = {
+    "Sonic Only",
+    "Sonic & Tails",
+    "Sonic & Knuckles",
+    "Sonic, Tails & Knuckles",
+    "Sonic, Knuckles & Tails",
+    "Tails Only",
+    "Tails & Sonic",
+    "Tails & Knuckles",
+    "Tails, Sonic & Knuckles",
+    "Tails, Knuckles & Sonic",
+    "Knuckles Only",
+    "Knuckles & Sonic",
+    "Knuckles & Tails",
+    "Knuckles, Sonic & Tails",
+    "Knuckles, Tails & Sonic",
+};
+
 const std::vector<SceneEntry> extra_scenes = {
-    {"Sound Test",     []() { return new SoundTest();       }},
-    {"Level Template", []() {
-        return new LevelScene({}, 0, {
-                Player::Character::Sonic
-            });
+    {"Sound Test",     [](int) { return new SoundTest();       }},
+    {"Engine Test", [](int player) {
+        return new LevelScene({}, 0, char_opts[player]);
     }},
-    {"Rendering Test", []() { return new TestScene();       }},
-    {"Animation Test", []() { return new MovieScene();      }},
-    {"Collision Test", []() { return new PartitionTest();   }},
-    {"Entity Test",    []() { return new EntityTest();      }},
-    {"Title Screen",   []() { return new TitleScreen();     }},
-    {"Exit",           []() {
+    // {"Rendering Test", [](int) { return new TestScene();       }},
+    // {"Animation Test", [](int) { return new MovieScene();      }},
+    // {"Collision Test", [](int) { return new PartitionTest();   }},
+    // {"Entity Test",    [](int) { return new EntityTest();      }},
+    {"Title Screen",   [](int) { return new TitleScreen();     }},
+    {"Exit",           [](int) {
         Core::queryClose();
         return nullptr;
     }},
@@ -148,6 +184,8 @@ void LevelSelect::update(double dt)
             << std::endl;
         currlvl++;
     }
+
+    oss << std::endl << "  Character: < " << charoptnames[player_selection] << " >";
     
     txt = oss.str();
 
@@ -159,6 +197,14 @@ void LevelSelect::update(double dt)
     if(selection >= currlvl) selection = 0;
     if(selection < 0) selection = currlvl - 1;
 
+    if(Controls::pressed(BTN_DIGITAL_LEFT))
+        player_selection--;
+    if(Controls::pressed(BTN_DIGITAL_RIGHT))
+        player_selection++;
+
+    if(player_selection < 0) player_selection = char_opts.size() - 1;
+    if(player_selection >= char_opts.size()) player_selection = 0;
+    
     if(Controls::pressed(BTN_DIGITAL_START) || Controls::pressed(BTN_DIGITAL_ACTIONDOWN)) {
         if(selection < numlvls) {
             auto lvldata = fromSelection();
@@ -168,7 +214,7 @@ void LevelSelect::update(double dt)
             }
         } else {
             int sel = selection - numlvls;
-            auto scene = extra_scenes[sel].spawner();
+            auto scene = extra_scenes[sel].spawner(player_selection);
             if(scene) {
                 Scenes::Manager::add(scene);
                 setShouldUnload(true);

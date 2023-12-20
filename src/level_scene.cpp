@@ -30,6 +30,7 @@ flecs::entity
 LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *follow)
 {
     glm::vec2 viewportSize(320.0f, 224.0f);
+    // glm::vec2 viewportSize(640.0f, 448.0f);
     
     // Player animation
     Resources::AnimatorPtr animator;
@@ -85,7 +86,7 @@ LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *fol
                 });
         }
         
-        player.set(Components::PlayerFollowEntity { *follow });
+        player.set(Components::PlayerFollowEntity { *follow, 0.0f });
     }
 
     return player;
@@ -103,7 +104,7 @@ LevelScene::load() {
     for(unsigned i = 0; i < this->chars.size(); i++) {
         std::ostringstream ss;
         ss.clear();
-        ss << "Player " << i;
+        ss << "P" << i;
         auto name = ss.str();
         if(i == 0)
             last = makePlayer(name.c_str(), this->chars[i], nullptr);

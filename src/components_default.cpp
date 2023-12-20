@@ -74,6 +74,10 @@ namespace Components
 
         ecs.component<PlayerUseJoypad>();
 
+        ecs.component<PlayerFollowEntity>()
+            .member<flecs::entity>("e")
+            .member<float>("jumpTimer");
+
         ecs.component<DebugCircleRender>()
             .member<float>("radius")
             .member<bool>("visible");
@@ -183,65 +187,116 @@ namespace Components
                    const Sensors,
                    const GroundSpeed,
                    Player::State,
-                   const PlayerFollowEntity>("PlayerUpdateFollow")
-            .each([](PlayerControls &ctrl,
-                     Transform &t,
-                     const Sensors &sensors,
-                     const GroundSpeed &gsp,
-                     Player::State &state,
-                     const PlayerFollowEntity &follow) {
-                auto followg = follow.e.get<GroundSpeed>();
-                auto followt = follow.e.get<Transform>();
-                auto followc = follow.e.get<PlayerControls>();
-                auto follows = follow.e.get<Speed>();
-                auto followstate = follow.e.get<Player::State>();
+                   PlayerFollowEntity>("PlayerUpdateFollow")
+            .iter([](flecs::iter& it,
+                     PlayerControls *ctrl,
+                     Transform *t,
+                     const Sensors *sensors,
+                     const GroundSpeed *gsp,
+                     Player::State *state,
+                     PlayerFollowEntity *follow) {
+                for(auto i : it) {
+                    auto followg = follow[i].e.get<GroundSpeed>();
+                    auto followt = follow[i].e.get<Transform>();
+                    auto followc = follow[i].e.get<PlayerControls>();
+                    auto follows = follow[i].e.get<Speed>();
+                    auto followstate = follow[i].e.get<Player::State>();
+                    auto followsensors = follow[i].e.get<Sensors>();
 
-                const float near_factor = 48.0f;
+                    const float near_factor = 20.0f;
                 
-                if(!followg || !followt || !followc || !follows || !followstate)
-                    return;
+                    if(!followg || !followt || !followc || !follows || !followstate || !followsensors)
+                        return;
 
-                ctrl.left = ctrl.right = false;
+                    float delta = it.delta_time() * Player::BaseFrameRate;
 
-                if(t.position.x > followt->position.x) {
-                    if(glm::abs(t.position.x - followt->position.x) > near_factor) {
-                        ctrl.left = true;
-                        ctrl.right = false;
+                    // Update jump timer
+                    follow[i].jumpTimer += 1.0f;
+                    
+                    // Reset inputs
+                    ctrl[i].left = ctrl[i].right = ctrl[i].pressJump = ctrl[i].jump = false;
+
+                    if(t[i].position.x > followt->position.x) {
+                        if(glm::abs(t[i].position.x - followt->position.x) > near_factor) {
+                            ctrl[i].left = true;
+                            ctrl[i].right = false;
+                        }
+
+                        if((gsp[i].gsp != 0.0f)
+                           && (state[i].action != Player::ActionKind::Pushing)
+                           && (state[i].direction > 0.0f)) {
+                            t[i].position.x -= 1.0f * delta;
+                        }
                     }
 
-                    if((gsp.gsp != 0.0f) && (state.direction < 0.0f)) {
-                        // TODO: Make sure we're not pushing
-                        t.position.x -= 1.0f;
-                    }
-                }
+                    if(t[i].position.x < followt->position.x) {
+                        if(glm::abs(t[i].position.x - followt->position.x) > near_factor) {
+                            ctrl[i].left = false;
+                            ctrl[i].right = true;
+                        }
 
-                if(t.position.x < followt->position.x) {
-                    if(glm::abs(t.position.x - followt->position.x) > near_factor) {
-                        ctrl.left = false;
-                        ctrl.right = true;
+                        if((gsp[i].gsp != 0.0f)
+                           && (state[i].action != Player::ActionKind::Pushing)
+                           && (state[i].direction < 0.0f)) {
+                            t[i].position.x += 1.0f * delta;
+                        }
                     }
 
-                    if((gsp.gsp != 0.0f) && (state.direction < 0.0f)) {
-                        // TODO: Make sure we're not pushing
-                        t.position.x += 1.0f;
+                    if(glm::abs(t[i].position.x - followt->position.x) < near_factor) {
+                        if(gsp[i].gsp == 0.0f)
+                            state[i].direction = followstate->direction;
                     }
-                }
 
-                if(glm::abs(t.position.x - followt->position.x) < near_factor) {
-                    if(gsp.gsp == 0.0f)
-                        state.direction = followstate->direction;
-                }
+                    // Look up and down
+                    ctrl[i].up = followc->up && sensors[i].ground && (gsp[i].gsp == 0.0f);
+                    ctrl[i].down = followc->down && sensors[i].ground && (gsp[i].gsp == 0.0f);
                 
-                // Jumping
-                auto withinJumpRange = glm::abs(t.position.x - followt->position.x) <= 200.0f;
-                auto shouldJump = sensors.ground && (followt->position.y <= (t.position.y - 40.0f));
-                auto remainJumping = !sensors.ground && (followt->position.y < (t.position.y - 20.0f));
-                ctrl.pressJump = withinJumpRange && shouldJump;
-                ctrl.jump = withinJumpRange && (shouldJump || remainJumping);
+                    /* Jumping */
 
-                // Look up and down
-                ctrl.up = followc->up && sensors.ground && (gsp.gsp == 0.0f);
-                ctrl.down = followc->down && sensors.ground && (gsp.gsp == 0.0f);
+                    // old code
+                    auto withinJumpRange = glm::abs(t[i].position.x - followt->position.x) <= 64.0f;
+                    auto shouldJump = sensors[i].ground && (followt->position.y <= (t[i].position.y - 40.0f));
+                    auto remainJumping = !sensors[i].ground && (followt->position.y < (t[i].position.y - 20.0f));
+                    ctrl[i].pressJump = withinJumpRange && shouldJump;
+                    ctrl[i].jump = withinJumpRange && (shouldJump || remainJumping);
+
+                //     // Continuing a jump
+                //     if(!sensors[i].ground && (state[i].action == Player::ActionKind::Jumping)) {
+                //         ctrl[i].jump = true;
+                //         goto END_P2_JUMP_LOGIC;
+                //     }
+
+                //     // Too far away from target
+                //     if(glm::abs(t[i].position.x - followt->position.x) > 64.0f) { 
+                //         goto END_P2_JUMP_LOGIC;
+                //     }
+
+                //     // Too far below target
+                //     if((followt->position.y >= t[i].position.y)
+                //        || (followt->position.y < (t[i].position.y - 32.0f))) {
+                //         goto END_P2_JUMP_LOGIC;
+                //     }
+
+                //     // Perform jump
+                //     ctrl[i].pressJump = true;
+                //     ctrl[i].jump = true;
+
+                //     // Jump every 64 frames
+                //     // if(follow[i].jumpTimer >= 64.0f) {
+                //     //     follow[i].jumpTimer = std::remainder(follow[i].jumpTimer, 64.0f);
+                //     //     // Perform jump
+                //     //     ctrl[i].pressJump = true;
+                //     //     ctrl[i].jump = true;
+                //     //     continue;
+                //     // }
+
+                // END_P2_JUMP_LOGIC:
+
+                //     if(follow[i].jumpTimer >= 64.0f) {
+                //         // Reset timer
+                //         follow[i].jumpTimer = std::remainder(follow[i].jumpTimer, 64.0f);
+                //     }
+                }
             });
 
         // Apply airborne movement.

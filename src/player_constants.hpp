@@ -48,7 +48,8 @@ namespace Player
         Idle,
         Jumping,
         Rolling,
-        Skidding
+        Skidding,
+        Pushing
     };
 
     struct State

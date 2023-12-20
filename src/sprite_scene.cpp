@@ -241,7 +241,7 @@ void SpriteScene::draw()
         char_model;
 
     // Camera MVP
-    glm::mat4 mvp = projection * view * model;
+    //glm::mat4 mvp = projection * view * model;
 
     font_mvp =
         projection *
@@ -254,15 +254,15 @@ void SpriteScene::draw()
         oss.clear();
         oss << "X:         " << cameraCenter.x << std::endl
             << "Y:         " << cameraCenter.y << std::endl
-            << "Direction: " << (direction < 0.0f ? "Left" : "Right") << std::endl
-            << "Animation: " << animator->getAnimation() << std::endl
+            // << "Direction: " << (direction < 0.0f ? "Left" : "Right") << std::endl
+            // << "Animation: " << animator->getAnimation() << std::endl
             << "Gamepad:   " << (Controls::isGamepad() ? "Yes" : "No");
         font->draw(font_mvp, oss.str().c_str());
     }
 
     glm::mat4 vp = projection * view;
     lvl->drawFrontLayers(cameraCenter, viewportSize, vp);
-    animator->draw(mvp);
+    //animator->draw(mvp);
     for(auto obj : objects) {
         // TODO: Only draw stuff within the screen!
         obj->draw(vp);

@@ -76,7 +76,10 @@ void TitleScreen::update(double) {
                     auto manager =
                         Resources::Manager::getLevelDataManager("resources/leveldata.toml");
                     if(manager->data.size() > 0) {
-                        Scenes::Manager::add(new LevelScene(manager->data[0], 0, { Player::Character::Sonic }));
+                        Scenes::Manager::add(new LevelScene(manager->data[0], 0, {
+                                    Player::Character::Sonic,
+                                    Player::Character::Tails
+                                }));
                         setShouldUnload(true);
                     }
                 }

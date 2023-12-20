@@ -62,6 +62,7 @@ namespace Components
 
     struct PlayerFollowEntity {
         flecs::entity e;
+        float         jumpTimer;
     };
 
     struct PlayerControls {
