@@ -14,6 +14,7 @@ class LevelScene : public Scenes::Scene
 {
 private:
     flecs::world ecs;
+    flecs::entity camera;
     std::vector<Player::Character> chars;
     Sound::AudioSourceIndex channel;
     Resources::AudioPtr     bgm;

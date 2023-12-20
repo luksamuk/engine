@@ -101,7 +101,7 @@ LevelScene::load() {
     Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
 
     // Camera
-    flecs::entity camera = ecs.entity("Camera")
+    camera = ecs.entity("Camera")
         .add<Components::Transform>()
         .set(Components::ViewportInfo { viewportSize })
         .set(Components::MakeCameraBox());
@@ -171,6 +171,19 @@ LevelScene::update(double dt)
         | ImGuiTableFlags_Borders;
 
     ImGui::Begin("Debug", &dbg_window_active, ImGuiWindowFlags_NoFocusOnAppearing);
+
+    auto camera_t = camera.get<Components::Transform>();
+    auto camera_box = camera.get_mut<Components::CameraBox>();
+    if(camera_t) {
+        ImGui::Text("Camera:\t{%0.4f, %0.4f}",
+                    camera_t->position.x, camera_t->position.y);
+        if(camera_box) {
+            if(ImGui::Button("Toggle Boundary")) {
+                camera_box->visible = !camera_box->visible;
+            }
+        }
+    }
+    
     if(ImGui::BeginTable("Entities", 7, tableflags)) {
         ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthStretch);
         //ImGui::TableSetupColumn("Position", ImGuiTableColumnFlags_WidthStretch);
