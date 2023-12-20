@@ -18,7 +18,7 @@ private:
     Sound::AudioSourceIndex channel;
     Resources::AudioPtr     bgm;
 
-    flecs::entity makePlayer(const char *, Player::Character, flecs::entity*);
+    flecs::entity makePlayer(const char *name, Player::Character, flecs::entity* follows);
 public:
     LevelScene(Tiled::LevelData l, unsigned act, std::vector<Player::Character>);
     virtual ~LevelScene();

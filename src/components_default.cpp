@@ -85,6 +85,14 @@ namespace Components
         ecs.component<FakeGround>()
             .member<float>("ypos");
 
+        ecs.component<CameraInfo>()
+            .member<flecs::entity>("camera");
+        
+        ecs.component<CameraBox>()
+            .member<bool>("visible");
+
+        ecs.component<CameraFollowed>();
+
         // Default behaviour for components
         RegisterDefaultSystems(ecs);
         RegisterPlayerMovementSystems(ecs);
@@ -107,6 +115,80 @@ namespace Components
                 mvp = glm::translate(mvp, glm::vec3(position, 0.0f));
                 mvp = glm::scale(mvp, glm::vec3(r.radius, r.radius, 1.0f));
                 r.atlas->draw(mvp);
+            });
+
+        // Render camera box
+        ecs.system<const CameraBox, const ViewportInfo>("RenderCameraBox")
+            .kind(flecs::PostUpdate)
+            .each([](const CameraBox &box, const ViewportInfo &vwp) {
+                if(!box.visible) return;
+
+                glm::mat4 mvp = glm::ortho(0.0f, vwp.size.x, vwp.size.y, 0.0f, 1.0f, -1.0f);
+                mvp = glm::translate(mvp, glm::vec3(vwp.size / 2.0f, 0.0f));
+                mvp = glm::scale(mvp, glm::vec3(16.0f, 64.0f, 1.0f));
+                box.atlas->draw(mvp);
+            });
+
+        // Camera follows object
+        ecs.system<const CameraInfo, const Transform, const CameraFollowed>("CameraFollowsEntity")
+            .iter([](flecs::iter &it,
+                     const CameraInfo *info,
+                     const Transform *t,
+                     const CameraFollowed*) {
+                for(auto i : it) {
+                    auto camera_t = info[i].camera.get_mut<Transform>();
+                    auto camera_vwp = info[i].camera.get<ViewportInfo>();
+                    if(!camera_t || !camera_vwp) continue;
+
+                    const float catch_up_lag = 16.0f;
+                    const float catch_up_lag_y_lowspd = 6.0f;
+                    // const float catch_up_lag_y_crouchdown = 2.0f;
+                    
+                    // Calculate borders. Rectangle is 16x64
+                    auto left = camera_t->position.x - 8.0f;
+                    auto right = camera_t->position.x + 8.0f;
+                    auto top = camera_t->position.y - 32.0f;
+                    auto bottom = camera_t->position.y + 32.0f;
+                    float displacement;
+
+                    // Horizontal border
+                    displacement = left - t[i].position.x;
+                    if(displacement > 0.0f) {
+                        camera_t->position.x -= glm::min(displacement, catch_up_lag);
+                    }
+
+                    displacement = t[i].position.x - right;
+                    if(displacement > 0.0f) {
+                        camera_t->position.x += glm::min(displacement, catch_up_lag);
+                    }
+
+                    // Vertical border
+                    // Check if camera target has a Sensors component.
+                    auto player_sensors = it.entity(i).get<Sensors>();
+                    auto player_gsp = it.entity(i).get<GroundSpeed>();
+                    if((player_sensors && player_gsp) && player_sensors->ground) {
+                        // If following a player and it is on the ground...
+                        displacement = t[i].position.y - camera_t->position.y;
+                        if(displacement != 0.0f) {
+                            camera_t->position.y += glm::min(
+                                displacement,
+                                glm::abs(player_gsp->gsp) >= 8.0f
+                                ? catch_up_lag
+                                : catch_up_lag_y_lowspd);
+                        }
+                    } else {
+                        // If this is not a player or we're in the air
+                        displacement = top - t[i].position.y;
+                        if(displacement > 0.0f) {
+                            camera_t->position.y -= glm::min(displacement, catch_up_lag);
+                        }
+
+                        displacement = t[i].position.y - bottom;
+                        if(displacement > 0.0f) {
+                            camera_t->position.y += glm::min(displacement, catch_up_lag);
+                        }
+                    }
+                }
             });
     }
 
@@ -482,21 +564,23 @@ namespace Components
             });
 
         // Apply animation.
-        ecs.system<const ViewportInfo,
+        ecs.system<//const ViewportInfo,
                    const Transform,
                    const GroundSpeed,
                    const Speed,
                    const Player::State,
                    const PlayerControls,
+                   const CameraInfo,
                    PlayerAnimation>("AnimatePlayer")
             .kind(flecs::PostUpdate)
             .iter([](flecs::iter &it,
-                     const ViewportInfo *vwp,
+                     //const ViewportInfo *vwp,
                      const Transform *t,
                      const GroundSpeed *gsp,
                      const Speed *s,
                      const Player::State *state,
                      const PlayerControls *ctrl,
+                     const CameraInfo *caminfo,
                      PlayerAnimation *anim) {
                 for(auto i : it) {
                     float delta = it.delta_time() * Player::BaseFrameRate;
@@ -536,20 +620,27 @@ namespace Components
                     }
 
                     anim[i].animator->update();
-                
+
+                    // Get camera stuff
+                    auto camera_t = caminfo[i].camera.get<Transform>();
+                    auto camera_vwp = caminfo[i].camera.get<ViewportInfo>();
+
+                    if(!camera_t || !camera_vwp) continue;
+                    
                     // DEBUG!
                     // Projection and View should probably be in another component.
                     glm::mat4 projection, view, model;
                 
-                    projection = glm::ortho(0.0f, vwp[i].size.x, vwp[i].size.y, 0.0f, 1.0f, -1.0f);
+                    projection = glm::ortho(0.0f, camera_vwp->size.x, camera_vwp->size.y, 0.0f, 1.0f, -1.0f);
 
                     view = glm::mat4(1.0f);
 
                     // DEBUG! Reposition at center of screen
-                    glm::vec2 position = t[i].position;
+                    glm::vec2 position = t[i].position - camera_t->position;
                     // if(position.x > vwp[i].size.x / 2.0f)
                     //     position.x = vwp[i].size.x / 2.0;
                     position.y -= 8.0f;
+                    position += camera_vwp->size / 2.0f;
                 
                     model = glm::mat4(1.0f);
                     model = glm::translate(model, glm::vec3(position, 0.0f));
@@ -567,5 +658,13 @@ namespace Components
         auto atlas = Resources::Manager::getAtlas("resources/sprites/circle.png");
         atlas->setFrame(0);
         return { radius, false, atlas };
+    }
+
+    CameraBox
+    MakeCameraBox() {
+        Resources::Manager::loadAtlas("resources/sprites/camerabox.png", glm::vec2(16.0f, 64.0f));
+        auto atlas = Resources::Manager::getAtlas("resources/sprites/camerabox.png");
+        atlas->setFrame(0);
+        return { false, atlas };
     }
 }

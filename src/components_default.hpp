@@ -79,10 +79,25 @@ namespace Components
         bool pressJump;
     };
 
+    // Other components
+
+    struct CameraInfo {
+        // A camera must have a Transform and a ViewportInfo.
+        flecs::entity        camera;
+    };
+
+    struct CameraBox {
+        bool                 visible = false;
+        Resources::AtlasPtr  atlas;
+    };
+
+    struct CameraFollowed {};
+
 
     // Functions
     void              RegisterDefaultComponents(flecs::world &ecs);
     DebugCircleRender MakeCircleRenderer(float radius);
+    CameraBox         MakeCameraBox();
 }
 
 #endif

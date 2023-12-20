@@ -12,6 +12,9 @@
 
 #include "imgui.h"
 
+glm::vec2 viewportSize(320.0f, 224.0f);
+// glm::vec2 viewportSize(640.0f, 448.0f);
+
 LevelScene::LevelScene(Tiled::LevelData l, unsigned act, std::vector<Player::Character> chars)
 {
     // IF debug
@@ -29,9 +32,6 @@ LevelScene::~LevelScene() {}
 flecs::entity
 LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *follow)
 {
-    glm::vec2 viewportSize(320.0f, 224.0f);
-    // glm::vec2 viewportSize(640.0f, 448.0f);
-    
     // Player animation
     Resources::AnimatorPtr animator;
 
@@ -100,6 +100,12 @@ LevelScene::load() {
     Resources::Manager::loadAnimator("resources/animation/tails.toml");
     Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
 
+    // Camera
+    flecs::entity camera = ecs.entity("Camera")
+        .add<Components::Transform>()
+        .set(Components::ViewportInfo { viewportSize })
+        .set(Components::MakeCameraBox());
+
     flecs::entity last;
     for(unsigned i = 0; i < this->chars.size(); i++) {
         std::ostringstream ss;
@@ -110,6 +116,11 @@ LevelScene::load() {
             last = makePlayer(name.c_str(), this->chars[i], nullptr);
         else last = makePlayer(name.c_str(), this->chars[i], &last);
         std::cout << name << ": " << last << std::endl;
+
+        // Attach camera
+        last.set(Components::CameraInfo { camera });
+        if(i == 0)
+            last.add<Components::CameraFollowed>();
     }
     
     // TODO
