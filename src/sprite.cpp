@@ -267,6 +267,17 @@ namespace Sprite
         return 0;
     }
 
+    bool
+    Animator::isAnimationValid(std::string name)
+    {
+        for(unsigned i = 0; i < _data.size(); i++) {
+            if(_data[i].name == name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     glm::vec2
     Animator::getFramesize() const
     {

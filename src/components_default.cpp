@@ -609,8 +609,12 @@ namespace Components
                                 anim[i].animator->setAnimationByName("Skidding");
                             else if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
                                 anim[i].animator->setAnimationByName("Walking");
-                            } else if(abs_gsp >= 6.0f) {
+                            } else if(abs_gsp >= 6.0f && abs_gsp <= 8.0f) {
                                 anim[i].animator->setAnimationByName("Running");
+                            } else {
+                                if(anim[i].animator->isAnimationValid("Peel-out"))
+                                    anim[i].animator->setAnimationByName("Peel-out");
+                                else anim[i].animator->setAnimationByName("Running");
                             }
                             duration = glm::floor(glm::max(0.0f, 8.0f - glm::abs(gsp[i].gsp)));
                             if(!state[i].braking)

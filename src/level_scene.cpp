@@ -45,6 +45,9 @@ LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *fol
     case Player::Character::Knuckles:
         animator = Resources::Manager::makeAnimator("resources/animation/knuckles.toml");
         break;
+    case Player::Character::SuperSonic:
+        animator = Resources::Manager::makeAnimator("resources/animation/supersonic.toml");
+        break;
     }
     animator->setAnimation(0);
 
