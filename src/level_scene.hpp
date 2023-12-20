@@ -8,12 +8,15 @@
 #include "scene.hpp"
 #include "tiled.hpp"
 #include "player_constants.hpp"
+#include "sound.hpp"
 
 class LevelScene : public Scenes::Scene
 {
 private:
     flecs::world ecs;
     std::vector<Player::Character> chars;
+    Sound::AudioSourceIndex channel;
+    Resources::AudioPtr     bgm;
 
     flecs::entity makePlayer(const char *, Player::Character, flecs::entity*);
 public:

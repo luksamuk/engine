@@ -120,10 +120,20 @@ LevelScene::load() {
     // std::cout << "Sonic entity: " << player << std::endl
     //           << "Tails entity: " << tails << std::endl
     //           << "Knuckles entity: " << knuckles << std::endl;
+
+    Resources::Manager::loadBGMTable("resources/audiodata.toml");
+    auto bgmtable = Resources::Manager::getBGMTable("resources/audiodata.toml");
+    bgm = bgmtable->load("07");
+    channel = Sound::getChannel();
+
+    if(bgm != nullptr)
+        Sound::channelOf(channel)->play(bgm);
 }
 
 void
-LevelScene::unload() {}
+LevelScene::unload() {
+    Sound::releaseChannel(channel);
+}
 
 static bool dbg_window_active = true;
 
