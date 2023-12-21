@@ -79,13 +79,10 @@ const std::vector<std::string> charoptnames = {
 
 const std::vector<SceneEntry> extra_scenes = {
     {"Sound Test",     [](int) { return new SoundTest();       }},
-    // {"Engine Test", [](int player) {
-    //     return new LevelScene({}, 0, char_opts[player]);
-    // }},
-    // {"Rendering Test", [](int) { return new TestScene();       }},
-    // {"Animation Test", [](int) { return new MovieScene();      }},
-    // {"Collision Test", [](int) { return new PartitionTest();   }},
-    // {"Entity Test",    [](int) { return new EntityTest();      }},
+    {"Rendering Test", [](int) { return new TestScene();       }},
+    {"Animation Test", [](int) { return new MovieScene();      }},
+    {"Collision Test", [](int) { return new PartitionTest();   }},
+    {"Entity Test",    [](int) { return new EntityTest();      }},
     {"Title Screen",   [](int) { return new TitleScreen();     }},
     {"Exit",           [](int) {
         Core::queryClose();
