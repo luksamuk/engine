@@ -30,6 +30,8 @@ namespace Components
         ecs.component<ViewportInfo>()
             .member<glm::vec2>("size");
 
+        ecs.component<LevelInfo>();
+
         ecs.component<Sensors>()
             .member<bool>("ground")
             .member<bool>("ceiling")
@@ -189,6 +191,21 @@ namespace Components
                         }
                     }
                 }
+            });
+
+        // Render level
+        // LevelInfo + CameraInfo
+        ecs.system<const LevelInfo, const CameraInfo>("RenderLevel")
+            .kind(flecs::PostUpdate)
+            .each([](const LevelInfo &l, const CameraInfo &c) {
+                auto camera_t = c.camera.get_mut<Transform>();
+                auto camera_vwp = c.camera.get<ViewportInfo>();
+                if(!camera_t || !camera_vwp) return;
+
+                glm::mat4 vp = glm::ortho(0.0f, camera_vwp->size.x, camera_vwp->size.y, 0.0f, 1.0f, -1.0f);
+                
+                l.lvl->drawFrontLayers(camera_t->position, camera_vwp->size, vp);
+                l.lvl->drawBackLayers(camera_t->position, camera_vwp->size, vp);
             });
     }
 

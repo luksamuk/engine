@@ -17,6 +17,9 @@ glm::vec2 viewportSize(320.0f, 224.0f);
 
 LevelScene::LevelScene(Tiled::LevelData l, unsigned act, std::vector<Player::Character> chars)
 {
+    this->lvldata = l;
+    this->act = act;
+    
     // IF debug
     ecs.set<flecs::Rest>({});
     ecs.import<flecs::monitor>();
@@ -63,7 +66,6 @@ LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *fol
         .add<Player::State>()
         .set(Components::ViewportInfo { viewportSize })
         .set(Components::MakeCircleRenderer(16.0f))
-        .set(Components::FakeGround { 200.0f })
         .set(Components::PlayerAnimation { animator })
         .add<Components::PlayerControls>();
 
@@ -109,6 +111,16 @@ LevelScene::load() {
         .set(Components::ViewportInfo { viewportSize })
         .set(Components::MakeCameraBox());
 
+    // Level
+    auto lvl = this->lvldata.loadLevel(this->act);
+    this->level = ecs.entity("Level")
+        .set(Components::LevelInfo { lvl })
+        .set(Components::CameraInfo { camera });
+
+    auto spawnpoint = lvl->map->getObject("spawn_sonic");
+    auto startpos = spawnpoint ? spawnpoint->position : glm::vec2(0, 0);
+    
+    // Players
     flecs::entity last;
     for(unsigned i = 0; i < this->chars.size(); i++) {
         std::ostringstream ss;
@@ -124,20 +136,15 @@ LevelScene::load() {
         last.set(Components::CameraInfo { camera });
         if(i == 0)
             last.add<Components::CameraFollowed>();
-    }
-    
-    // TODO
-    // flecs::entity player = makePlayer("Sonic", Player::Character::Sonic, nullptr);
-    // flecs::entity tails = makePlayer("Tails", Player::Character::Tails, &player);
-    // flecs::entity knuckles = makePlayer("Knuckles", Player::Character::Knuckles, &tails);
-    
-    // std::cout << "Sonic entity: " << player << std::endl
-    //           << "Tails entity: " << tails << std::endl
-    //           << "Knuckles entity: " << knuckles << std::endl;
 
+        // Attach fake ground
+        last.set(Components::FakeGround { startpos.y });
+    }
+
+    // Level music
     Resources::Manager::loadBGMTable("resources/audiodata.toml");
     auto bgmtable = Resources::Manager::getBGMTable("resources/audiodata.toml");
-    bgm = bgmtable->load("07");
+    bgm = bgmtable->load(lvldata.bgm);
     channel = Sound::getChannel();
 
     if(bgm != nullptr)

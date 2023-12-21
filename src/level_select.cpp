@@ -29,7 +29,7 @@ struct SceneEntry {
     SceneCreatorFn spawner;
 };
 
-static int player_selection = 0;
+static int player_selection = 1;
 
 const std::vector<std::vector<Player::Character>> char_opts = {
     {Player::Character::Sonic},
@@ -79,9 +79,9 @@ const std::vector<std::string> charoptnames = {
 
 const std::vector<SceneEntry> extra_scenes = {
     {"Sound Test",     [](int) { return new SoundTest();       }},
-    {"Engine Test", [](int player) {
-        return new LevelScene({}, 0, char_opts[player]);
-    }},
+    // {"Engine Test", [](int player) {
+    //     return new LevelScene({}, 0, char_opts[player]);
+    // }},
     // {"Rendering Test", [](int) { return new TestScene();       }},
     // {"Animation Test", [](int) { return new MovieScene();      }},
     // {"Collision Test", [](int) { return new PartitionTest();   }},
@@ -219,7 +219,8 @@ void LevelSelect::update(double dt)
         if(selection < numlvls) {
             auto lvldata = fromSelection();
             if(lvldata.first.maps_path.size() > 0) {
-                Scenes::Manager::add(new SpriteScene(lvldata.first, lvldata.second));
+                //Scenes::Manager::add(new SpriteScene(lvldata.first, lvldata.second));
+                Scenes::Manager::add(new LevelScene(lvldata.first, lvldata.second, char_opts[player_selection]));
                 setShouldUnload(true);
             }
         } else {

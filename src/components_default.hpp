@@ -8,6 +8,7 @@
 
 #include "sprite.hpp"
 #include "resources.hpp"
+#include "tiled.hpp"
 
 namespace Components
 {
@@ -45,6 +46,10 @@ namespace Components
         bool ceiling;
         bool left;
         bool right;
+    };
+
+    struct LevelInfo {
+        Resources::LevelPtr lvl;
     };
     
 

@@ -7,42 +7,42 @@ maps = [
       "resources/levels/R0/zone0.tmx",
 ]
 
-# [[levels]]
-# name  = "Isolated Island"
-# bgm   = "03"
-# atlas = "resources/levels/R1/chunks.png"
-# tiles = "resources/levels/R1/tiles.tsx"
-# maps = [
-#       "resources/levels/R1/zone0.tmx",
-#       "resources/levels/R1/zone1.tmx"
-# ]
+[[levels]]
+name  = "Isolated Island"
+bgm   = "03"
+atlas = "resources/levels/R1/chunks.png"
+tiles = "resources/levels/R1/tiles.tsx"
+maps = [
+      "resources/levels/R1/zone0.tmx",
+      "resources/levels/R1/zone1.tmx"
+]
 
-# [[levels]]
-# name  = "Speed Slider"
-# bgm   = "0B"
-# atlas = "resources/levels/R2/chunks.png"
-# tiles = "resources/levels/R2/tiles.tsx"
-# maps = [
-#      "resources/levels/R2/zone0.tmx"
-# ]
+[[levels]]
+name  = "Speed Slider"
+bgm   = "0B"
+atlas = "resources/levels/R2/chunks.png"
+tiles = "resources/levels/R2/tiles.tsx"
+maps = [
+     "resources/levels/R2/zone0.tmx"
+]
 
-# [[levels]]
-# name  = "Wood"
-# bgm   = "04"
-# atlas = "resources/levels/R3/chunks.png"
-# tiles = "resources/levels/R3/tiles.tsx"
-# maps  = [
-#       "resources/levels/R3/zone0.tmx"
-# ]
+[[levels]]
+name  = "Wood"
+bgm   = "04"
+atlas = "resources/levels/R3/chunks.png"
+tiles = "resources/levels/R3/tiles.tsx"
+maps  = [
+      "resources/levels/R3/zone0.tmx"
+]
 
-# [[levels]]
-# name  = "Hidden Palace"
-# bgm   = "0A"
-# atlas = "resources/levels/R4/chunks.png"
-# tiles = "resources/levels/R4/tiles.tsx"
-# maps  = [
-#       "resources/levels/R4/zone0.tmx"
-# ]
+[[levels]]
+name  = "Hidden Palace"
+bgm   = "0A"
+atlas = "resources/levels/R4/chunks.png"
+tiles = "resources/levels/R4/tiles.tsx"
+maps  = [
+      "resources/levels/R4/zone0.tmx"
+]
 
 [[levels]]
 name  = "Techno Tower"

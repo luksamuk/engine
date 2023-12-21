@@ -19,6 +19,10 @@ private:
     Sound::AudioSourceIndex channel;
     Resources::AudioPtr     bgm;
 
+    flecs::entity level;
+    Tiled::LevelData lvldata;
+    unsigned act;
+
     flecs::entity makePlayer(const char *name, Player::Character, flecs::entity* follows);
 public:
     LevelScene(Tiled::LevelData l, unsigned act, std::vector<Player::Character>);
