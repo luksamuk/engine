@@ -5,7 +5,9 @@ This is a 360° 2D Platformer engine, heavily inspired by Sonic The Hedgehog. It
 This is one of my many attempts to emulate Classic Sonic's movements from scratch using a custom-built game engine. This time, I'm trying to make the 2D platformer movement as a focus, not doing anything necessarily generic.
 
 <center>
+
 ![Title Screen with Sonic, build date information and a "PRESS START BUTTON" text](./screenshots/titlescreen.png)
+
 </center>
 
 This is purely a hobby project which I started after many (many!) attempts at making 2D games from scratch. This time, I'm trying to use the simplest tools to build something more robust and yet explore new things, such as:
@@ -54,6 +56,14 @@ All code here is distributed under the MIT License. For more information, see th
 
 _Please notice that even though the levels are rendered, there is no collision in this version. ;)_
 
-| ![Level Select screen.](./screenshots/levelselect.png) | ![Wood Zone with three characters at same time.](./screenshots/wood-3chars.png) |
-| ![Techno Tower Zone](./screenshots/technotower.png)    | ![Super Sonic](./screenshots/supersonic.png)                                    |
+<center>
 
+![Level Select screen.](./screenshots/levelselect.png)
+
+![Wood Zone with three characters at same time.](./screenshots/wood-3chars.png)
+
+![Techno Tower Zone](./screenshots/technotower.png)
+
+![Super Sonic](./screenshots/supersonic.png)
+
+</center>
