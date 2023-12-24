@@ -15,6 +15,11 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
+#define VERSION "0.1a"
+
+const std::string build_date = __DATE__;
+const std::string build_time = __TIME__;
+
 namespace Core
 {
     static GLFWwindow *window                       = nullptr;
@@ -38,6 +43,9 @@ namespace Core
             Render::initGui(window);
             Sound::init();
         }
+
+        std::cout << "Version " << VERSION << " (build " << build_date
+                  << " " << build_time << ")" << std::endl;
     }
 
     void
