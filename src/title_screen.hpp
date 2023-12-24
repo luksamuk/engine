@@ -12,6 +12,7 @@ class TitleScreen : public Scenes::Scene
 private:
     Resources::AtlasPtr     atlas;
     Resources::FontPtr      font;
+    Resources::FontPtr      info_font;
     Sound::AudioSourceIndex channel;
     Resources::AudioPtr     bgm;
     glm::mat4 vp;

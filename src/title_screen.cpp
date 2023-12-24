@@ -42,9 +42,9 @@ void TitleScreen::load() {
                                  glm::vec2(10.0f, 18.0f));
     font  = Resources::Manager::getFont("resources/sprites/fonts/hud.png");
 
-    // Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
-    //                              glm::vec2(10.0f, 10.0f));
-    // font = Resources::Manager::getFont("resources/sprites/fonts/levelselect.png");
+    Resources::Manager::loadFont("resources/sprites/fonts/levelselect.png",
+                                 glm::vec2(10.0f, 10.0f));
+    info_font = Resources::Manager::getFont("resources/sprites/fonts/levelselect.png");
 
     vp = glm::ortho(0.0f, viewportSize.x, viewportSize.y, 0.0f, 1.0f, -1.0f);
 
@@ -130,6 +130,19 @@ void TitleScreen::draw() {
     mvp = glm::ortho(0.0f, txtVwp.x, txtVwp.y, 0.0f, 1.0f, -1.0f) *
         glm::translate(glm::mat4(1.0f), txtPos);
     font->draw(mvp, text);
+
+    // Build info text
+    txtVwp = glm::vec2(640.0f, 480.0f);
+    
+    txtPos = glm::vec3(10.0f, 10.0f, 0.0f);
+    mvp = glm::ortho(0.0f, txtVwp.x, txtVwp.y, 0.0f, 1.0f, -1.0f) *
+        glm::translate(glm::mat4(1.0f), txtPos);
+    info_font->draw(mvp, Core::getVersion().c_str());
+    
+    txtPos = glm::vec3(10.0f, 20.0f, 0.0f);
+    mvp = glm::ortho(0.0f, txtVwp.x, txtVwp.y, 0.0f, 1.0f, -1.0f) *
+        glm::translate(glm::mat4(1.0f), txtPos);
+    info_font->draw(mvp, Core::getBuildDateAndTime().c_str());
 
     glm::vec2 titlepos(viewportSize / 2.0f);
     titlepos.y -= 20.0f;

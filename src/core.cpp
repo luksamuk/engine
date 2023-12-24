@@ -15,10 +15,11 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-#define VERSION "0.1a"
+#define VERSION "0.1.0 pre-alpha"
 
 const std::string build_date = __DATE__;
 const std::string build_time = __TIME__;
+const std::string build_date_and_time = __DATE__ " " __TIME__;
 
 namespace Core
 {
@@ -26,6 +27,18 @@ namespace Core
     static std::string _windowCaption               = "Engine";
     static std::unique_ptr<std::thread> _audiothread;
 
+    std::string
+    getVersion()
+    {
+        return VERSION;
+    }
+
+    std::string
+    getBuildDateAndTime()
+    {
+        return build_date_and_time;
+    }
+    
     void
     init(std::string windowCaption)
     {

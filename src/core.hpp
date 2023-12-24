@@ -11,6 +11,9 @@ namespace Core
     void    dispose(void);
     void    queryClose(void);
     void    setWindowCaptionAppendix(std::string appendix);
+
+    std::string getVersion();
+    std::string getBuildDateAndTime();
 }
 
 #endif
