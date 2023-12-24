@@ -348,8 +348,7 @@ namespace Tiled
         int y = 0;
         for(unsigned i = 0; i < window.size(); i++) {
             if(window[i] != 0) {
-                glm::vec2 cameraDiff;
-                cameraDiff = glm::mod(cameraCenter, tiledata->tilesize);
+                glm::vec2 cameraDiff = glm::mod(cameraCenter, tiledata->tilesize);
                 glm::mat4 level_model = glm::translate(
                     glm::mat4(1.0),
                     glm::vec3(

@@ -4,13 +4,14 @@
 #include <glm/ext.hpp>
 
 #include "controls.hpp"
+#include <iostream>
 
 namespace Components
 {
     // Prototypes
     void RegisterDefaultSystems(flecs::world &ecs);
     void RegisterPlayerMovementSystems(flecs::world &ecs);
-
+    void RegisterCollisionSystems(flecs::world &ecs);
 
     /* impl */
     
@@ -98,6 +99,7 @@ namespace Components
         // Default behaviour for components
         RegisterDefaultSystems(ecs);
         RegisterPlayerMovementSystems(ecs);
+        RegisterCollisionSystems(ecs);
     }
 
     void
@@ -665,10 +667,95 @@ namespace Components
                 
                     model = glm::mat4(1.0f);
                     model = glm::translate(model, glm::vec3(position, 0.0f));
+                    model = glm::rotate(model, t[i].angle, glm::vec3(0, 0, 1));
                     model = glm::scale(model, glm::vec3(state[i].direction * 30.0f, 30.0f, 1.0f));
 
                     glm::mat4 mvp = projection * view * model;
                     anim[i].animator->draw(mvp);
+                }
+            });
+    }
+
+    void
+    RegisterCollisionSystems(flecs::world &ecs)
+    {
+        // LevelInfo, CameraInfo, Sensors, Transform
+        ecs.system<const LevelInfo,
+                   const CameraInfo,
+                   Sensors,
+                   Transform,
+                   GroundSpeed,
+                   Player::State,
+                   Speed>("LevelCollisionDetection")
+            .each([](const LevelInfo& levelinfo,
+                     const CameraInfo &camerainfo,
+                     Sensors& sensors,
+                     Transform& transform,
+                     GroundSpeed& gsp,
+                     Player::State& state,
+                     Speed& spd)
+            {
+                auto camerat = camerainfo.camera.get<Transform>();
+                auto vwp = camerainfo.camera.get<ViewportInfo>();
+                if(!camerat || !vwp) return;
+
+                glm::vec2 start, end;
+
+                // left ground linecast
+                start = glm::vec2(transform.position.x - 19.0f,
+                                  transform.position.y);
+                end = glm::vec2(transform.position.x - 19.0f,
+                                transform.position.y + 16.0f);
+                auto grl =
+                    Collision::Linecast(levelinfo.lvl,
+                                        transform.position,
+                                        vwp->size,
+                                        start,
+                                        end);
+
+                // right ground linecast
+                start = glm::vec2(transform.position.x + 19.0f,
+                                  transform.position.y);
+                end = glm::vec2(transform.position.x + 19.0f,
+                                transform.position.y + 16.0f);
+                auto grr =
+                    Collision::Linecast(levelinfo.lvl,
+                                        transform.position,
+                                        vwp->size,
+                                        start,
+                                        end);
+                
+                if(!sensors.ground && (grl || grr) && (spd.speed.y > 0.0f)) {
+                    std::cout << "Got collision!" << std::endl;
+                    sensors.ground = true;
+                    spd.speed.y = 0.0f;
+                    state.action = Player::ActionKind::Idle;
+                    
+                    // land on ground (TODO)
+                    // See https://info.sonicretro.org/SPG:Slope_Physics#Landing_On_The_Ground
+                    
+                    gsp.gsp = spd.speed.x;
+
+                    // Check highest point
+                    if(grl && grr) {
+                        if((*grl).y < (*grr).y)
+                            transform.position.y = (*grl).y;
+                        else transform.position.y = (*grr).y;
+
+                        glm::vec2 direction = (*grr) - (*grl);
+                        transform.angle = std::atan2(direction.y, direction.x);
+                    } else if(grl) {
+                        transform.position.y = (*grl).y;
+                        transform.angle = 0.0f;
+                    }
+                    else {
+                        transform.position.y = (*grr).y;
+                        transform.angle = 0.0f;
+                    }
+                }
+
+                if(sensors.ground && (!grl && !grr)) {
+                    sensors.ground = false;
                 }
             });
     }

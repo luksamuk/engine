@@ -23,7 +23,7 @@ private:
     Tiled::LevelData lvldata;
     unsigned act;
 
-    flecs::entity makePlayer(const char *name, Player::Character, flecs::entity* follows);
+    flecs::entity makePlayer(const char *name, Player::Character, flecs::entity* follows, glm::vec2 startpos);
 public:
     LevelScene(Tiled::LevelData l, unsigned act, std::vector<Player::Character>);
     virtual ~LevelScene();

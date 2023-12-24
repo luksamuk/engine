@@ -4,6 +4,9 @@
 #include <glm/glm.hpp>
 #include <vector>
 #include <memory>
+#include <optional>
+
+#include "resources.hpp"
 
 // Collision shapes
 
@@ -12,6 +15,7 @@ namespace Collision
     struct Shape
     {
         virtual ~Shape() = 0;
+        Shape() {}
     };
 
     inline Shape::~Shape() {}
@@ -62,12 +66,16 @@ namespace Collision
         virtual ~Triangle() {}
     };
 
-    typedef std::unique_ptr<Shape> ShapeUPtr;
-    typedef std::vector<ShapeUPtr> Array;
+    typedef std::shared_ptr<Shape> ShapePtr;
+    typedef std::vector<ShapePtr> Array;
     
 
     Array TrianglesFromPolygon(std::vector<glm::vec2>& points);
 
+    std::optional<glm::vec2> Linecast(Resources::LevelPtr level,
+                                      glm::vec2 cameraCenter,
+                                      glm::vec2 viewport,
+                                      glm::vec2 start, glm::vec2 end);
 }
     
 #endif

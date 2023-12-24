@@ -33,7 +33,7 @@ LevelScene::LevelScene(Tiled::LevelData l, unsigned act, std::vector<Player::Cha
 LevelScene::~LevelScene() {}
 
 flecs::entity
-LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *follow)
+LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *follow, glm::vec2 startpos)
 {
     // Player animation
     Resources::AnimatorPtr animator;
@@ -73,8 +73,8 @@ LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *fol
         std::cout << "Not following anything" << std::endl;
         player
             .set(Components::Transform {
-                glm::vec2(100.0f, 100.0f),
-                0.0f
+                    startpos,
+                    0.0f
             })
             .add<Components::PlayerUseJoypad>();
     } else {
@@ -119,6 +119,10 @@ LevelScene::load() {
 
     auto spawnpoint = lvl->map->getObject("spawn_sonic");
     auto startpos = spawnpoint ? spawnpoint->position : glm::vec2(0, 0);
+
+    // Set camera position to starting point
+    //auto camerat = camera.get_mut<Components::Transform>();
+    //camerat->position = startpos; // TODO: Compensate viewport?
     
     // Players
     flecs::entity last;
@@ -128,8 +132,8 @@ LevelScene::load() {
         ss << "P" << i;
         auto name = ss.str();
         if(i == 0)
-            last = makePlayer(name.c_str(), this->chars[i], nullptr);
-        else last = makePlayer(name.c_str(), this->chars[i], &last);
+            last = makePlayer(name.c_str(), this->chars[i], nullptr, startpos);
+        else last = makePlayer(name.c_str(), this->chars[i], &last, startpos);
         std::cout << name << ": " << last << std::endl;
 
         // Attach camera
@@ -137,8 +141,11 @@ LevelScene::load() {
         if(i == 0)
             last.add<Components::CameraFollowed>();
 
+        // Attach level info
+        last.set(Components::LevelInfo { lvl });
+
         // Attach fake ground
-        last.set(Components::FakeGround { startpos.y });
+        //last.set(Components::FakeGround { startpos.y });
     }
 
     // Level music
