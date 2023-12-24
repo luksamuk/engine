@@ -1,10 +1,11 @@
 [[levels]]
-name  = "Playground"
+name  = "Engine Test"
 bgm   = "09"
 atlas = "resources/levels/R0/chunks.png"
 tiles = "resources/levels/R0/tiles.tsx"
 maps = [
       "resources/levels/R0/zone0.tmx",
+      "resources/levels/R0/zone1.tmx",
 ]
 
 [[levels]]
