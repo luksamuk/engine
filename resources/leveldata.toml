@@ -72,3 +72,12 @@ maps  = [
 # atlas = ""
 # tiles = ""
 # maps  = []
+
+[[levels]]
+name  = "Eggmanland"
+bgm   = "0C"
+atlas = "resources/levels/R9/chunks.png"
+tiles = "resources/levels/R9/tiles.tsx"
+maps  = [
+     "resources/levels/R9/zone0.tmx"
+]

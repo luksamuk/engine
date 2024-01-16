@@ -53,7 +53,12 @@ file       = "resources/audio/bgm/speedslider.ogg"
 loop-start = 0.075
 loop-end   = 72.077
 
-# [0C]
+[0C]
+# Eggmanland remix by DRocca
+file       = "resources/audio/bgm/eggmanland.ogg"
+loop-start = 11.344
+loop-end   = 143.000
+
 # [0D]
 # [0E]
 # [0F]
