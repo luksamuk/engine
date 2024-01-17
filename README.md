@@ -35,13 +35,21 @@ Libraries and frameworks:
 
 Some tools I generally use:
 
-- GCC (G++) with C++20 support
+- GCC with C11, C99 and C++20 support
 - GNU Make
+- CMake 3.20 or above
 - Tiled 1.10.2 or above (for level maps, tiles, collision)
 - [SpriteSheetPacker](http://amakaseev.github.io/sprite-sheet-packer/) (for organizing level chunks)
 - GIMP (for editing any image stuff)
 - Audacity (for editing and figuring out the looping points of audio files)
 
+# Building
+
+1. Create a `build/` directory on project root.
+2. `cd` into `build/`, then run `cmake ..`. This will generate a Makefile.
+3. Run `make`. This will produce a binary called `game`.
+
+Notice that, if you're going to run the game, you need to run from the same directory where the `resources/` directory exists, otherwise no game assets will be found. Use the `run.sh` script to facilitate this process.
 
 # License
 
