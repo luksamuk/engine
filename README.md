@@ -28,8 +28,8 @@ Libraries and frameworks:
 - OpenAL v1.23.1
 - OGG v1.3.5
 - Vorbis v1.3.7
-- Toml++ 3.4.0 (included)
-- RapidXML 1.16 (included)
+- Toml++ 3.4.0 (header-only, included)
+- RapidXML 1.16 (header-only, included)
 - dear imgui 3.2.7 (included)
 - Flecs 1.89.9 (included)
 
@@ -45,11 +45,13 @@ Some tools I generally use:
 
 # Building
 
-1. Create a `build/` directory on project root.
-2. `cd` into `build/`, then run `cmake -DCMAKE_BUILD_TYPE=Debug ..`. This will generate a Makefile.
-3. Run `make`. This will produce a binary called `game`.
+```bash
+make build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make
+```
 
-Notice that, if you're going to run the game, you need to run from the same directory where the `resources/` directory exists, otherwise no game assets will be found. Use the `run.sh` script to facilitate this process.
+> **WARNING:** Notice that, if you're going to run the game, you need to run from the same directory where the `resources/` directory exists, otherwise no game assets will be found. Use the `run.sh` script to facilitate this process.
 
 # License
 
