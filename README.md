@@ -43,6 +43,24 @@ Some tools I generally use:
 - GIMP (for editing any image stuff)
 - Audacity (for editing and figuring out the looping points of audio files)
 
+### Ubuntu packages for building and running
+
+The OpenGL implementation depends on your video driver, so if you can install GLFW3, you'll most likely have all the dependencies to build and run OpenGL.
+
+* To build:
+
+- `libglfw3-dev`
+- `libopenal-dev`
+- `libogg-dev`
+- `libvorbis-dev`
+
+* To run:
+
+- `libglfw3`
+- `openal-soft`
+- `libogg`
+- `libvorbis`
+
 # Building
 
 ```bash
