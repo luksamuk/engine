@@ -1,0 +1,30 @@
+name: Build Game
+
+on:
+  push:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build game
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install build tools
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential make cmake
+      - name: Install dependencies
+        run: |
+          sudo apt install -y libglfw3-dev libopenal-dev libogg-dev libvorbis-dev
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Build
+        run: |
+          mkdir build/
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          make
+
