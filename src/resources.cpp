@@ -3,7 +3,7 @@
 #include "render.hpp"
 #include "tiled.hpp"
 #include "sound.hpp"
-#include <toml++/toml.h>
+#include <toml++/toml.hpp>
 #include <iostream>
 #include <vector>
 #include <map>
