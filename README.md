@@ -23,8 +23,9 @@ I will add more info here as the project goes on.
 
 Libraries and frameworks:
 
-- GLFW
 - OpenGL ES 3.2
+- GLFW v3.3.9
+- GLM v0.9.9.8 (header-only)
 - OpenAL v1.23.1
 - OGG v1.3.5
 - Vorbis v1.3.7
@@ -50,6 +51,7 @@ The OpenGL implementation depends on your video driver, so if you can install GL
 * To build:
 
 - `libglfw3-dev`
+- `libglm-dev`
 - `libopenal-dev`
 - `libogg-dev`
 - `libvorbis-dev`
