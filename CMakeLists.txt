@@ -42,32 +42,40 @@ target_include_directories(imgui PUBLIC
 ### GAME ###
 # Glob source files
 file(GLOB SRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
-add_executable(game ${SRC_FILES})
+list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
+add_library(engine ${SRC_FILES})
 
-# Dependencies
-find_package(TomlPlusPlus REQUIRED)
-find_package(glfw3 3.3 REQUIRED)
-find_package(OpenGL REQUIRED)
-find_package(OpenAL REQUIRED)
-# Ogg, Vorbis, Vorbisfile
-find_package(OggVorbis REQUIRED)
-
-# Game include directories
-target_include_directories(game PUBLIC
+target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src/>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/tomlplusplus-3.4.0/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/flecs-3.2.7/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/backends/>
   $<INSTALL_INTERFACE:include/>)
 
+# Dependencies
+find_package(glfw3 3.3 REQUIRED)
+find_package(OpenGL REQUIRED)
+find_package(OpenAL REQUIRED)
+find_package(OggVorbis REQUIRED)
+
+# Game include directories
+
+add_executable(game ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
+
+target_include_directories(engine PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include/>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src/>
+  $<INSTALL_INTERFACE:include/>)
+
 target_link_libraries(game
+  engine
   glfw
   OpenGL::GL
   glad
   flecs
   imgui
-  tomlplusplus
   openal
   ogg
   vorbis
@@ -76,4 +84,5 @@ target_link_libraries(game
 set_property(TARGET glad PROPERTY C_STANDARD 11)
 set_property(TARGET flecs PROPERTY C_STANDARD 99)
 set_property(TARGET imgui PROPERTY CXX_STANDARD 20)
+set_property(TARGET engine PROPERTY CXX_STANDARD 20)
 set_property(TARGET game PROPERTY CXX_STANDARD 20)

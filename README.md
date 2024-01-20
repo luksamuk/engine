@@ -46,7 +46,7 @@ Some tools I generally use:
 # Building
 
 1. Create a `build/` directory on project root.
-2. `cd` into `build/`, then run `cmake ..`. This will generate a Makefile.
+2. `cd` into `build/`, then run `cmake -DCMAKE_BUILD_TYPE=Debug ..`. This will generate a Makefile.
 3. Run `make`. This will produce a binary called `game`.
 
 Notice that, if you're going to run the game, you need to run from the same directory where the `resources/` directory exists, otherwise no game assets will be found. Use the `run.sh` script to facilitate this process.
