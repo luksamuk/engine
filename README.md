@@ -23,25 +23,59 @@ I will add more info here as the project goes on.
 
 Libraries and frameworks:
 
-- GLFW
 - OpenGL ES 3.2
-- Toml++
-- RapidXML
-- dear imgui 3.2.7 (included)
-- Flecs 1.89.9 (included)
+- GLFW v3.3.9 (included, submodule)
+- GLM v0.9.9.8 (header-only)
 - OpenAL v1.23.1
 - OGG v1.3.5
 - Vorbis v1.3.7
+- Toml++ 3.4.0 (header-only, included)
+- RapidXML 1.16 (header-only, included)
+- dear imgui 3.2.7 (included)
+- Flecs 1.89.9 (included)
 
 Some tools I generally use:
 
-- GCC (G++) with C++20 support
+- GCC with C11, C99 and C++20 support
 - GNU Make
+- CMake 3.27 or above
 - Tiled 1.10.2 or above (for level maps, tiles, collision)
 - [SpriteSheetPacker](http://amakaseev.github.io/sprite-sheet-packer/) (for organizing level chunks)
 - GIMP (for editing any image stuff)
 - Audacity (for editing and figuring out the looping points of audio files)
 
+### Ubuntu packages for building and running
+
+The OpenGL implementation depends on your video driver, so if you can install GLFW3, you'll most likely have all the dependencies to build and run OpenGL.
+
+* To build:
+
+- `libxrandr-dev`
+- `libxinerama-dev`
+- `libxcursor-dev`
+- `libxi-dev`
+- `libgles-dev`
+- `libglm-dev`
+- `libopenal-dev`
+- `libogg-dev`
+- `libvorbis-dev`
+
+* To run:
+
+- `openal-soft`
+- `libogg`
+- `libvorbis`
+- `libgles`
+
+# Building
+
+```bash
+make build && cd build
+cmake -DCMAKE_BUILD_TYPE=Debug ..
+make
+```
+
+> **WARNING:** Notice that, if you're going to run the game, you need to run from the same directory where the `resources/` directory exists, otherwise no game assets will be found. Use the `run.sh` script to facilitate this process.
 
 # License
 

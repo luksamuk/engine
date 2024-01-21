@@ -1,0 +1,65 @@
+name: Build Game
+
+on:
+  push:
+    tags:
+      - "v*"
+  pull_request:
+    branches:
+      - master
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build game
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install build tools
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential make cmake
+      - name: Install dependencies
+        run: |
+          sudo apt install -y libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgles-dev libglm-dev libopenal-dev libogg-dev libvorbis-dev
+      - name: Install zip/unzip
+        uses: montudor/action-zip@v1
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          submodules: true
+      - name: Build
+        run: |
+          mkdir build/
+          cd build
+          cmake -DCMAKE_BUILD_TYPE=Release ..
+          make VERBOSE=1
+      - name: Zip artifacts
+        run: |
+          cp build/game ./
+          zip -qq -r game.zip game resources
+          rm game
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: GameBuild
+          path: game.zip
+
+  release:
+    needs: [build]
+    if: ${{ startsWith(github.ref, 'refs/tags/') }}
+    name: Release game tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: GameBuild
+      - name: Create release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "game.zip"
+          token: ${{ secrets.GITHUB_TOKEN }}
+
