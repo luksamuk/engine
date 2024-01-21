@@ -6,7 +6,7 @@ project(engine
   DESCRIPTION
       "Sonic Engine")
 
-add_compile_definitions(-DIMGUI_IMPL_OPENGL_ES2)
+add_compile_definitions(-DIMGUI_IMPL_OPENGL_ES3)
     
 ### CMake modules ###
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
@@ -37,6 +37,10 @@ target_include_directories(imgui PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/glfw/include/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/backends/>)
+target_link_libraries(imgui
+  OpenGL::GLES3
+  glad
+  glfw)
 
 ### GLFW ###
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
