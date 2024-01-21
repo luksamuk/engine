@@ -50,7 +50,11 @@ The OpenGL implementation depends on your video driver, so if you can install GL
 
 * To build:
 
-- `libglfw3-dev`
+- `libxrandr-dev`
+- `libxinerama-dev`
+- `libxcursor-dev`
+- `libxi-dev`
+- `libgl-dev`
 - `libglm-dev`
 - `libopenal-dev`
 - `libogg-dev`
@@ -58,7 +62,6 @@ The OpenGL implementation depends on your video driver, so if you can install GL
 
 * To run:
 
-- `libglfw3`
 - `openal-soft`
 - `libogg`
 - `libvorbis`
