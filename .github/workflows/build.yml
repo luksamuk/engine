@@ -35,17 +35,13 @@ jobs:
           cd build
           cmake -DCMAKE_BUILD_TYPE=Release ..
           make VERBOSE=1
-
-      - name: Zip artifacts
-        run: |
-          cp build/game ./
-          zip -qq -r game.zip game resources
-          rm game
+          cp game ../
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: GameBuild
-          path: game.zip
-
+          name: engine-build
+          path: |
+            game
+            resources/
 
