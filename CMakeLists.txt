@@ -34,6 +34,7 @@ file(GLOB IMGUI_SRC
   ${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/backends/imgui_impl_opengl3.cpp)
 add_library(imgui ${IMGUI_SRC})
 target_include_directories(imgui PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/glfw/include/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/backends/>)
 
@@ -52,6 +53,7 @@ add_library(engine ${SRC_FILES})
 target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src/>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/glfw/include/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/tomlplusplus-3.4.0/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/rapidxml-1.16/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/flecs-3.2.7/>
@@ -59,14 +61,11 @@ target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/backends/>
   $<INSTALL_INTERFACE:include/>)
 
-# Dependencies
-#find_package(glfw3 3.3 REQUIRED)
+# Dependencies that should have their development packages installed system-wide
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(OggVorbis REQUIRED)
-
-# Game include directories
 
 add_executable(game ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
 
