@@ -19,13 +19,15 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt install -y libglfw3-dev libglm-dev libopenal-dev libogg-dev libvorbis-dev
+          sudo apt install -y libglm-dev libopenal-dev libogg-dev libvorbis-dev
 
       - name: Install zip/unzip
         uses: montudor/action-zip@v1
 
       - name: Checkout repository
         uses: actions/checkout@v3
+        with:
+          submodules: true
 
       - name: Build
         run: |

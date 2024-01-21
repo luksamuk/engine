@@ -24,7 +24,7 @@ I will add more info here as the project goes on.
 Libraries and frameworks:
 
 - OpenGL ES 3.2
-- GLFW v3.3.9
+- GLFW v3.3.9 (included, submodule)
 - GLM v0.9.9.8 (header-only)
 - OpenAL v1.23.1
 - OGG v1.3.5
