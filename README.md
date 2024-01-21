@@ -38,7 +38,7 @@ Some tools I generally use:
 
 - GCC with C11, C99 and C++20 support
 - GNU Make
-- CMake 3.20 or above
+- CMake 3.27 or above
 - Tiled 1.10.2 or above (for level maps, tiles, collision)
 - [SpriteSheetPacker](http://amakaseev.github.io/sprite-sheet-packer/) (for organizing level chunks)
 - GIMP (for editing any image stuff)
@@ -54,7 +54,7 @@ The OpenGL implementation depends on your video driver, so if you can install GL
 - `libxinerama-dev`
 - `libxcursor-dev`
 - `libxi-dev`
-- `libgl-dev`
+- `libgles-dev`
 - `libglm-dev`
 - `libopenal-dev`
 - `libogg-dev`
@@ -65,6 +65,7 @@ The OpenGL implementation depends on your video driver, so if you can install GL
 - `openal-soft`
 - `libogg`
 - `libvorbis`
+- `libgles`
 
 # Building
 

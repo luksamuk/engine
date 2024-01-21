@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.27)
 
 project(engine
   VERSION
@@ -63,7 +63,7 @@ target_include_directories(engine PUBLIC
 
 # Dependencies that should have their development packages installed system-wide
 find_package(GLM REQUIRED)
-find_package(OpenGL REQUIRED)
+find_package(OpenGL REQUIRED COMPONENTS EGL GLES2 GLES3)
 find_package(OpenAL REQUIRED)
 find_package(OggVorbis REQUIRED)
 
@@ -77,7 +77,10 @@ target_include_directories(engine PUBLIC
 target_link_libraries(game
   engine
   glfw
-  OpenGL::GL
+  OpenGL::OpenGL
+  OpenGL::EGL
+  OpenGL::GLES2
+  OpenGL::GLES3
   glad
   flecs
   imgui
