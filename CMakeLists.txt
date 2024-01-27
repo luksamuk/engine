@@ -13,6 +13,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
 
 
 ### Glad library ####
+# CHANGE
 add_library(glad ${CMAKE_CURRENT_LIST_DIR}/src/glad.c)
 target_include_directories(glad PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include/>)
@@ -48,15 +49,28 @@ set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 add_subdirectory(${CMAKE_CURRENT_LIST_DIR}/glfw)
 
-### GAME ###
+### ENGINE ###
 # Glob source files
-file(GLOB SRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
-list(REMOVE_ITEM SRC_FILES ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
-add_library(engine ${SRC_FILES})
+file(GLOB ENGINE_SRC_FILES
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/collision/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/components/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/controls/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/core/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/io/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/player/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/render/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/resources/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/scenes/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/sound/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/sprite/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/engine/tiled/*.cpp)
+
+add_library(engine ${ENGINE_SRC_FILES})
 
 target_include_directories(engine PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src/include/>
+  
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include/>
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/glfw/include/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/tomlplusplus-3.4.0/>
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/rapidxml-1.16/>
@@ -65,13 +79,19 @@ target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/imgui-1.89.9/backends/>
   $<INSTALL_INTERFACE:include/>)
 
+
+### GAME ###
 # Dependencies that should have their development packages installed system-wide
 find_package(GLM REQUIRED)
 find_package(OpenGL REQUIRED COMPONENTS GLES2 GLES3)
 find_package(OpenAL REQUIRED)
 find_package(OggVorbis REQUIRED)
 
-add_executable(game ${CMAKE_CURRENT_LIST_DIR}/src/main.cpp)
+file(GLOB GAME_SRC_FILES
+  ${CMAKE_CURRENT_LIST_DIR}/src/screens/*.cpp
+  ${CMAKE_CURRENT_LIST_DIR}/src/*.cpp)
+
+add_executable(game ${GAME_SRC_FILES})
 
 target_include_directories(engine PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include/>

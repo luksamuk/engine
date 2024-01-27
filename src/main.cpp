@@ -1,5 +1,5 @@
-#include "core.hpp"
-#include "scene.hpp"
+#include "engine/core.hpp"
+#include "engine/scene.hpp"
 
 #include "test_scene.hpp"
 #include "sprite_scene.hpp"
