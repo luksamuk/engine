@@ -8,6 +8,8 @@
 #include "engine/resources.hpp"
 #include "engine/tiled.hpp"
 
+#include "engine/sound.hpp"
+
 namespace Components
 {
     void RegisterComponents(flecs::world &ecs);
@@ -85,6 +87,17 @@ namespace Components
         bool pressJump;
     };
 
+    // Audio components
+
+    struct SoundEmitter
+    {
+        std::string             current = "";
+        Sound::AudioSourceIndex chn;
+        Resources::BGMTablePtr  table;
+
+        void play(std::string name);
+    };
+
     // Other components
 
     struct CameraInfo {
@@ -102,6 +115,7 @@ namespace Components
 
     // Functions
     void              RegisterDefaultComponents(flecs::world &ecs);
+    void              RegisterSoundComponents(flecs::world &ecs);
     DebugCircleRender MakeCircleRenderer(float radius);
     CameraBox         MakeCameraBox();
 }

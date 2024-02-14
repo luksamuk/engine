@@ -317,6 +317,14 @@ Sound::AudioSource::setElapsedTime(float seconds)
     alSourcef(source, AL_SEC_OFFSET, seconds);
 }
 
+bool
+Sound::AudioSource::isPlaying() const
+{
+    ALint state;
+    alGetSourcei(source, AL_SOURCE_STATE, &state);
+    return state == AL_PLAYING;
+}
+
 // ==================== Audio Table (Info only) ======================
 
 Resources::AudioPtr

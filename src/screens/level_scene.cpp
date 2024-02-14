@@ -67,6 +67,11 @@ LevelScene::makePlayer(const char *name, Player::Character c, flecs::entity *fol
         .set(Components::ViewportInfo { viewportSize })
         .set(Components::MakeCircleRenderer(16.0f))
         .set(Components::PlayerAnimation { animator })
+        .set(Components::SoundEmitter {
+                .current = "",
+                .chn = Sound::getChannel(),
+                .table = Resources::Manager::getBGMTable("resources/audiodata.toml")
+            })
         .add<Components::PlayerControls>();
 
     if(!follow) {
@@ -104,7 +109,8 @@ LevelScene::load() {
     Resources::Manager::loadAnimator("resources/animation/sonic1mania.toml");
     Resources::Manager::loadAnimator("resources/animation/tails.toml");
     Resources::Manager::loadAnimator("resources/animation/knuckles.toml");
-
+    Resources::Manager::loadBGMTable("resources/audiodata.toml");
+    
     // Camera
     camera = ecs.entity("Camera")
         .add<Components::Transform>()
@@ -142,7 +148,6 @@ LevelScene::load() {
     }
 
     // Level music
-    Resources::Manager::loadBGMTable("resources/audiodata.toml");
     auto bgmtable = Resources::Manager::getBGMTable("resources/audiodata.toml");
     bgm = bgmtable->load(lvldata.bgm);
     channel = Sound::getChannel();

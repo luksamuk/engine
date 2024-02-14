@@ -59,7 +59,12 @@ file       = "resources/audio/bgm/eggmanland.ogg"
 loop-start = 11.344
 loop-end   = 143.000
 
-# [0D]
+[0D]
+# Ouranos Island Remix
+file       = "resources/audio/bgm/ouranos.ogg"
+loop-start = 48.738
+loop-end   = 276.681
+
 # [0E]
 # [0F]
 # [10]

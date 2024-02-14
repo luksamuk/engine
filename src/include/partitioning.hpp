@@ -3,15 +3,15 @@
 
 #include <glm/glm.hpp>
 #include <set>
+#include <vector>
+#include <flecs.h>
 
-#include "game_object.hpp"
-
-typedef std::set<ObjPtr> ObjSet;
+typedef std::set<flecs::entity> EntitySet;
 
 class Grid
 {
 private:
-    std::vector<ObjSet> cells;
+    std::vector<EntitySet> cells;
     glm::ivec2 size;
     glm::vec2  cellsize;
 
@@ -23,8 +23,8 @@ private:
 public:
     Grid(glm::vec2 playarea, glm::vec2 cellsize);
 
-    void insert(ObjPtr obj);
-    void move(ObjPtr obj);
+    void insert(flecs::entity obj);
+    void move(flecs::entity obj);
     void testAll(CollisionTestFn fn);
 };
 

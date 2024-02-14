@@ -549,14 +549,16 @@ namespace Components
                    Sensors,
                    Player::State,
                    const PlayerControls,
-                   const Player::Constants>("GroundYMovement")
+                   const Player::Constants,
+                   SoundEmitter>("GroundYMovement")
             .iter([](flecs::iter &it,
                      Transform *t,
                      Speed *spd,
                      Sensors *sensors,
                      Player::State *state,
                      const PlayerControls *ctrl,
-                     const Player::Constants *constants) {
+                     const Player::Constants *constants,
+                     SoundEmitter *emitter) {
                 for(auto i : it) {
                     if(!sensors[i].ground) continue;
 
@@ -576,19 +578,23 @@ namespace Components
 
                         // reset angle before airborne state
                         t[i].angle = 0.0f; // TODO: remove when introducing air rotation
+
+                        // Play sound
+                        emitter[i].play("18");
                     }
                 }
             });
 
         // Apply animation.
         ecs.system<//const ViewportInfo,
-                   const Transform,
-                   const GroundSpeed,
-                   const Speed,
-                   const Player::State,
-                   const PlayerControls,
-                   const CameraInfo,
-                   PlayerAnimation>("AnimatePlayer")
+            const Transform,
+            const GroundSpeed,
+            const Speed,
+            const Player::State,
+            const PlayerControls,
+            const CameraInfo,
+            PlayerAnimation,
+            SoundEmitter>("AnimatePlayer")
             .kind(flecs::PostUpdate)
             .iter([](flecs::iter &it,
                      //const ViewportInfo *vwp,
@@ -598,7 +604,8 @@ namespace Components
                      const Player::State *state,
                      const PlayerControls *ctrl,
                      const CameraInfo *caminfo,
-                     PlayerAnimation *anim) {
+                     PlayerAnimation *anim,
+                     SoundEmitter *emitter) {
                 for(auto i : it) {
                     float delta = it.delta_time() * Player::BaseFrameRate;
                     float abs_gsp = glm::abs(gsp[i].gsp);
@@ -622,9 +629,10 @@ namespace Components
                                 anim[i].animator->setAnimationByName("Idle");
                         } else {
                             if(state[i].braking
-                               && (glm::sign(gsp[i].gsp) == state[i].direction))
+                               && (glm::sign(gsp[i].gsp) == state[i].direction)) {
                                 anim[i].animator->setAnimationByName("Skidding");
-                            else if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
+                                emitter[i].play("16");
+                            } else if(abs_gsp > 0.0f && abs_gsp < 6.0f) {
                                 anim[i].animator->setAnimationByName("Walking");
                             } else if(abs_gsp >= 6.0f && abs_gsp <= 8.0f) {
                                 anim[i].animator->setAnimationByName("Running");

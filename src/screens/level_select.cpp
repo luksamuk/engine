@@ -9,10 +9,8 @@
 #include <glm/ext.hpp>
 
 #include "level_scene.hpp"
-#include "sprite_scene.hpp"
 #include "test_scene.hpp"
 #include "movie_scene.hpp"
-#include "partition_test.hpp"
 #include "title_screen.hpp"
 #include "entity_test.hpp"
 #include "sound_test.hpp"
@@ -81,7 +79,6 @@ const std::vector<SceneEntry> extra_scenes = {
     {"Sound Test",     [](int) { return new SoundTest();       }},
     {"Rendering Test", [](int) { return new TestScene();       }},
     {"Animation Test", [](int) { return new MovieScene();      }},
-    {"Collision Test", [](int) { return new PartitionTest();   }},
     {"Entity Test",    [](int) { return new EntityTest();      }},
     {"Title Screen",   [](int) { return new TitleScreen();     }},
     {"Exit",           [](int) {
@@ -216,7 +213,6 @@ void LevelSelect::update(double dt)
         if(selection < numlvls) {
             auto lvldata = fromSelection();
             if(lvldata.first.maps_path.size() > 0) {
-                //Scenes::Manager::add(new SpriteScene(lvldata.first, lvldata.second));
                 Scenes::Manager::add(new LevelScene(lvldata.first, lvldata.second, char_opts[player_selection]));
                 setShouldUnload(true);
             }

@@ -2,7 +2,6 @@
 #include "engine/scene.hpp"
 
 #include "test_scene.hpp"
-#include "sprite_scene.hpp"
 #include "title_screen.hpp"
 
 int

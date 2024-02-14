@@ -43,6 +43,7 @@ namespace Sound
 
         float getElapsedTime();
         void  setElapsedTime(float);
+        bool  isPlaying() const;
     };
 
     typedef std::shared_ptr<AudioSource> AudioSourcePtr;

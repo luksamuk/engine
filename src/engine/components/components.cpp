@@ -7,5 +7,6 @@ namespace Components
     {
         RegisterBaseComponents(ecs);
         RegisterDefaultComponents(ecs);
+        RegisterSoundComponents(ecs);
     }
 }

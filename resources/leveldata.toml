@@ -37,7 +37,7 @@ maps  = [
 
 [[levels]]
 name  = "Hidden Palace"
-bgm   = "0A"
+bgm   = "0D"
 atlas = "resources/levels/R4/chunks.png"
 tiles = "resources/levels/R4/tiles.tsx"
 maps  = [
