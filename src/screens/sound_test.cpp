@@ -95,6 +95,15 @@ SoundTest::draw()
     mvp = glm::translate(vp, txtPos);
     font->draw(mvp, "Sound Test");
 
+    textsize = font->measure(table->entries[txt].name.c_str());
+    txtPos   = glm::vec3((viewportSize / 2.0f)
+		         - (textsize / 2.0f)
+			 - (font->getGlyphsize() / 2.0f),
+			 0.0f);
+    txtPos.y += (viewportSize.y / 16.0f) * 2.0f;
+    mvp = glm::translate(vp, txtPos);
+    font->draw(mvp, table->entries[txt].name.c_str());
+
     textsize = font->measure(txt.c_str());
     txtPos = glm::vec3((viewportSize / 2.0f)
                        - (textsize / 2.0f)

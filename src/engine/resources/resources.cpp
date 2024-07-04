@@ -98,6 +98,7 @@ namespace Resources
                 {
                     Sound::BGMTableEntry entry;
                     auto tb = *val.as_table();
+		    entry.name = tb["name"].value_or("");
                     entry.file = tb["file"].value_or("");
                     entry.loopend = tb["loop-end"].value_or(-1.0f);
                     entry.loopstart = tb["loop-start"].value_or(-1.0f);

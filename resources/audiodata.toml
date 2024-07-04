@@ -1,66 +1,79 @@
 # Sounds 01..15 relate to level bgm
 
 [01]
+name       = "Title Screen"
 file       = "resources/audio/bgm/titlescreen.ogg"
 
 [02]
+name       = "You're My Hero"
 file       = "resources/audio/bgm/youre_my_hero.ogg"
 loop-start = 6.937
 loop-end   = 96.111
 
 [03]
+name       = "Transparent Highway"
 file       = "resources/audio/bgm/transparenthighway.ogg"
 loop-start = 45.459
 loop-end   = 124.528
 
 [04]
+name       = "Enjoy This World"
 file       = "resources/audio/bgm/enjoythisworld.ogg"
 loop-start = 0.049
 loop-end   = 111.671
 
 [05]
+name       = "Amazing Aquarium"
 file       = "resources/audio/bgm/amazingaquarium.ogg"
 loop-start = 11.009
 loop-end   = 87.848
 
 [06]
+name       = "Cyber City"
 file       = "resources/audio/bgm/cybercity.ogg"
 loop-start = 6.438
 loop-end   = 67.231
 
 [07]
+name       = "Walkin'"
 file       = "resources/audio/bgm/walkin.ogg"
 loop-start = 1.080
 loop-end   = 17.233
 
 [08]
+name       = "Chaotic Canyon"
 file       = "resources/audio/bgm/chaoticcanyon.ogg"
 loop-start = 8.799
 loop-end   = 78.616
 
 [09]
+name       = "Hyper Hyper"
 file       = "resources/audio/bgm/hyperhyper.ogg"
 loop-start = 11.351
 loop-end   = 41.420
 
 [0A]
+name       = "Hidden Palace"
 file       = "resources/audio/bgm/hiddenpalace.ogg"
 loop-start = 0.612
 loop-end   = 52.679
 
 [0B]
+name       = "Speed Slider"
 file       = "resources/audio/bgm/speedslider.ogg"
 loop-start = 0.075
 loop-end   = 72.077
 
 [0C]
 # Eggmanland remix by DRocca
+name       = "Eggmanland"
 file       = "resources/audio/bgm/eggmanland.ogg"
 loop-start = 11.344
 loop-end   = 143.000
 
 [0D]
 # Ouranos Island Remix
+name       = "Ouranos Island"
 file       = "resources/audio/bgm/ouranos.ogg"
 loop-start = 48.738
 loop-end   = 276.681
@@ -75,65 +88,86 @@ loop-end   = 276.681
 # [15]
 
 [16]
+name = "Skidding"
 file = "resources/audio/sfx/skidding.ogg"
 
 [17]
+name = "Rolling"
 file = "resources/audio/sfx/rolling.ogg"
 
 [18]
+name = "Jump"
 file = "resources/audio/sfx/jump.ogg"
 
 [19]
+name = "SpinDash"
 file = "resources/audio/sfx/spindash.ogg"
 
 [1A]
+name = "Release"
 file = "resources/audio/sfx/release.ogg"
 
 [1B]
+name = "Splash"
 file = "resources/audio/sfx/splash.ogg"
 
 [1C]
+name = "Normal Shield"
 file = "resources/audio/sfx/normalshield.ogg"
 
 [1D]
+name = "Bubble Shield"
 file = "resources/audio/sfx/bubbleshield.ogg"
 
 [1E]
+name = "Water Count"
 file = "resources/audio/sfx/watercount.ogg"
 
 [1F]
+name = "Bubble Get"
 file = "resources/audio/sfx/bubbleget.ogg"
 
 [20]
+name = "Drowning"
 file = "resources/audio/sfx/drown.ogg"
 
 [21]
+name = "Ring Loss"
 file = "resources/audio/sfx/ringloss.ogg"
 
 [22]
+name = "Ring"
 file = "resources/audio/sfx/ring.ogg"
 
 [23]
+name = "Mini Explosion"
 file = "resources/audio/sfx/miniexplosion.ogg"
 
 [24]
+name = "Transform"
 file = "resources/audio/sfx/transform.ogg"
 
 [25]
+name = "Death"
 file = "resources/audio/sfx/death.ogg"
 
 [26]
+name = "Checkpoint"
 file = "resources/audio/sfx/checkpoint.ogg"
 
 [27]
+name = "Wrong Way"
 file = "resources/audio/sfx/wrongway.ogg"
 
 [28]
+name = "Spring"
 file = "resources/audio/sfx/spring.ogg"
 
 [29]
+name = "Ka-ching!"
 file = "resources/audio/sfx/kaching.ogg"
 
 [2A]
+name = "Warp"
 file = "resources/audio/sfx/warp.ogg"
 

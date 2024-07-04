@@ -51,6 +51,7 @@ namespace Sound
 
     struct BGMTableEntry
     {
+	std::string name;
         std::string file;
         std::optional<float> loopstart;
         std::optional<float> loopend;

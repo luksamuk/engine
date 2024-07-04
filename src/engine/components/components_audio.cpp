@@ -14,6 +14,7 @@ namespace Components
         
         auto audio = table->load(name);
         if(audio != nullptr) {
+            Sound::channelOf(chn)->stop();
             Sound::channelOf(chn)->play(audio);
         }
     }
