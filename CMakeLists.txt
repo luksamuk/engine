@@ -6,7 +6,10 @@ project(engine
   DESCRIPTION
       "Sonic Engine")
 
-add_compile_definitions(-DIMGUI_IMPL_OPENGL_ES3)
+add_compile_definitions(
+  -DIMGUI_IMPL_OPENGL_ES3
+  -DGLM_ENABLE_EXPERIMENTAL
+)
     
 ### CMake modules ###
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake")
